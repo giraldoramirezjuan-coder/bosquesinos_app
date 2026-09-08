@@ -38,9 +38,9 @@ const Plantula = mongoose.model('Plantula', plantulaSchema);
 // --- 3. AUTO-CREACIÓN DE TU USUARIO ---
 async function crearUsuarioAdmin() {
   try {
-    const usuarioExiste = await User.findOne({ email: 'bosquesinojuan' });
+    const usuarioExiste = await User.findOne({ email: 'bosquesinos' });
     if (!usuarioExiste) {
-      const nuevoUsuario = new User({ email: 'bosquesinojuan', password: 'juancho123', rol: 'Admin' });
+      const nuevoUsuario = new User({ email: 'bosquesinojuan', password: 'bosquesinas', rol: 'Admin' });
       await nuevoUsuario.save();
       console.log('✅ Usuario administrador creado: bosquesinojuan');
     } else {
