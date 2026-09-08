@@ -110,7 +110,26 @@
                 <option value="Lista">🌳 Lista para traslado</option>
             </select>
             <button type="submit" class="btn-principal">Guardar en Catálogo</button>
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
+<h4 style="color: #2a4d31; margin-bottom: 10px;">👤 Registrar Nuevo Asociado</h4>
+<form id="formAsociado">
+    <input type="text" id="nuevoEmail" placeholder="Nuevo usuario" required>
+    <input type="password" id="nuevoPassword" placeholder="Contraseña temporal" required>
+    <button type="button" class="btn-principal" onclick="registrarAsociado()" style="background: #4a7c59;">Crear Cuenta de Asociado</button>
+</form>
         </form>
+    <button type="submit" class="btn-principal">Guardar en Catálogo</button>
+        </form>
+
+        <!-- FORMULARIO PARA CREAR NUEVOS ASOCIADOS -->
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
+        <h4 style="color: #2a4d31; margin-bottom: 10px;">👤 Registrar Nuevo Asociado</h4>
+        <form id="formAsociado">
+            <input type="text" id="nuevoEmail" placeholder="Nuevo usuario" required>
+            <input type="password" id="nuevoPassword" placeholder="Contraseña temporal" required>
+            <button type="button" class="btn-principal" onclick="registrarAsociado()" style="background: #4a7c59;">Crear Cuenta de Asociado</button>
+        </form>
+    </div>
     </div>
 
     <!-- MOSAICO DE INVENTARIO -->
@@ -233,6 +252,34 @@
         }
 
         cargarCatalogo();
+    // Función para enviar los datos del nuevo asociado al servidor
+        async function registrarAsociado() {
+            const email = document.getElementById('nuevoEmail').value;
+            const password = document.getElementById('nuevoPassword').value;
+
+            if (!email || !password) {
+                alert('Por favor completa ambos campos');
+                return;
+            }
+
+            try {
+                const respuesta = await fetch(`${hostUrl}/api/registrar-asociado`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const resultado = await respuesta.json();
+                
+                if (respuesta.ok) {
+                    alert(resultado.mensaje);
+                    document.getElementById('formAsociado').reset();
+                } else {
+                    alert(resultado.error || 'No se pudo registrar');
+                }
+            } catch (error) {
+                alert('Error de conexión');
+            }
+        }
     </script>
 </body>
 </html>

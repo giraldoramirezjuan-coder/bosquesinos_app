@@ -38,12 +38,11 @@ const Plantula = mongoose.model('Plantula', plantulaSchema);
 // --- 3. AUTO-CREACIÓN DE TU USUARIO ---
 async function crearUsuarioAdmin() {
   try {
-    const usuarioExiste = await User.findOne({ email: 'bosquesino' });
-    
+    const usuarioExiste = await User.findOne({ email: 'bosquesinojuan' });
     if (!usuarioExiste) {
-      const nuevoUsuario = new User({ email: 'bosquesino', password: 'bosquesinas', rol: 'Admin' });
+      const nuevoUsuario = new User({ email: 'bosquesinojuan', password: 'juancho123', rol: 'Admin' });
       await nuevoUsuario.save();
-      console.log('✅ Usuario administrador creado: bosquesino');
+      console.log('✅ Usuario administrador creado: bosquesinojuan');
     } else {
       console.log('✅ El usuario administrador ya está listo en la base de datos.');
     }
@@ -51,6 +50,18 @@ async function crearUsuarioAdmin() {
     console.log('Error al verificar el usuario:', error);
   }
 }
+
+// Ruta para registrar nuevos asociados (Solo accesible si ya eres Admin)
+app.post('/api/registrar-asociado', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const nuevoAsociado = new User({ email, password, rol: 'Asociado' });
+        await nuevoAsociado.save();
+        res.status(201).json({ mensaje: '¡Nuevo asociado registrado con éxito!' });
+    } catch (error) {
+        res.status(400).json({ error: 'El usuario ya existe o faltan datos.' });
+    }
+});
 
 // --- 4. RUTAS DE AUTENTICACIÓN Y CATÁLOGO ---
 app.post('/api/login', async (req, res) => {
@@ -74,6 +85,18 @@ app.post('/api/plantulas', async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: 'Error al registrar' });
   }
+});
+
+// --- NUEVA RUTA PARA REGISTRAR ASOCIADOS ---
+app.post('/api/registrar-asociado', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const nuevoAsociado = new User({ email, password, rol: 'Asociado' });
+        await nuevoAsociado.save();
+        res.status(201).json({ mensaje: '¡Nuevo asociado registrado con éxito!' });
+    } catch (error) {
+        res.status(400).json({ error: 'El usuario ya existe o faltan datos.' });
+    }
 });
 
 app.get('/api/plantulas', async (req, res) => {
