@@ -76,7 +76,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE LOGIN (Reemplaza los prompts feos) -->
+    <!-- MODAL DE LOGIN -->
     <div id="modalLogin" class="modal oculto">
         <div class="modal-contenido" style="max-width: 400px; text-align: center;">
             <span class="cerrar-modal" onclick="cerrarModalLogin()">&times;</span>
@@ -111,13 +111,12 @@
     <script>
         const hostUrl = '';
         let modoAdminActivo = false;
-        window.inventarioGlobal = []; // Guardamos el inventario para poder editarlo
+        window.inventarioGlobal = [];
 
-      async function cargarCatalogo() {
+        async function cargarCatalogo() {
             const lista = document.getElementById('listaPlantulas');
             
             try {
-                // Mensaje temporal mientras carga
                 lista.innerHTML = '<p style="text-align:center; width:100%; color:#555;">Cargando inventario (si el servidor estaba dormido, puede tardar 30 segundos)...</p>';
                 
                 const respuesta = await fetch(`${hostUrl}/api/plantulas`);
@@ -129,7 +128,7 @@
                 const plantulas = await respuesta.json();
                 window.inventarioGlobal = plantulas; 
                 
-                lista.innerHTML = ''; // Limpiamos el mensaje de carga
+                lista.innerHTML = ''; 
                 
                 if (plantulas.length === 0) {
                     lista.innerHTML = '<p style="text-align:center; width:100%; color:#555;">No hay plántulas en el inventario aún.</p>';
@@ -142,7 +141,6 @@
                 let totalGeneral = 0;
 
                 plantulas.forEach(pl => {
-                    // Asegurarnos de que la cantidad sea un número
                     const cantidadNum = parseInt(pl.cantidad) || 0;
 
                     if (pl.estado === 'Germinación') totalGerminacion += cantidadNum;
@@ -150,7 +148,6 @@
                     if (pl.estado === 'Lista') totalListas += cantidadNum;
                     totalGeneral += cantidadNum;
 
-                    // Escapar comillas en el nombre por si las dudas
                     const nombreSeguro = pl.especie ? pl.especie.replace(/'/g, "\\'") : 'Planta';
 
                     const botonesAdmin = modoAdminActivo 
@@ -189,47 +186,7 @@
 
             } catch (error) {
                 console.error('Error detallado:', error);
-                lista.innerHTML = `<p style="text-align:center; width:100%; color:red;">Hubo un error cargando los datos: ${error.message}. <br>Presiona F12 para ver la consola.</p>`;
-            }
-        }
-
-                    // Agregamos los dos botones bonitos cuando es Admin
-                    const botonesAdmin = modoAdminActivo 
-                        ? `<div style="display:flex; gap:10px; margin-top:10px;">
-                               <button class="btn-editar" style="margin-top:0;" onclick="abrirModal('${pl._id}')">✏️ Editar</button>
-                               <button class="btn-retirar" style="margin-top:0;" onclick="retirarPlantula('${pl._id}', '${pl.especie}')">📦 Retirar</button>
-                           </div>` 
-                        : '';
-                    
-                    const imagenMostrada = pl.imagenUrl ? pl.imagenUrl : 'https://via.placeholder.com/300x200/d4e5d7/386641?text=Sin+Foto';
-                    const nomCientifico = pl.nombreCientifico ? `<i>${pl.nombreCientifico}</i>` : '';
-                    const descrip = pl.caracteristicas ? `<p>${pl.caracteristicas}</p>` : '';
-
-                    const item = document.createElement('li');
-                    item.className = 'item-planta';
-                    item.innerHTML = `
-                        <img src="${imagenMostrada}" alt="${pl.especie}" class="img-arbol" onerror="this.src='https://via.placeholder.com/300x200/d4e5d7/386641?text=Error+de+Foto'">
-                        <div class="info-arbol">
-                            <h3>${pl.especie}</h3>
-                            ${nomCientifico}
-                            ${descrip}
-                            <div class="estadisticas">
-                                <span style="font-size: 13px; font-weight: 600; color: #386641;">📦 ${pl.cantidad} uds.</span>
-                                <span class="estado-tag">${pl.estado}</span>
-                            </div>
-                            ${botonesAdmin}
-                        </div>
-                    `;
-                    lista.appendChild(item);
-                });
-
-                document.getElementById('cant-germinacion').innerText = totalGerminacion;
-                document.getElementById('cant-vivero').innerText = totalVivero;
-                document.getElementById('cant-listas').innerText = totalListas;
-                document.getElementById('total-plantulas').innerText = totalGeneral;
-
-            } catch (error) {
-                console.error('Error al cargar el catálogo:', error);
+                lista.innerHTML = `<p style="text-align:center; width:100%; color:red;">Hubo un error cargando los datos: ${error.message}. <br>Revisa que tu servidor Node esté corriendo.</p>`;
             }
         }
 
