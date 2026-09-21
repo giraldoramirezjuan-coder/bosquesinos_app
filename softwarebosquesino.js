@@ -9,7 +9,7 @@ app.use(express.static(__dirname));
 
 // --- 1. CONEXIÓN A BASE DE DATOS ---
 const uri = 'mongodb+srv://erbmondt_db_user:wisLulWsZAX3XrRy@cluster0.nruxsel.mongodb.net/?appName=Cluster0';
-
+  
 mongoose.connect(uri)
   .then(() => {
     console.log('¡Conexión a MongoDB Atlas exitosa!');
@@ -129,6 +129,21 @@ app.post('/api/plantulas/retirar', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: 'Error al procesar salida' });
+  }
+});
+
+// --- RUTA PARA EDITAR UNA PLÁNTULA ---
+app.put('/api/plantulas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const datosActualizados = req.body;
+    
+    const plantula = await Plantula.findByIdAndUpdate(id, datosActualizados, { new: true });
+    
+    if (!plantula) return res.status(404).json({ error: 'Plántula no encontrada' });
+    res.json({ mensaje: 'Inventario actualizado correctamente', plantula });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar la plántula' });
   }
 });
 

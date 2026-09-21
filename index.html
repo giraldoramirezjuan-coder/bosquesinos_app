@@ -55,6 +55,53 @@
         </form>
     </div>
 
+<!-- MODAL DE EDICIÓN (Oculto por defecto) -->
+    <div id="modalEditar" class="modal oculto">
+        <div class="modal-contenido">
+            <span class="cerrar-modal" onclick="cerrarModal()">&times;</span>
+            <h3 style="color: #2a4d31; margin-top: 0;">✏️ Editar Inventario</h3>
+            <form id="formEditar">
+                <input type="hidden" id="edit-id">
+                <input type="text" id="edit-especie" placeholder="Nombre común" required>
+                <input type="text" id="edit-nombreCientifico" placeholder="Nombre científico (Opcional)">
+                <input type="url" id="edit-imagenUrl" placeholder="Enlace de la foto (URL)">
+                <textarea id="edit-caracteristicas" placeholder="Características..."></textarea>
+                <label style="font-size: 12px; color: #555;">Cantidad Total Actual (Suma o resta aquí):</label>
+                <input type="number" id="edit-cantidad" placeholder="Cantidad de unidades" required>
+                <select id="edit-estado">
+                    <option value="Germinación">🌱 Germinación</option>
+                    <option value="Vivero">🌿 Vivero</option>
+                    <option value="Lista">🌳 Lista para traslado</option>
+                </select>
+                <button type="submit" class="btn-principal" style="background: #e09f3e;">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+<!-- MODAL DE LOGIN (Reemplaza los prompts feos) -->
+    <div id="modalLogin" class="modal oculto">
+        <div class="modal-contenido" style="max-width: 400px; text-align: center;">
+            <span class="cerrar-modal" onclick="cerrarModalLogin()">&times;</span>
+            <h3 style="color: #2a4d31; margin-top: 0;">🔐 Acceso de Asociado</h3>
+            <p style="font-size: 13px; color: #555; margin-bottom: 20px;">Ingresa tus credenciales para administrar el inventario.</p>
+            <input type="email" id="login-email" placeholder="Correo electrónico" required>
+            <input type="password" id="login-password" placeholder="Contraseña" required>
+            <button class="btn-principal" onclick="procesarLogin()">Ingresar</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE RETIRO RÁPIDO (Reemplaza el cuadro de la imagen) -->
+    <div id="modalRetirar" class="modal oculto">
+        <div class="modal-contenido" style="max-width: 400px; text-align: center;">
+            <span class="cerrar-modal" onclick="cerrarModalRetirar()">&times;</span>
+            <h3 style="color: #2a4d31; margin-top: 0;">📦 Retirar Unidades</h3>
+            <p id="texto-retiro" style="font-size: 14px; color: #4a7c59; margin-bottom: 20px;">¿Cuántas unidades deseas retirar?</p>
+            <input type="hidden" id="retirar-id">
+            <input type="number" id="retirar-cantidad" placeholder="Cantidad a retirar" min="1" required>
+            <button class="btn-retirar" style="width: 100%; font-size: 16px; padding: 10px;" onclick="procesarRetiro()">Confirmar Retiro</button>
+        </div>
+    </div>
+
     <!-- MOSAICO DE INVENTARIO -->
     <ul id="listaPlantulas"></ul>
 
@@ -86,8 +133,10 @@
                     if (pl.estado === 'Lista') totalListas += pl.cantidad;
                     totalGeneral += pl.cantidad;
 
-                    const botonRetirar = modoAdminActivo 
-                        ? `<button class="btn-retirar" onclick="retirarPlantula('${pl._id}')">Retirar unidades</button>` 
+                 window.inventarioGlobal = plantulas;
+
+                    const botonEditar = modoAdminActivo 
+                        ? `<button class="btn-editar" onclick="abrirModal('${pl._id}')">✏️ Editar / Ajustar</button>` 
                         : '';
                     
                     const imagenMostrada = pl.imagenUrl ? pl.imagenUrl : 'https://via.placeholder.com/300x200/d4e5d7/386641?text=Sin+Foto';
@@ -106,7 +155,7 @@
                                 <span style="font-size: 13px; font-weight: 600; color: #386641;">📦 ${pl.cantidad} uds.</span>
                                 <span class="estado-tag">${pl.estado}</span>
                             </div>
-                            ${botonRetirar}
+                            ${botonEditar}
                         </div>
                     `;
                     lista.appendChild(item);
@@ -123,14 +172,54 @@
             }
         }
 
-        async function toggleAdmin() {
+        function toggleAdmin() {
             if (modoAdminActivo) {
+                // Si ya está activo, cerramos sesión
                 modoAdminActivo = false;
                 document.getElementById('panelAdmin').classList.add('oculto');
                 document.getElementById('btnModoAdmin').innerText = '⚙️ Acceso Asociados';
                 cargarCatalogo();
+            } else {
+                // Si no está activo, abrimos la ventana bonita de login
+                document.getElementById('modalLogin').classList.remove('oculto');
+            }
+        }
+
+        function cerrarModalLogin() {
+            document.getElementById('modalLogin').classList.add('oculto');
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+        }
+
+        async function procesarLogin() {
+            const usuario = document.getElementById('login-email').value;
+            const codigo = document.getElementById('login-password').value;
+
+            if (!usuario || !codigo) {
+                alert("Por favor llena ambos campos");
                 return;
             }
+
+            try {
+                const res = await fetch(`${hostUrl}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: usuario, password: codigo })
+                });
+                
+                if (res.ok) {
+                    modoAdminActivo = true;
+                    cerrarModalLogin();
+                    document.getElementById('panelAdmin').classList.remove('oculto');
+                    document.getElementById('btnModoAdmin').innerText = '❌ Cerrar Sesión de Asociado';
+                    cargarCatalogo(); 
+                } else {
+                    alert('Acceso denegado. Credenciales incorrectas.');
+                }
+            } catch (err) {
+                alert('Sin conexión con el servidor.');
+            }
+        }
 
             const usuario = prompt('Ingresa tu nombre de asociado (email):');
             if (!usuario) return;
@@ -180,17 +269,56 @@
             }
         });
 
-        async function retirarPlantula(id) {
-            const cantidadRetirar = prompt('¿Cuántas unidades deseas retirar?');
-            if (!cantidadRetirar || isNaN(cantidadRetirar) || cantidadRetirar <= 0) return;
+       // --- LÓGICA DE EDICIÓN ---
+        function abrirModal(id) {
+            // Buscamos la plántula exacta en la lista que ya descargamos
+            const pl = window.inventarioGlobal.find(item => item._id === id);
+            if (!pl) return;
 
-            await fetch(`${hostUrl}/api/plantulas/retirar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, cantidadRetirar })
-            });
-            cargarCatalogo(); 
+            // Llenamos el formulario con los datos actuales
+            document.getElementById('edit-id').value = pl._id;
+            document.getElementById('edit-especie').value = pl.especie;
+            document.getElementById('edit-nombreCientifico').value = pl.nombreCientifico || '';
+            document.getElementById('edit-imagenUrl').value = pl.imagenUrl || '';
+            document.getElementById('edit-caracteristicas').value = pl.caracteristicas || '';
+            document.getElementById('edit-cantidad').value = pl.cantidad;
+            document.getElementById('edit-estado').value = pl.estado;
+
+            // Mostramos la ventana
+            document.getElementById('modalEditar').classList.remove('oculto');
         }
+
+        function cerrarModal() {
+            document.getElementById('modalEditar').classList.add('oculto');
+        }
+
+        // Enviar la actualización al servidor
+        document.getElementById('formEditar').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            
+            const datosActualizados = {
+                especie: document.getElementById('edit-especie').value,
+                nombreCientifico: document.getElementById('edit-nombreCientifico').value,
+                imagenUrl: document.getElementById('edit-imagenUrl').value,
+                caracteristicas: document.getElementById('edit-caracteristicas').value,
+                cantidad: parseInt(document.getElementById('edit-cantidad').value),
+                estado: document.getElementById('edit-estado').value
+            };
+
+            const respuesta = await fetch(`${hostUrl}/api/plantulas/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datosActualizados)
+            });
+            
+            if (respuesta.ok) {
+                cerrarModal();
+                cargarCatalogo(); // Recargamos para ver los cambios de inmediato
+            } else {
+                alert("Error al actualizar la plántula");
+            }
+        });
 
         // Cargar las plántulas apenas abre la página
         cargarCatalogo();
