@@ -16,8 +16,6 @@
 
     <!-- PANEL ADMINISTRADOR -->
     <div id="panelAdmin" class="tarjeta-admin oculto">
-        
-        <!-- RESUMEN DE INVENTARIO -->
         <h3 style="color: #2a4d31; margin-top: 0; text-align: center;">📊 Resumen de Inventario</h3>
         <div class="inventory-stats">
             <div class="stat">
@@ -55,7 +53,7 @@
         </form>
     </div>
 
-<!-- MODAL DE EDICIÓN (Oculto por defecto) -->
+    <!-- MODAL DE EDICIÓN -->
     <div id="modalEditar" class="modal oculto">
         <div class="modal-contenido">
             <span class="cerrar-modal" onclick="cerrarModal()">&times;</span>
@@ -66,7 +64,7 @@
                 <input type="text" id="edit-nombreCientifico" placeholder="Nombre científico (Opcional)">
                 <input type="url" id="edit-imagenUrl" placeholder="Enlace de la foto (URL)">
                 <textarea id="edit-caracteristicas" placeholder="Características..."></textarea>
-                <label style="font-size: 12px; color: #555;">Cantidad Total Actual (Suma o resta aquí):</label>
+                <label style="font-size: 12px; color: #555;">Cantidad Total Actual:</label>
                 <input type="number" id="edit-cantidad" placeholder="Cantidad de unidades" required>
                 <select id="edit-estado">
                     <option value="Germinación">🌱 Germinación</option>
@@ -78,19 +76,19 @@
         </div>
     </div>
 
-<!-- MODAL DE LOGIN (Reemplaza los prompts feos) -->
+    <!-- MODAL DE LOGIN (Reemplaza los prompts feos) -->
     <div id="modalLogin" class="modal oculto">
         <div class="modal-contenido" style="max-width: 400px; text-align: center;">
             <span class="cerrar-modal" onclick="cerrarModalLogin()">&times;</span>
             <h3 style="color: #2a4d31; margin-top: 0;">🔐 Acceso de Asociado</h3>
             <p style="font-size: 13px; color: #555; margin-bottom: 20px;">Ingresa tus credenciales para administrar el inventario.</p>
-            <input type="email" id="login-email" placeholder="Correo electrónico" required>
+            <input type="text" id="login-email" placeholder="Usuario (Ej. bosquesinojuan)" required>
             <input type="password" id="login-password" placeholder="Contraseña" required>
             <button class="btn-principal" onclick="procesarLogin()">Ingresar</button>
         </div>
     </div>
 
-    <!-- MODAL DE RETIRO RÁPIDO (Reemplaza el cuadro de la imagen) -->
+    <!-- MODAL DE RETIRO RÁPIDO -->
     <div id="modalRetirar" class="modal oculto">
         <div class="modal-contenido" style="max-width: 400px; text-align: center;">
             <span class="cerrar-modal" onclick="cerrarModalRetirar()">&times;</span>
@@ -113,30 +111,94 @@
     <script>
         const hostUrl = '';
         let modoAdminActivo = false;
+        window.inventarioGlobal = []; // Guardamos el inventario para poder editarlo
 
-        async function cargarCatalogo() {
+      async function cargarCatalogo() {
+            const lista = document.getElementById('listaPlantulas');
+            
             try {
-                const respuesta = await fetch(`${hostUrl}/api/plantulas`);
-                const plantulas = await respuesta.json();
-                const lista = document.getElementById('listaPlantulas');
-                lista.innerHTML = ''; 
+                // Mensaje temporal mientras carga
+                lista.innerHTML = '<p style="text-align:center; width:100%; color:#555;">Cargando inventario (si el servidor estaba dormido, puede tardar 30 segundos)...</p>';
                 
+                const respuesta = await fetch(`${hostUrl}/api/plantulas`);
+                
+                if (!respuesta.ok) {
+                    throw new Error("El servidor respondió con error: " + respuesta.status);
+                }
+
+                const plantulas = await respuesta.json();
+                window.inventarioGlobal = plantulas; 
+                
+                lista.innerHTML = ''; // Limpiamos el mensaje de carga
+                
+                if (plantulas.length === 0) {
+                    lista.innerHTML = '<p style="text-align:center; width:100%; color:#555;">No hay plántulas en el inventario aún.</p>';
+                    return;
+                }
+
                 let totalGerminacion = 0;
                 let totalVivero = 0;
                 let totalListas = 0;
                 let totalGeneral = 0;
 
                 plantulas.forEach(pl => {
-                    // Calcular estadísticas según el estado (Germinación, Vivero, Lista)
-                    if (pl.estado === 'Germinación') totalGerminacion += pl.cantidad;
-                    if (pl.estado === 'Vivero') totalVivero += pl.cantidad;
-                    if (pl.estado === 'Lista') totalListas += pl.cantidad;
-                    totalGeneral += pl.cantidad;
+                    // Asegurarnos de que la cantidad sea un número
+                    const cantidadNum = parseInt(pl.cantidad) || 0;
 
-                 window.inventarioGlobal = plantulas;
+                    if (pl.estado === 'Germinación') totalGerminacion += cantidadNum;
+                    if (pl.estado === 'Vivero') totalVivero += cantidadNum;
+                    if (pl.estado === 'Lista') totalListas += cantidadNum;
+                    totalGeneral += cantidadNum;
 
-                    const botonEditar = modoAdminActivo 
-                        ? `<button class="btn-editar" onclick="abrirModal('${pl._id}')">✏️ Editar / Ajustar</button>` 
+                    // Escapar comillas en el nombre por si las dudas
+                    const nombreSeguro = pl.especie ? pl.especie.replace(/'/g, "\\'") : 'Planta';
+
+                    const botonesAdmin = modoAdminActivo 
+                        ? `<div style="display:flex; gap:10px; margin-top:10px;">
+                               <button class="btn-editar" style="margin-top:0;" onclick="abrirModal('${pl._id}')">✏️ Editar</button>
+                               <button class="btn-retirar" style="margin-top:0;" onclick="retirarPlantula('${pl._id}', '${nombreSeguro}')">📦 Retirar</button>
+                           </div>` 
+                        : '';
+                    
+                    const imagenMostrada = pl.imagenUrl ? pl.imagenUrl : 'https://via.placeholder.com/300x200/d4e5d7/386641?text=Sin+Foto';
+                    const nomCientifico = pl.nombreCientifico ? `<i>${pl.nombreCientifico}</i>` : '';
+                    const descrip = pl.caracteristicas ? `<p>${pl.caracteristicas}</p>` : '';
+
+                    const item = document.createElement('li');
+                    item.className = 'item-planta';
+                    item.innerHTML = `
+                        <img src="${imagenMostrada}" alt="${pl.especie}" class="img-arbol" onerror="this.src='https://via.placeholder.com/300x200/d4e5d7/386641?text=Error+de+Foto'">
+                        <div class="info-arbol">
+                            <h3>${pl.especie}</h3>
+                            ${nomCientifico}
+                            ${descrip}
+                            <div class="estadisticas">
+                                <span style="font-size: 13px; font-weight: 600; color: #386641;">📦 ${cantidadNum} uds.</span>
+                                <span class="estado-tag">${pl.estado}</span>
+                            </div>
+                            ${botonesAdmin}
+                        </div>
+                    `;
+                    lista.appendChild(item);
+                });
+
+                document.getElementById('cant-germinacion').innerText = totalGerminacion;
+                document.getElementById('cant-vivero').innerText = totalVivero;
+                document.getElementById('cant-listas').innerText = totalListas;
+                document.getElementById('total-plantulas').innerText = totalGeneral;
+
+            } catch (error) {
+                console.error('Error detallado:', error);
+                lista.innerHTML = `<p style="text-align:center; width:100%; color:red;">Hubo un error cargando los datos: ${error.message}. <br>Presiona F12 para ver la consola.</p>`;
+            }
+        }
+
+                    // Agregamos los dos botones bonitos cuando es Admin
+                    const botonesAdmin = modoAdminActivo 
+                        ? `<div style="display:flex; gap:10px; margin-top:10px;">
+                               <button class="btn-editar" style="margin-top:0;" onclick="abrirModal('${pl._id}')">✏️ Editar</button>
+                               <button class="btn-retirar" style="margin-top:0;" onclick="retirarPlantula('${pl._id}', '${pl.especie}')">📦 Retirar</button>
+                           </div>` 
                         : '';
                     
                     const imagenMostrada = pl.imagenUrl ? pl.imagenUrl : 'https://via.placeholder.com/300x200/d4e5d7/386641?text=Sin+Foto';
@@ -155,13 +217,12 @@
                                 <span style="font-size: 13px; font-weight: 600; color: #386641;">📦 ${pl.cantidad} uds.</span>
                                 <span class="estado-tag">${pl.estado}</span>
                             </div>
-                            ${botonEditar}
+                            ${botonesAdmin}
                         </div>
                     `;
                     lista.appendChild(item);
                 });
 
-                // Actualizar los textos del dashboard si el panel admin está visible
                 document.getElementById('cant-germinacion').innerText = totalGerminacion;
                 document.getElementById('cant-vivero').innerText = totalVivero;
                 document.getElementById('cant-listas').innerText = totalListas;
@@ -172,15 +233,14 @@
             }
         }
 
+        // --- FUNCIONES DE LOGIN ---
         function toggleAdmin() {
             if (modoAdminActivo) {
-                // Si ya está activo, cerramos sesión
                 modoAdminActivo = false;
                 document.getElementById('panelAdmin').classList.add('oculto');
                 document.getElementById('btnModoAdmin').innerText = '⚙️ Acceso Asociados';
                 cargarCatalogo();
             } else {
-                // Si no está activo, abrimos la ventana bonita de login
                 document.getElementById('modalLogin').classList.remove('oculto');
             }
         }
@@ -221,31 +281,7 @@
             }
         }
 
-            const usuario = prompt('Ingresa tu nombre de asociado (email):');
-            if (!usuario) return;
-            const codigo = prompt('Ingresa tu contraseña:');
-            if (!codigo) return;
-
-            try {
-                const res = await fetch(`${hostUrl}/api/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: usuario, password: codigo })
-                });
-                
-                if (res.ok) {
-                    modoAdminActivo = true;
-                    document.getElementById('panelAdmin').classList.remove('oculto');
-                    document.getElementById('btnModoAdmin').innerText = '❌ Cerrar Sesión de Asociado';
-                    cargarCatalogo(); 
-                } else {
-                    alert('Acceso denegado. Credenciales incorrectas.');
-                }
-            } catch (err) {
-                alert('Sin conexión con el servidor.');
-            }
-        }
-
+        // --- CREAR NUEVA PLÁNTULA ---
         document.getElementById('formPlantula').addEventListener('submit', async (e) => {
             e.preventDefault();
             const datos = {
@@ -269,13 +305,11 @@
             }
         });
 
-       // --- LÓGICA DE EDICIÓN ---
+        // --- LÓGICA DE EDICIÓN ---
         function abrirModal(id) {
-            // Buscamos la plántula exacta en la lista que ya descargamos
             const pl = window.inventarioGlobal.find(item => item._id === id);
             if (!pl) return;
 
-            // Llenamos el formulario con los datos actuales
             document.getElementById('edit-id').value = pl._id;
             document.getElementById('edit-especie').value = pl.especie;
             document.getElementById('edit-nombreCientifico').value = pl.nombreCientifico || '';
@@ -284,7 +318,6 @@
             document.getElementById('edit-cantidad').value = pl.cantidad;
             document.getElementById('edit-estado').value = pl.estado;
 
-            // Mostramos la ventana
             document.getElementById('modalEditar').classList.remove('oculto');
         }
 
@@ -292,7 +325,6 @@
             document.getElementById('modalEditar').classList.add('oculto');
         }
 
-        // Enviar la actualización al servidor
         document.getElementById('formEditar').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('edit-id').value;
@@ -314,13 +346,44 @@
             
             if (respuesta.ok) {
                 cerrarModal();
-                cargarCatalogo(); // Recargamos para ver los cambios de inmediato
+                cargarCatalogo(); 
             } else {
                 alert("Error al actualizar la plántula");
             }
         });
 
-        // Cargar las plántulas apenas abre la página
+        // --- LÓGICA DE RETIRAR RÁPIDO ---
+        function retirarPlantula(id, nombreEspecie) {
+            document.getElementById('retirar-id').value = id;
+            document.getElementById('texto-retiro').innerText = `¿Cuántas unidades de ${nombreEspecie} deseas retirar?`;
+            document.getElementById('modalRetirar').classList.remove('oculto');
+        }
+
+        function cerrarModalRetirar() {
+            document.getElementById('modalRetirar').classList.add('oculto');
+            document.getElementById('retirar-cantidad').value = '';
+        }
+
+        async function procesarRetiro() {
+            const id = document.getElementById('retirar-id').value;
+            const cantidadRetirar = document.getElementById('retirar-cantidad').value;
+
+            if (!cantidadRetirar || isNaN(cantidadRetirar) || cantidadRetirar <= 0) {
+                alert("Ingresa una cantidad válida");
+                return;
+            }
+
+            await fetch(`${hostUrl}/api/plantulas/retirar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, cantidadRetirar })
+            });
+            
+            cerrarModalRetirar();
+            cargarCatalogo(); 
+        }
+
+        // Cargar todo al iniciar
         cargarCatalogo();
     </script>
 </body>
