@@ -73,7 +73,7 @@ button.btn-principal {
     background: #386641; color: white; border: none; cursor: pointer; font-weight: 600;
 }
 button.btn-principal:hover { background: #2a4d31; }
-.oculto { display: none !important; }
+
 
 /* DISEÑO EN MOSAICO (GRID) */
 #listaPlantulas {
@@ -109,15 +109,24 @@ button.btn-principal:hover { background: #2a4d31; }
     background: #a3c9a8; color: #1b3315; padding: 4px 10px;
     border-radius: 20px; font-size: 11px; font-weight: bold;
 }
+
+/* Botones de acción en tarjetas */
 .btn-retirar {
     background: #bc4749; color: white; border: none; padding: 8px 12px; 
     font-size: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;
     margin-top: 10px; width: 100%;
 }
-.btn-retirar:hover {
-    background: #a33b3d;
-}
+.btn-retirar:hover { background: #a33b3d; }
 
+.btn-editar {
+    background: #e09f3e; 
+    color: white; border: none; padding: 8px 12px; 
+    font-size: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;
+    margin-top: 10px; width: 100%;
+}
+.btn-editar:hover { background: #c28732; }
+
+/* Botón inferior secreto */
 .footer-admin { text-align: center; margin-top: 40px; padding-bottom: 20px; }
 .footer-admin span { 
     color: #2a4d31; font-size: 14px; cursor: pointer; font-weight: bold; 
@@ -125,3 +134,50 @@ button.btn-principal:hover { background: #2a4d31; }
     box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
 }
 .footer-admin span:hover { background: #eef5ef; }
+
+/* --- VENTANAS FLOTANTES (MODALES) CENTRADAS Y RESALTADAS --- */
+.oculto { display: none !important; }
+
+.modal {
+    position: fixed !important; /* Mantiene la ventana siempre en tu pantalla */
+    z-index: 9999 !important; /* La pone por encima de absolutamente todo */
+    left: 0 !important; 
+    top: 0 !important; 
+    width: 100vw !important; 
+    height: 100vh !important;
+    background-color: rgba(0, 0, 0, 0.75) !important; /* Fondo negro semi-transparente oscuro */
+    backdrop-filter: blur(4px) !important; /* Efecto de desenfoque moderno */
+    display: flex; 
+    justify-content: center !important; 
+    align-items: center !important;
+}
+
+.modal.oculto {
+    display: none !important;
+}
+
+.modal-contenido {
+    background: #ffffff !important; /* Fondo blanco para que sobresalga */
+    padding: 30px !important; 
+    border-radius: 12px !important; 
+    width: 90% !important; 
+    max-width: 500px !important; 
+    position: relative !important; 
+    border-top: 8px solid #e09f3e !important; 
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6) !important; /* Sombra fuerte */
+    max-height: 85vh !important; 
+    overflow-y: auto !important; /* Scroll interno si la pantalla es muy pequeña */
+    text-align: left;
+}
+
+.cerrar-modal {
+    position: absolute !important; 
+    top: 15px !important; 
+    right: 20px !important; 
+    font-size: 28px !important; 
+    cursor: pointer !important; 
+    color: #777 !important;
+    font-weight: bold !important;
+    line-height: 1 !important;
+}
+.cerrar-modal:hover { color: #d32f2f !important; }
