@@ -4,88 +4,7 @@
     <meta charset="UTF-8">
     <title>Portal Bosquesinos</title>
     <link rel="icon" type="image/png" href="logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: linear-gradient(135deg, #e4f1e1 0%, #a3c9a8 100%); 
-            color: #1b3315; 
-            padding: 20px; 
-            min-height: 100vh;
-            margin: 0;
-        }
-        .encabezado { text-align: center; margin-bottom: 30px; }
-        .encabezado img { 
-            width: 100px; border-radius: 50%; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 3px solid white;
-        }
-        h1 { color: #2a4d31; margin-bottom: 5px; }
-        p.subtitulo { color: #4a7c59; font-size: 16px; margin-top: 0; }
-        
-        .tarjeta-admin { 
-            background: #eef5ef; padding: 25px; border-radius: 12px; 
-            box-shadow: 0 10px 25px rgba(45, 90, 39, 0.2); 
-            max-width: 600px; margin: 0 auto 30px auto; 
-            border-top: 6px solid #2a4d31;
-        }
-        
-        input, select, textarea, button { 
-            display: block; width: 100%; margin-bottom: 12px; 
-            padding: 10px; box-sizing: border-box; 
-            border: 1px solid #bcdec1; border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-        }
-        textarea { resize: vertical; min-height: 80px; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #386641; }
-        button.btn-principal { 
-            background: #386641; color: white; border: none; cursor: pointer; font-weight: 600;
-        }
-        button.btn-principal:hover { background: #2a4d31; }
-        .oculto { display: none !important; }
-
-        /* DISEÑO EN MOSAICO (GRID) */
-        #listaPlantulas {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 0; margin: 0; list-style: none;
-            max-width: 1200px; margin: 0 auto;
-        }
-        
-        .item-planta { 
-            background: white; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            display: flex; flex-direction: column;
-            transition: transform 0.2s;
-        }
-        .item-planta:hover { transform: translateY(-5px); }
-        
-        .img-arbol {
-            width: 100%; height: 200px; object-fit: cover;
-            background: #d4e5d7; 
-        }
-        .info-arbol { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
-        .info-arbol h3 { margin: 0 0 2px 0; color: #1b3315; font-size: 18px; }
-        .info-arbol i { color: #555; font-size: 13px; display: block; margin-bottom: 10px; }
-        .info-arbol p { font-size: 13px; color: #444; line-height: 1.4; margin-bottom: 15px; flex-grow: 1; }
-        
-        .estadisticas { 
-            display: flex; justify-content: space-between; align-items: center;
-            border-top: 1px solid #eee; padding-top: 10px;
-        }
-        .estado-tag {
-            background: #a3c9a8; color: #1b3315; padding: 4px 10px;
-            border-radius: 20px; font-size: 11px; font-weight: bold;
-        }
-        .btn-retirar {
-            background: #bc4749; color: white; border: none; padding: 6px 12px; 
-            font-size: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;
-            margin-top: 10px; width: 100%;
-        }
-        
-        .footer-admin { text-align: center; margin-top: 40px; padding-bottom: 20px; }
-        .footer-admin span { color: #6a9972; font-size: 12px; cursor: pointer; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -97,6 +16,29 @@
 
     <!-- PANEL ADMINISTRADOR -->
     <div id="panelAdmin" class="tarjeta-admin oculto">
+        
+        <!-- RESUMEN DE INVENTARIO -->
+        <h3 style="color: #2a4d31; margin-top: 0; text-align: center;">📊 Resumen de Inventario</h3>
+        <div class="inventory-stats">
+            <div class="stat">
+                <h4>Germinación</h4>
+                <p id="cant-germinacion">0</p>
+            </div>
+            <div class="stat">
+                <h4>Vivero</h4>
+                <p id="cant-vivero">0</p>
+            </div>
+            <div class="stat">
+                <h4>Listas</h4>
+                <p id="cant-listas">0</p>
+            </div>
+        </div>
+        <div class="total-general">
+            <strong>Total General: </strong> <span id="total-plantulas">0</span> plántulas
+        </div>
+
+        <hr style="border: 1px solid #bcdec1; margin-bottom: 20px;">
+
         <h3 style="color: #2a4d31; margin-top: 0;">⚙️ Registrar Nueva Especie</h3>
         <form id="formPlantula">
             <input type="text" id="especie" placeholder="Nombre común (Ej. Guayacán Amarillo)" required>
@@ -132,7 +74,18 @@
                 const lista = document.getElementById('listaPlantulas');
                 lista.innerHTML = ''; 
                 
+                let totalGerminacion = 0;
+                let totalVivero = 0;
+                let totalListas = 0;
+                let totalGeneral = 0;
+
                 plantulas.forEach(pl => {
+                    // Calcular estadísticas según el estado (Germinación, Vivero, Lista)
+                    if (pl.estado === 'Germinación') totalGerminacion += pl.cantidad;
+                    if (pl.estado === 'Vivero') totalVivero += pl.cantidad;
+                    if (pl.estado === 'Lista') totalListas += pl.cantidad;
+                    totalGeneral += pl.cantidad;
+
                     const botonRetirar = modoAdminActivo 
                         ? `<button class="btn-retirar" onclick="retirarPlantula('${pl._id}')">Retirar unidades</button>` 
                         : '';
@@ -158,8 +111,15 @@
                     `;
                     lista.appendChild(item);
                 });
+
+                // Actualizar los textos del dashboard si el panel admin está visible
+                document.getElementById('cant-germinacion').innerText = totalGerminacion;
+                document.getElementById('cant-vivero').innerText = totalVivero;
+                document.getElementById('cant-listas').innerText = totalListas;
+                document.getElementById('total-plantulas').innerText = totalGeneral;
+
             } catch (error) {
-                console.error('Error al cargar');
+                console.error('Error al cargar el catálogo:', error);
             }
         }
 
@@ -172,9 +132,9 @@
                 return;
             }
 
-            const usuario = prompt('Ingresa tu nombre de asociado:');
+            const usuario = prompt('Ingresa tu nombre de asociado (email):');
             if (!usuario) return;
-            const codigo = prompt('Ingresa tu código de acceso:');
+            const codigo = prompt('Ingresa tu contraseña:');
             if (!codigo) return;
 
             try {
@@ -190,10 +150,10 @@
                     document.getElementById('btnModoAdmin').innerText = '❌ Cerrar Sesión de Asociado';
                     cargarCatalogo(); 
                 } else {
-                    alert('Acceso denegado.');
+                    alert('Acceso denegado. Credenciales incorrectas.');
                 }
             } catch (err) {
-                alert('Sin conexión.');
+                alert('Sin conexión con el servidor.');
             }
         }
 
@@ -201,10 +161,10 @@
             e.preventDefault();
             const datos = {
                 especie: document.getElementById('especie').value,
-                nombreCientifico: document.getElementById('nombreCientifico',).value,
+                nombreCientifico: document.getElementById('nombreCientifico').value,
                 imagenUrl: document.getElementById('imagenUrl').value,
                 caracteristicas: document.getElementById('caracteristicas').value,
-                cantidad: document.getElementById('cantidad').value,
+                cantidad: parseInt(document.getElementById('cantidad').value),
                 estado: document.getElementById('estado').value
             };
 
@@ -232,6 +192,7 @@
             cargarCatalogo(); 
         }
 
+        // Cargar las plántulas apenas abre la página
         cargarCatalogo();
     </script>
 </body>
