@@ -157,14 +157,23 @@
                            </div>` 
                         : '';
                     
-                    const imagenMostrada = pl.imagenUrl ? pl.imagenUrl : 'https://via.placeholder.com/300x200/d4e5d7/386641?text=Sin+Foto';
+                    // --- NUEVA LÓGICA DE IMÁGENES ---
+                    let elementoImagen = '';
+                    if (pl.imagenUrl && pl.imagenUrl.trim() !== '') {
+                        // Si hay URL, intenta cargarla. Si el enlace está roto, la oculta sin generar errores masivos.
+                        elementoImagen = `<img src="${pl.imagenUrl}" alt="${pl.especie}" class="img-arbol" onerror="this.style.display='none'">`;
+                    } else {
+                        // Si no hay URL, crea un recuadro de color sólido con un texto
+                        elementoImagen = `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
+                    }
+
                     const nomCientifico = pl.nombreCientifico ? `<i>${pl.nombreCientifico}</i>` : '';
                     const descrip = pl.caracteristicas ? `<p>${pl.caracteristicas}</p>` : '';
 
                     const item = document.createElement('li');
                     item.className = 'item-planta';
                     item.innerHTML = `
-                        <img src="${imagenMostrada}" alt="${pl.especie}" class="img-arbol" onerror="this.src='https://via.placeholder.com/300x200/d4e5d7/386641?text=Error+de+Foto'">
+                        ${elementoImagen}
                         <div class="info-arbol">
                             <h3>${pl.especie}</h3>
                             ${nomCientifico}
