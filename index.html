@@ -109,248 +109,282 @@
     </div>
 
     <script>
-        const hostUrl = '';
-        let modoAdminActivo = false;
-        window.inventarioGlobal = [];
+    const hostUrl = '';
+    let modoAdminActivo = false;
+    window.inventarioGlobal = [];
 
-        async function cargarCatalogo() {
-            const lista = document.getElementById('listaPlantulas');
+    // =========================================================
+    // FUNCIÓN AYUDANTE: OBTENER EL TOKEN PARA RUTAS PROTEGIDAS
+    // =========================================================
+    function obtenerCabecerasSeguras() {
+        const token = localStorage.getItem('tokenAdmin');
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        };
+    }
+
+    async function cargarCatalogo() {
+        const lista = document.getElementById('listaPlantulas');
+        
+        try {
+            lista.innerHTML = '<p style="text-align:center; width:100%; color:#555;">Cargando inventario...</p>';
             
-            try {
-                lista.innerHTML = '<p style="text-align:center; width:100%; color:#555;">Cargando inventario (si el servidor estaba dormido, puede tardar 30 segundos)...</p>';
-                
-                const respuesta = await fetch(`${hostUrl}/api/plantulas`);
-                
-                if (!respuesta.ok) {
-                    throw new Error("El servidor respondió con error: " + respuesta.status);
-                }
-
-                const plantulas = await respuesta.json();
-                window.inventarioGlobal = plantulas; 
-                
-                lista.innerHTML = ''; 
-                
-                if (plantulas.length === 0) {
-                    lista.innerHTML = '<p style="text-align:center; width:100%; color:#555;">No hay plántulas en el inventario aún.</p>';
-                    return;
-                }
-
-                let totalGerminacion = 0;
-                let totalVivero = 0;
-                let totalListas = 0;
-                let totalGeneral = 0;
-
-                plantulas.forEach(pl => {
-                    const cantidadNum = parseInt(pl.cantidad) || 0;
-
-                    if (pl.estado === 'Germinación') totalGerminacion += cantidadNum;
-                    if (pl.estado === 'Vivero') totalVivero += cantidadNum;
-                    if (pl.estado === 'Lista') totalListas += cantidadNum;
-                    totalGeneral += cantidadNum;
-
-                    const nombreSeguro = pl.especie ? pl.especie.replace(/'/g, "\\'") : 'Planta';
-
-                    const botonesAdmin = modoAdminActivo 
-                        ? `<div style="display:flex; gap:10px; margin-top:10px;">
-                               <button class="btn-editar" style="margin-top:0;" onclick="abrirModal('${pl._id}')">✏️ Editar</button>
-                               <button class="btn-retirar" style="margin-top:0;" onclick="retirarPlantula('${pl._id}', '${nombreSeguro}')">📦 Retirar</button>
-                           </div>` 
-                        : '';
-                    
-                    // --- NUEVA LÓGICA DE IMÁGENES ---
-                    let elementoImagen = '';
-                    if (pl.imagenUrl && pl.imagenUrl.trim() !== '') {
-                        // Si hay URL, intenta cargarla. Si el enlace está roto, la oculta sin generar errores masivos.
-                        elementoImagen = `<img src="${pl.imagenUrl}" alt="${pl.especie}" class="img-arbol" onerror="this.style.display='none'">`;
-                    } else {
-                        // Si no hay URL, crea un recuadro de color sólido con un texto
-                        elementoImagen = `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
-                    }
-
-                    const nomCientifico = pl.nombreCientifico ? `<i>${pl.nombreCientifico}</i>` : '';
-                    const descrip = pl.caracteristicas ? `<p>${pl.caracteristicas}</p>` : '';
-
-                    const item = document.createElement('li');
-                    item.className = 'item-planta';
-                    item.innerHTML = `
-                        ${elementoImagen}
-                        <div class="info-arbol">
-                            <h3>${pl.especie}</h3>
-                            ${nomCientifico}
-                            ${descrip}
-                            <div class="estadisticas">
-                                <span style="font-size: 13px; font-weight: 600; color: #386641;">📦 ${cantidadNum} uds.</span>
-                                <span class="estado-tag">${pl.estado}</span>
-                            </div>
-                            ${botonesAdmin}
-                        </div>
-                    `;
-                    lista.appendChild(item);
-                });
-
-                document.getElementById('cant-germinacion').innerText = totalGerminacion;
-                document.getElementById('cant-vivero').innerText = totalVivero;
-                document.getElementById('cant-listas').innerText = totalListas;
-                document.getElementById('total-plantulas').innerText = totalGeneral;
-
-            } catch (error) {
-                console.error('Error detallado:', error);
-                lista.innerHTML = `<p style="text-align:center; width:100%; color:red;">Hubo un error cargando los datos: ${error.message}. <br>Revisa que tu servidor Node esté corriendo.</p>`;
+            // Esta ruta es pública, no requiere token
+            const respuesta = await fetch(`${hostUrl}/api/plantulas`);
+            
+            if (!respuesta.ok) {
+                throw new Error("El servidor respondió con error: " + respuesta.status);
             }
-        }
 
-        // --- FUNCIONES DE LOGIN ---
-        function toggleAdmin() {
-            if (modoAdminActivo) {
-                modoAdminActivo = false;
-                document.getElementById('panelAdmin').classList.add('oculto');
-                document.getElementById('btnModoAdmin').innerText = '⚙️ Acceso Asociados';
-                cargarCatalogo();
-            } else {
-                document.getElementById('modalLogin').classList.remove('oculto');
-            }
-        }
-
-        function cerrarModalLogin() {
-            document.getElementById('modalLogin').classList.add('oculto');
-            document.getElementById('login-email').value = '';
-            document.getElementById('login-password').value = '';
-        }
-
-        async function procesarLogin() {
-            const usuario = document.getElementById('login-email').value;
-            const codigo = document.getElementById('login-password').value;
-
-            if (!usuario || !codigo) {
-                alert("Por favor llena ambos campos");
+            const plantulas = await respuesta.json();
+            window.inventarioGlobal = plantulas; 
+            
+            lista.innerHTML = ''; 
+            
+            if (plantulas.length === 0) {
+                lista.innerHTML = '<p style="text-align:center; width:100%; color:#555;">No hay plántulas en el inventario aún.</p>';
                 return;
             }
 
-            try {
-                const res = await fetch(`${hostUrl}/api/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: usuario, password: codigo })
-                });
+            let totalGerminacion = 0;
+            let totalVivero = 0;
+            let totalListas = 0;
+            let totalGeneral = 0;
+
+            plantulas.forEach(pl => {
+                const cantidadNum = parseInt(pl.cantidad) || 0;
+
+                if (pl.estado === 'Germinación') totalGerminacion += cantidadNum;
+                if (pl.estado === 'Vivero') totalVivero += cantidadNum;
+                if (pl.estado === 'Lista') totalListas += cantidadNum;
+                totalGeneral += cantidadNum;
+
+                const nombreSeguro = pl.especie ? pl.especie.replace(/'/g, "\\'") : 'Planta';
+
+                const botonesAdmin = modoAdminActivo 
+                    ? `<div style="display:flex; gap:10px; margin-top:10px;">
+                           <button class="btn-editar" style="margin-top:0;" onclick="abrirModal('${pl._id}')">✏️ Editar</button>
+                           <button class="btn-retirar" style="margin-top:0;" onclick="retirarPlantula('${pl._id}', '${nombreSeguro}')">📦 Retirar</button>
+                       </div>` 
+                    : '';
                 
-                if (res.ok) {
-                    modoAdminActivo = true;
-                    cerrarModalLogin();
-                    document.getElementById('panelAdmin').classList.remove('oculto');
-                    document.getElementById('btnModoAdmin').innerText = '❌ Cerrar Sesión de Asociado';
-                    cargarCatalogo(); 
+                let elementoImagen = '';
+                if (pl.imagenUrl && pl.imagenUrl.trim() !== '') {
+                    elementoImagen = `<img src="${pl.imagenUrl}" alt="${pl.especie}" class="img-arbol" onerror="this.style.display='none'">`;
                 } else {
-                    alert('Acceso denegado. Credenciales incorrectas.');
+                    elementoImagen = `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
                 }
-            } catch (err) {
-                alert('Sin conexión con el servidor.');
-            }
+
+                const nomCientifico = pl.nombreCientifico ? `<i>${pl.nombreCientifico}</i>` : '';
+                const descrip = pl.caracteristicas ? `<p>${pl.caracteristicas}</p>` : '';
+
+                const item = document.createElement('li');
+                item.className = 'item-planta';
+                item.innerHTML = `
+                    ${elementoImagen}
+                    <div class="info-arbol">
+                        <h3>${pl.especie}</h3>
+                        ${nomCientifico}
+                        ${descrip}
+                        <div class="estadisticas">
+                            <span style="font-size: 13px; font-weight: 600; color: #386641;">📦 ${cantidadNum} uds.</span>
+                            <span class="estado-tag">${pl.estado}</span>
+                        </div>
+                        ${botonesAdmin}
+                    </div>
+                `;
+                lista.appendChild(item);
+            });
+
+            document.getElementById('cant-germinacion').innerText = totalGerminacion;
+            document.getElementById('cant-vivero').innerText = totalVivero;
+            document.getElementById('cant-listas').innerText = totalListas;
+            document.getElementById('total-plantulas').innerText = totalGeneral;
+
+        } catch (error) {
+            console.error('Error detallado:', error);
+            lista.innerHTML = `<p style="text-align:center; width:100%; color:red;">Hubo un error cargando los datos: ${error.message}.</p>`;
+        }
+    }
+
+    // --- FUNCIONES DE LOGIN ---
+    function toggleAdmin() {
+        if (modoAdminActivo) {
+            modoAdminActivo = false;
+            localStorage.removeItem('tokenAdmin'); // Borramos el token al cerrar sesión
+            document.getElementById('panelAdmin').classList.add('oculto');
+            document.getElementById('btnModoAdmin').innerText = '⚙️ Acceso Asociados';
+            cargarCatalogo();
+        } else {
+            document.getElementById('modalLogin').classList.remove('oculto');
+        }
+    }
+
+    function cerrarModalLogin() {
+        document.getElementById('modalLogin').classList.add('oculto');
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-password').value = '';
+    }
+
+    async function procesarLogin() {
+        const usuario = document.getElementById('login-email').value;
+        const codigo = document.getElementById('login-password').value;
+
+        if (!usuario || !codigo) {
+            alert("Por favor llena ambos campos");
+            return;
         }
 
-        // --- CREAR NUEVA PLÁNTULA ---
-        document.getElementById('formPlantula').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const datos = {
-                especie: document.getElementById('especie').value,
-                nombreCientifico: document.getElementById('nombreCientifico').value,
-                imagenUrl: document.getElementById('imagenUrl').value,
-                caracteristicas: document.getElementById('caracteristicas').value,
-                cantidad: parseInt(document.getElementById('cantidad').value),
-                estado: document.getElementById('estado').value
-            };
-
-            const respuesta = await fetch(`${hostUrl}/api/plantulas`, {
+        try {
+            const res = await fetch(`${hostUrl}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
+                body: JSON.stringify({ email: usuario, password: codigo })
             });
             
-            if (respuesta.ok) {
-                document.getElementById('formPlantula').reset();
-                cargarCatalogo(); 
-            }
-        });
+            const data = await res.json();
 
-        // --- LÓGICA DE EDICIÓN ---
-        function abrirModal(id) {
-            const pl = window.inventarioGlobal.find(item => item._id === id);
-            if (!pl) return;
-
-            document.getElementById('edit-id').value = pl._id;
-            document.getElementById('edit-especie').value = pl.especie;
-            document.getElementById('edit-nombreCientifico').value = pl.nombreCientifico || '';
-            document.getElementById('edit-imagenUrl').value = pl.imagenUrl || '';
-            document.getElementById('edit-caracteristicas').value = pl.caracteristicas || '';
-            document.getElementById('edit-cantidad').value = pl.cantidad;
-            document.getElementById('edit-estado').value = pl.estado;
-
-            document.getElementById('modalEditar').classList.remove('oculto');
-        }
-
-        function cerrarModal() {
-            document.getElementById('modalEditar').classList.add('oculto');
-        }
-
-        document.getElementById('formEditar').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('edit-id').value;
-            
-            const datosActualizados = {
-                especie: document.getElementById('edit-especie').value,
-                nombreCientifico: document.getElementById('edit-nombreCientifico').value,
-                imagenUrl: document.getElementById('edit-imagenUrl').value,
-                caracteristicas: document.getElementById('edit-caracteristicas').value,
-                cantidad: parseInt(document.getElementById('edit-cantidad').value),
-                estado: document.getElementById('edit-estado').value
-            };
-
-            const respuesta = await fetch(`${hostUrl}/api/plantulas/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datosActualizados)
-            });
-            
-            if (respuesta.ok) {
-                cerrarModal();
+            if (res.ok) {
+                // GUARDAMOS EL TOKEN
+                localStorage.setItem('tokenAdmin', data.token);
+                
+                modoAdminActivo = true;
+                cerrarModalLogin();
+                document.getElementById('panelAdmin').classList.remove('oculto');
+                document.getElementById('btnModoAdmin').innerText = '❌ Cerrar Sesión de Asociado';
                 cargarCatalogo(); 
             } else {
-                alert("Error al actualizar la plántula");
+                alert('Acceso denegado. ' + (data.error || 'Credenciales incorrectas.'));
             }
+        } catch (err) {
+            alert('Sin conexión con el servidor.');
+        }
+    }
+
+    // --- CREAR NUEVA PLÁNTULA ---
+    document.getElementById('formPlantula').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const datos = {
+            especie: document.getElementById('especie').value,
+            nombreCientifico: document.getElementById('nombreCientifico').value,
+            imagenUrl: document.getElementById('imagenUrl').value,
+            caracteristicas: document.getElementById('caracteristicas').value,
+            cantidad: parseInt(document.getElementById('cantidad').value),
+            estado: document.getElementById('estado').value
+        };
+
+        const respuesta = await fetch(`${hostUrl}/api/plantulas`, {
+            method: 'POST',
+            headers: obtenerCabecerasSeguras(), // <-- ENVIAMOS EL TOKEN
+            body: JSON.stringify(datos)
         });
+        
+        if (respuesta.ok) {
+            document.getElementById('formPlantula').reset();
+            cargarCatalogo(); 
+        } else {
+            const data = await respuesta.json();
+            alert('Error: ' + data.error);
+        }
+    });
 
-        // --- LÓGICA DE RETIRAR RÁPIDO ---
-        function retirarPlantula(id, nombreEspecie) {
-            document.getElementById('retirar-id').value = id;
-            document.getElementById('texto-retiro').innerText = `¿Cuántas unidades de ${nombreEspecie} deseas retirar?`;
-            document.getElementById('modalRetirar').classList.remove('oculto');
+    // --- LÓGICA DE EDICIÓN ---
+    function abrirModal(id) {
+        const pl = window.inventarioGlobal.find(item => item._id === id);
+        if (!pl) return;
+
+        document.getElementById('edit-id').value = pl._id;
+        document.getElementById('edit-especie').value = pl.especie;
+        document.getElementById('edit-nombreCientifico').value = pl.nombreCientifico || '';
+        document.getElementById('edit-imagenUrl').value = pl.imagenUrl || '';
+        document.getElementById('edit-caracteristicas').value = pl.caracteristicas || '';
+        document.getElementById('edit-cantidad').value = pl.cantidad;
+        document.getElementById('edit-estado').value = pl.estado;
+
+        document.getElementById('modalEditar').classList.remove('oculto');
+    }
+
+    function cerrarModal() {
+        document.getElementById('modalEditar').classList.add('oculto');
+    }
+
+    document.getElementById('formEditar').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('edit-id').value;
+        
+        const datosActualizados = {
+            especie: document.getElementById('edit-especie').value,
+            nombreCientifico: document.getElementById('edit-nombreCientifico').value,
+            imagenUrl: document.getElementById('edit-imagenUrl').value,
+            caracteristicas: document.getElementById('edit-caracteristicas').value,
+            cantidad: parseInt(document.getElementById('edit-cantidad').value),
+            estado: document.getElementById('edit-estado').value
+        };
+
+        const respuesta = await fetch(`${hostUrl}/api/plantulas/${id}`, {
+            method: 'PUT',
+            headers: obtenerCabecerasSeguras(), // <-- ENVIAMOS EL TOKEN
+            body: JSON.stringify(datosActualizados)
+        });
+        
+        if (respuesta.ok) {
+            cerrarModal();
+            cargarCatalogo(); 
+        } else {
+            const data = await respuesta.json();
+            alert("Error al actualizar la plántula: " + data.error);
+        }
+    });
+
+    // --- LÓGICA DE RETIRAR RÁPIDO ---
+    function retirarPlantula(id, nombreEspecie) {
+        document.getElementById('retirar-id').value = id;
+        document.getElementById('texto-retiro').innerText = `¿Cuántas unidades de ${nombreEspecie} deseas retirar?`;
+        document.getElementById('modalRetirar').classList.remove('oculto');
+    }
+
+    function cerrarModalRetirar() {
+        document.getElementById('modalRetirar').classList.add('oculto');
+        document.getElementById('retirar-cantidad').value = '';
+    }
+
+    async function procesarRetiro() {
+        const id = document.getElementById('retirar-id').value;
+        const cantidadRetirar = document.getElementById('retirar-cantidad').value;
+
+        if (!cantidadRetirar || isNaN(cantidadRetirar) || cantidadRetirar <= 0) {
+            alert("Ingresa una cantidad válida");
+            return;
         }
 
-        function cerrarModalRetirar() {
-            document.getElementById('modalRetirar').classList.add('oculto');
-            document.getElementById('retirar-cantidad').value = '';
-        }
-
-        async function procesarRetiro() {
-            const id = document.getElementById('retirar-id').value;
-            const cantidadRetirar = document.getElementById('retirar-cantidad').value;
-
-            if (!cantidadRetirar || isNaN(cantidadRetirar) || cantidadRetirar <= 0) {
-                alert("Ingresa una cantidad válida");
-                return;
-            }
-
-            await fetch(`${hostUrl}/api/plantulas/retirar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, cantidadRetirar })
-            });
-            
+        const respuesta = await fetch(`${hostUrl}/api/plantulas/retirar`, {
+            method: 'POST',
+            headers: obtenerCabecerasSeguras(), // <-- ENVIAMOS EL TOKEN
+            body: JSON.stringify({ id, cantidadRetirar })
+        });
+        
+        if (respuesta.ok) {
             cerrarModalRetirar();
             cargarCatalogo(); 
+        } else {
+            const data = await respuesta.json();
+            alert("Error al retirar: " + data.error);
         }
+    }
 
-        // Cargar todo al iniciar
-        cargarCatalogo();
-    </script>
+    // Cargar todo al iniciar
+    cargarCatalogo();
+
+    // Revisa si hay un token guardado al iniciar la página para mantener la sesión abierta
+    window.onload = () => {
+        if (localStorage.getItem('tokenAdmin')) {
+            modoAdminActivo = true;
+            document.getElementById('panelAdmin').classList.remove('oculto');
+            document.getElementById('btnModoAdmin').innerText = '❌ Cerrar Sesión de Asociado';
+            cargarCatalogo(); // Recarga el catálogo mostrando los botones de admin
+        }
+    };
+</script>
 </body>
 </html>
