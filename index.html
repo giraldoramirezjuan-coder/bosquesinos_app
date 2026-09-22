@@ -52,13 +52,9 @@
             <button type="submit" class="btn-principal">Guardar en inventario</button>
         </form>
         <hr style="border: 1px solid #bcdec1; margin-bottom: 20px; margin-top: 20px;">
-
-        <h3 style="color: #2a4d31; margin-top: 0;">👥 Registrar Nuevo Asociado</h3>
-        <form id="formRegistrarAsociado">
-            <input type="text" id="nuevo-email" placeholder="Usuario o Correo (Ej. asoc_carlos)" required>
-            <input type="password" id="nueva-password" placeholder="Contraseña para el asociado" required>
-            <button type="submit" class="btn-principal" style="background: #386641;">Crear Asociado</button>
-        </form>
+        <div style="text-align: center;">
+            <button class="btn-principal" style="background: #386641; width: auto; padding: 10px 20px;" onclick="abrirModalBosquesino()">👥 Agregar Nuevo Bosquesino</button>
+        </div>
     </div>
 
     <!-- MODAL DE EDICIÓN -->
@@ -95,7 +91,19 @@
             <button class="btn-principal" onclick="procesarLogin()">Ingresar</button>
         </div>
     </div>
-
+    <!-- MODAL DE AGREGAR BOSQUESINO -->
+    <div id="modalBosquesino" class="modal oculto">
+        <div class="modal-contenido" style="max-width: 400px; text-align: center;">
+            <span class="cerrar-modal" onclick="cerrarModalBosquesino()">&times;</span>
+            <h3 style="color: #2a4d31; margin-top: 0;">👥 Agregar Nuevo Bosquesino</h3>
+            <p style="font-size: 13px; color: #555; margin-bottom: 20px;">Crea credenciales para un nuevo miembro.</p>
+            <form id="formRegistrarAsociado">
+                <input type="text" id="nuevo-email" placeholder="Usuario (Ej. asoc_carlos)" required>
+                <input type="password" id="nueva-password" placeholder="Contraseña segura" required>
+                <button type="submit" class="btn-principal" style="background: #386641;">Crear Bosquesino</button>
+            </form>
+        </div>
+    </div>
     <!-- MODAL DE RETIRO RÁPIDO -->
     <div id="modalRetirar" class="modal oculto">
         <div class="modal-contenido" style="max-width: 400px; text-align: center;">
@@ -297,9 +305,18 @@
         }
     });
 
-    // --- CREAR NUEVO ASOCIADO DESDE LA PÁGINA ---
+    // --- LÓGICA DE AGREGAR BOSQUESINO ---
+    function abrirModalBosquesino() {
+        document.getElementById('modalBosquesino').classList.remove('oculto');
+    }
+
+    function cerrarModalBosquesino() {
+        document.getElementById('modalBosquesino').classList.add('oculto');
+        document.getElementById('formRegistrarAsociado').reset(); // Limpia los campos al cerrar
+    }
+
     document.getElementById('formRegistrarAsociado').addEventListener('submit', async (e) => {
-        e.preventDefault(); // Evita que la página recargue
+        e.preventDefault(); 
         
         const emailNuevo = document.getElementById('nuevo-email').value;
         const passwordNueva = document.getElementById('nueva-password').value;
@@ -307,7 +324,7 @@
         try {
             const respuesta = await fetch(`${hostUrl}/api/registrar-asociado`, {
                 method: 'POST',
-                headers: obtenerCabecerasSeguras(), // <-- Inyectamos tu Token de seguridad automáticamente
+                headers: obtenerCabecerasSeguras(), // Tu Token de seguridad
                 body: JSON.stringify({ email: emailNuevo, password: passwordNueva })
             });
             
@@ -315,7 +332,7 @@
 
             if (respuesta.ok) {
                 alert('✅ ' + data.mensaje);
-                document.getElementById('formRegistrarAsociado').reset(); // Limpia las casillas
+                cerrarModalBosquesino(); // Cierra la ventana emergente al terminar
             } else {
                 alert('❌ Error: ' + data.error);
             }
