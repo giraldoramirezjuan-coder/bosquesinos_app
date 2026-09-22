@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "softwarebosquesino.js",
-  "scripts": {"start": "node softwarebosquesino.js",
+  "scripts": {
+    "start": "node softwarebosquesino.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,8 +12,10 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.5"
   }
 }
