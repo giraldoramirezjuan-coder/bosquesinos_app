@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 // --- 1. CONEXIÓN A BASE DE DATOS ---
-const uri = 'mongodb+srv://erbmondt_db_user:wisLulWsZAX3XrRy@cluster0.nruxsel.mongodb.net/?appName=Cluster0';
+const uri = process.env.MONGO_URI;
   
 mongoose.connect(uri)
   .then(() => {
