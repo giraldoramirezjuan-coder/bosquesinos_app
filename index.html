@@ -49,7 +49,15 @@
                 <option value="Vivero">🌿 Vivero</option>
                 <option value="Lista">🌳 Lista para traslado</option>
             </select>
-            <button type="submit" class="btn-principal">Guardar en el inventario</button>
+            <button type="submit" class="btn-principal">Guardar en inventario</button>
+        </form>
+        <hr style="border: 1px solid #bcdec1; margin-bottom: 20px; margin-top: 20px;">
+
+        <h3 style="color: #2a4d31; margin-top: 0;">👥 Registrar Nuevo Asociado</h3>
+        <form id="formRegistrarAsociado">
+            <input type="text" id="nuevo-email" placeholder="Usuario o Correo (Ej. asoc_carlos)" required>
+            <input type="password" id="nueva-password" placeholder="Contraseña para el asociado" required>
+            <button type="submit" class="btn-principal" style="background: #386641;">Crear Asociado</button>
         </form>
     </div>
 
@@ -82,7 +90,7 @@
             <span class="cerrar-modal" onclick="cerrarModalLogin()">&times;</span>
             <h3 style="color: #2a4d31; margin-top: 0;">🔐 Acceso de bosquesinos</h3>
             <p style="font-size: 13px; color: #555; margin-bottom: 20px;">Ingresa tus credenciales para administrar el inventario.</p>
-            <input type="text" id="login-email" placeholder="Usuario (Ej. bosquesinojuan)" required>
+            <input type="text" id="login-email" placeholder="Usuario" required>
             <input type="password" id="login-password" placeholder="Contraseña" required>
             <button class="btn-principal" onclick="procesarLogin()">Ingresar</button>
         </div>
@@ -286,6 +294,33 @@
         } else {
             const data = await respuesta.json();
             alert('Error: ' + data.error);
+        }
+    });
+
+    // --- CREAR NUEVO ASOCIADO DESDE LA PÁGINA ---
+    document.getElementById('formRegistrarAsociado').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Evita que la página recargue
+        
+        const emailNuevo = document.getElementById('nuevo-email').value;
+        const passwordNueva = document.getElementById('nueva-password').value;
+
+        try {
+            const respuesta = await fetch(`${hostUrl}/api/registrar-asociado`, {
+                method: 'POST',
+                headers: obtenerCabecerasSeguras(), // <-- Inyectamos tu Token de seguridad automáticamente
+                body: JSON.stringify({ email: emailNuevo, password: passwordNueva })
+            });
+            
+            const data = await respuesta.json();
+
+            if (respuesta.ok) {
+                alert('✅ ' + data.mensaje);
+                document.getElementById('formRegistrarAsociado').reset(); // Limpia las casillas
+            } else {
+                alert('❌ Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('❌ Error de conexión al registrar usuario.');
         }
     });
 
