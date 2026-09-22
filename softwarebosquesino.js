@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const jwt = require('jsonwebtoken'); // Importado al inicio por orden
+const bcrypt = require('bcrypt');    // Importado al inicio por orden
 
 const app = express();
 app.use(cors());         
@@ -35,27 +37,65 @@ const plantulaSchema = new mongoose.Schema({
 });
 const Plantula = mongoose.model('Plantula', plantulaSchema);
 
-// --- 3. AUTO-CREACIÓN DE TU USUARIO ---
+// --- 3. AUTO-CREACIÓN DE TU USUARIO (BLINDADA) ---
 async function crearUsuarioAdmin() {
   try {
     const usuarioExiste = await User.findOne({ email: 'bosquesinojuan' });
     if (!usuarioExiste) {
-      const nuevoUsuario = new User({ email: 'bosquesinojuan', password: 'juancho123', rol: 'Admin' });
+      // IMPORTANTE: Cambia 'tu_nueva_clave_secreta' por la contraseña que quieras usar
+      const passwordEncriptada = await bcrypt.hash('superbosquesinos', 10);
+      
+      const nuevoUsuario = new User({ 
+        email: 'bosquesinojuan', 
+        password: passwordEncriptada, 
+        rol: 'Admin' 
+      });
       await nuevoUsuario.save();
-      console.log('✅ Usuario administrador creado: bosquesinojuan');
-    } else {
-      console.log('✅ El usuario administrador ya está listo en la base de datos.');
+      console.log('✅ Usuario administrador creado de forma segura');
     }
   } catch (error) {
     console.log('Error al verificar el usuario:', error);
   }
 }
 
-// Ruta para registrar nuevos asociados (Solo accesible si ya eres Admin)
-app.post('/api/registrar-asociado', async (req, res) => {
+// --- MIDDLEWARE DE SEGURIDAD ("EL PORTERO") ---
+function verificarAdmin(req, res, next) {
+    const token = req.headers['authorization'];
+    
+    if (!token) {
+        return res.status(403).json({ error: 'Acceso denegado, falta tu credencial' });
+    }
+
     try {
-        const { email, password } = req.body;
-        const nuevoAsociado = new User({ email, password, rol: 'Asociado' });
+        const tokenLimpio = token.replace('Bearer ', '');
+        const decodificado = jwt.verify(tokenLimpio, process.env.JWT_SECRET);
+        
+        if (decodificado.rol !== 'Admin') {
+            return res.status(403).json({ error: 'No tienes permisos de Administrador' });
+        }
+
+        next(); 
+    } catch (error) {
+        return res.status(401).json({ error: 'Token inválido o expirado' });
+    }
+}
+
+// --- 4. RUTAS DE AUTENTICACIÓN Y GESTIÓN DE USUARIOS ---
+
+// Registro de asociados (Protegido por verificarAdmin y con contraseña cifrada)
+app.post('/api/registrar-asociado', verificarAdmin, async (req, res) => {
+    try {
+        const email = String(req.body.email);
+        const passwordPlana = String(req.body.password);
+        
+        const passwordEncriptada = await bcrypt.hash(passwordPlana, 10);
+        
+        const nuevoAsociado = new User({ 
+            email: email, 
+            password: passwordEncriptada, 
+            rol: 'Asociado' 
+        });
+        
         await nuevoAsociado.save();
         res.status(201).json({ mensaje: '¡Nuevo asociado registrado con éxito!' });
     } catch (error) {
@@ -63,42 +103,45 @@ app.post('/api/registrar-asociado', async (req, res) => {
     }
 });
 
-// --- 4. RUTAS DE AUTENTICACIÓN Y CATÁLOGO ---
+// Login (Blindado contra inyección NoSQL y emitiendo Token JWT)
 app.post('/api/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const usuario = await User.findOne({ email, password });
+        const email = String(req.body.email);
+        const passwordPlana = String(req.body.password);
+
+        const usuario = await User.findOne({ email: email });
+        
         if (!usuario) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
-        res.json({ mensaje: '¡Bienvenido al sistema!', rol: usuario.rol });
-    } catch (error) {
+
+        const claveValida = await bcrypt.compare(passwordPlana, usuario.password);
+        
+        if (!claveValida) {
+            return res.status(401).json({ error: 'Credenciales incorrectas' });
+        }
+
+        const token = jwt.sign(
+            { id: usuario._id, email: usuario.email, rol: usuario.rol }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '2h' }     
+        );
+
+        res.json({ 
+            mensaje: '¡Bienvenido al sistema!', 
+            token: token, 
+            rol: usuario.rol 
+        });
+
+    } catch (error) { 
         res.status(500).json({ error: 'Error en el servidor' });
     }
 });
 
-app.post('/api/plantulas', async (req, res) => {
-  try {
-    const nuevaPlantula = new Plantula(req.body); 
-    await nuevaPlantula.save();
-    res.status(201).json({ mensaje: 'Plántula registrada' });
-  } catch (error) {
-    res.status(400).json({ error: 'Error al registrar' });
-  }
-});
 
-// --- NUEVA RUTA PARA REGISTRAR ASOCIADOS ---
-app.post('/api/registrar-asociado', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const nuevoAsociado = new User({ email, password, rol: 'Asociado' });
-        await nuevoAsociado.save();
-        res.status(201).json({ mensaje: '¡Nuevo asociado registrado con éxito!' });
-    } catch (error) {
-        res.status(400).json({ error: 'El usuario ya existe o faltan datos.' });
-    }
-});
+// --- 5. RUTAS DEL INVENTARIO (PLÁNTULAS) ---
 
+// Obtener catálogo (PÚBLICA - No lleva verificarAdmin porque cualquiera puede ver el catálogo)
 app.get('/api/plantulas', async (req, res) => {
   try {
     const inventario = await Plantula.find();
@@ -108,7 +151,19 @@ app.get('/api/plantulas', async (req, res) => {
   }
 });
 
-app.post('/api/plantulas/retirar', async (req, res) => {
+// Crear plántula (PROTEGIDA)
+app.post('/api/plantulas', verificarAdmin, async (req, res) => {
+  try {
+    const nuevaPlantula = new Plantula(req.body); 
+    await nuevaPlantula.save();
+    res.status(201).json({ mensaje: 'Plántula registrada' });
+  } catch (error) {
+    res.status(400).json({ error: 'Error al registrar' });
+  }
+});
+
+// Retirar stock de plántula (PROTEGIDA)
+app.post('/api/plantulas/retirar', verificarAdmin, async (req, res) => {
   try {
     const { id, cantidadRetirar } = req.body;
     const plantula = await Plantula.findById(id);
@@ -132,8 +187,8 @@ app.post('/api/plantulas/retirar', async (req, res) => {
   }
 });
 
-// --- RUTA PARA EDITAR UNA PLÁNTULA ---
-app.put('/api/plantulas/:id', async (req, res) => {
+// Editar plántula (PROTEGIDA)
+app.put('/api/plantulas/:id', verificarAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const datosActualizados = req.body;
@@ -147,11 +202,12 @@ app.put('/api/plantulas/:id', async (req, res) => {
   }
 });
 
+
+// --- 6. FRONTEND Y PUERTO ---
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-// --- 5. INICIO DEL SERVIDOR ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor en línea en el puerto ${PORT}`);
