@@ -38,20 +38,24 @@ const plantulaSchema = new mongoose.Schema({
 const Plantula = mongoose.model('Plantula', plantulaSchema);
 
 // --- 3. AUTO-CREACIÓN DE TU USUARIO (BLINDADA) ---
+// --- 3. AUTO-CREACIÓN DE TU USUARIO BASE ---
 async function crearUsuarioAdmin() {
   try {
-    const usuarioExiste = await User.findOne({ email: 'bosquesinojuan' });
+    // Buscamos el nuevo usuario maestro
+    const usuarioExiste = await User.findOne({ email: 'bosquesinos' });
     if (!usuarioExiste) {
-      // IMPORTANTE: Cambia 'tu_nueva_clave_secreta' por la contraseña que quieras usar
-      const passwordEncriptada = await bcrypt.hash('superbosquesinos', 10);
+      // Encriptamos la clave exacta que pediste
+      const passwordEncriptada = await bcrypt.hash('bosquesinas', 10);
       
       const nuevoUsuario = new User({ 
-        email: 'bosquesinojuan', 
+        email: 'bosquesinos', 
         password: passwordEncriptada, 
         rol: 'Admin' 
       });
       await nuevoUsuario.save();
-      console.log('✅ Usuario administrador creado de forma segura');
+      console.log('✅ Usuario base creado: bosquesinos');
+    } else {
+      console.log('✅ El usuario base ya está listo en la base de datos.');
     }
   } catch (error) {
     console.log('Error al verificar el usuario:', error);
