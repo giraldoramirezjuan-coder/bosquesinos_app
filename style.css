@@ -1,266 +1,148 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 body { 
     font-family: 'Poppins', sans-serif; 
-    background: linear-gradient(135deg, #e4f1e1 0%, #a3c9a8 100%); 
-    color: #1b3315; 
+    /* Fondo: Blanco perla luminoso hacia un verde agua muy suave */
+    background: linear-gradient(135deg, #fdfefe 0%, #e0ece4 100%); 
+    color: #0d2818; /* Verde selva muy oscuro para el texto */
     padding: 20px; 
     min-height: 100vh;
     margin: 0;
 }
 .encabezado { text-align: center; margin-bottom: 30px; }
 .encabezado img { 
-    width: 100px; border-radius: 50%; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 3px solid white;
+    width: 110px; border-radius: 50%; 
+    box-shadow: 0 8px 20px rgba(45, 106, 79, 0.2); border: 4px solid #ffffff;
 }
-h1 { color: #2a4d31; margin-bottom: 5px; }
-p.subtitulo { color: #4a7c59; font-size: 16px; margin-top: 0; }
+h1 { color: #1b4332; margin-bottom: 5px; font-weight: 700; letter-spacing: -0.5px; } 
+p.subtitulo { color: #40916c; font-size: 16px; margin-top: 0; font-weight: 500; } 
 
 .tarjeta-admin { 
-    background: #eef5ef; padding: 25px; border-radius: 12px; 
-    box-shadow: 0 10px 25px rgba(45, 90, 39, 0.2); 
+    background: #ffffff; padding: 25px; border-radius: 16px; 
+    box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08); 
     max-width: 600px; margin: 0 auto 30px auto; 
-    border-top: 6px solid #2a4d31;
+    border-top: 5px solid #2d6a4f; /* Verde esmeralda fuerte */
 }
 
 /* Panel de Estadísticas / Totales */
 .inventory-stats {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    gap: 10px;
+    display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px;
 }
 .stat {
-    background-color: #d4e5d7;
-    padding: 15px 5px;
-    border-radius: 8px;
-    width: 32%;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    background-color: #f1f7f3; /* Blanco verdoso muy fresco */
+    padding: 15px 5px; border-radius: 12px; width: 32%; text-align: center;
+    border: 1px solid #d8eadd;
 }
-.stat h4 {
-    margin: 0 0 10px 0;
-    font-size: 0.85em;
-    color: #2a4d31;
-}
-.stat p {
-    margin: 0;
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #1b3315;
-}
+.stat h4 { margin: 0 0 10px 0; font-size: 0.85em; color: #2d6a4f; }
+.stat p { margin: 0; font-size: 1.8em; font-weight: bold; color: #1b4332; }
 .total-general {
-    text-align: center;
-    color: #2a4d31;
-    font-size: 1.4em;
-    margin-bottom: 20px;
-    border-top: 2px solid #bcdec1;
-    padding-top: 15px;
+    text-align: center; color: #1b4332; font-size: 1.4em; margin-bottom: 20px;
+    border-top: 2px solid #d8eadd; padding-top: 15px;
 }
 
 /* Formularios y Botones */
 input, select, textarea, button { 
     display: block; width: 100%; margin-bottom: 12px; 
-    padding: 10px; box-sizing: border-box; 
-    border: 1px solid #bcdec1; border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px;
+    padding: 12px; box-sizing: border-box; 
+    border: 1px solid #c7dcd0; border-radius: 10px;
+    background-color: #fafcfa;
+    font-family: 'Poppins', sans-serif; font-size: 14px; color: #0d2818;
 }
 textarea { resize: vertical; min-height: 80px; }
-input:focus, select:focus, textarea:focus { outline: none; border-color: #386641; }
+input:focus, select:focus, textarea:focus { 
+    outline: none; border-color: #40916c; 
+    box-shadow: 0 0 0 3px rgba(64, 145, 108, 0.15); 
+}
 
 button.btn-principal { 
-    background: #386641; color: white; border: none; cursor: pointer; font-weight: 600;
+    background: #2d6a4f; /* Verde principal */ 
+    color: white; border: none; cursor: pointer; font-weight: 600; border-radius: 10px;
+    transition: background 0.3s;
 }
-button.btn-principal:hover { background: #2a4d31; }
-
+button.btn-principal:hover { background: #1b4332; }
 
 /* DISEÑO EN MOSAICO (GRID) */
 #listaPlantulas {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    padding: 0; margin: 0; list-style: none;
-    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;
+    padding: 0; margin: 0; list-style: none; max-width: 1200px; margin: 0 auto;
 }
 
 .item-planta { 
-    background: white; border-radius: 12px; overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    display: flex; flex-direction: column;
-    transition: transform 0.2s;
+    background: #ffffff; /* Blanco perla puro */
+    border-radius: 16px; overflow: hidden; border: 1px solid #eef4f0;
+    box-shadow: 0 8px 20px rgba(27, 67, 50, 0.06); 
+    display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s;
 }
-.item-planta:hover { transform: translateY(-5px); }
+.item-planta:hover { 
+    transform: translateY(-5px); box-shadow: 0 15px 30px rgba(27, 67, 50, 0.12);
+}
 
 .img-arbol {
-    width: 100%; height: 200px; object-fit: cover;
-    background: #d4e5d7; 
+    width: 100%; height: 200px; object-fit: cover; background: #e0ece4; 
+    border-bottom: 3px solid #74c69d; /* Acento verde brillante y vivo */
 }
-.info-arbol { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
-.info-arbol h3 { margin: 0 0 2px 0; color: #1b3315; font-size: 18px; }
-.info-arbol i { color: #555; font-size: 13px; display: block; margin-bottom: 10px; }
-.info-arbol p { font-size: 13px; color: #444; line-height: 1.4; margin-bottom: 15px; flex-grow: 1; }
+.info-arbol { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+.info-arbol h3 { margin: 0 0 2px 0; color: #1b4332; font-size: 19px; font-weight: 600; }
+.info-arbol i { color: #52796f; font-size: 13px; display: block; margin-bottom: 12px; }
+.info-arbol p { font-size: 13.5px; color: #354f52; line-height: 1.6; margin-bottom: 15px; flex-grow: 1; }
 
 .estadisticas { 
     display: flex; justify-content: space-between; align-items: center;
-    border-top: 1px solid #eee; padding-top: 10px;
+    border-top: 1px solid #eef4f0; padding-top: 15px;
 }
 .estado-tag {
-    background: #a3c9a8; color: #1b3315; padding: 4px 10px;
+    background: #d8eadd; color: #1b4332; padding: 5px 12px;
     border-radius: 20px; font-size: 11px; font-weight: bold;
 }
 
 /* Botones de acción en tarjetas */
 .btn-retirar {
-    background: #bc4749; color: white; border: none; padding: 8px 12px; 
-    font-size: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;
-    margin-top: 10px; width: 100%;
+    background: #e07a5f; /* Un coral suave para contrastar con el verde */ 
+    color: white; border: none; padding: 8px 12px; 
+    font-size: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
 }
-.btn-retirar:hover { background: #a33b3d; }
+.btn-retirar:hover { background: #cb6246; }
 
 .btn-editar {
-    background: #e09f3e; 
+    background: #40916c; /* Verde esmeralda claro */
     color: white; border: none; padding: 8px 12px; 
-    font-size: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;
-    margin-top: 10px; width: 100%;
+    font-size: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
 }
-.btn-editar:hover { background: #c28732; }
+.btn-editar:hover { background: #2d6a4f; }
 
 /* Botón inferior secreto */
 .footer-admin { text-align: center; margin-top: 40px; padding-bottom: 20px; }
 .footer-admin span { 
-    color: #2a4d31; font-size: 14px; cursor: pointer; font-weight: bold; 
-    background: white; padding: 10px 20px; border-radius: 20px; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    color: #2d6a4f; font-size: 14px; cursor: pointer; font-weight: bold; 
+    background: #ffffff; padding: 10px 20px; border-radius: 20px; 
+    box-shadow: 0 4px 10px rgba(27, 67, 50, 0.08); border: 1px solid #eef4f0;
 }
-.footer-admin span:hover { background: #eef5ef; }
+.footer-admin span:hover { background: #f1f7f3; }
 
 /* --- VENTANAS FLOTANTES (MODALES) CENTRADAS Y RESALTADAS --- */
 .oculto { display: none !important; }
 
 .modal {
-    position: fixed !important; /* Mantiene la ventana siempre en tu pantalla */
-    z-index: 9999 !important; /* La pone por encima de absolutamente todo */
-    left: 0 !important; 
-    top: 0 !important; 
-    width: 100vw !important; 
-    height: 100vh !important;
-    background-color: rgba(0, 0, 0, 0.75) !important; /* Fondo negro semi-transparente oscuro */
-    backdrop-filter: blur(4px) !important; /* Efecto de desenfoque moderno */
-    display: flex; 
-    justify-content: center !important; 
-    align-items: center !important;
+    position: fixed !important; z-index: 9999 !important; left: 0 !important; top: 0 !important; 
+    width: 100vw !important; height: 100vh !important;
+    background-color: rgba(8, 28, 21, 0.75) !important; /* Verde muy oscuro semitransparente */
+    backdrop-filter: blur(5px) !important; 
+    display: flex; justify-content: center !important; align-items: center !important;
 }
 
-.modal.oculto {
-    display: none !important;
-}
+.modal.oculto { display: none !important; }
 
 .modal-contenido {
-    background: #ffffff !important; /* Fondo blanco para que sobresalga */
-    padding: 30px !important; 
-    border-radius: 12px !important; 
-    width: 90% !important; 
-    max-width: 500px !important; 
-    position: relative !important; 
-    border-top: 8px solid #e09f3e !important; 
-    box-shadow: 0 15px 50px rgba(0,0,0,0.6) !important; /* Sombra fuerte */
-    max-height: 85vh !important; 
-    overflow-y: auto !important; /* Scroll interno si la pantalla es muy pequeña */
-    text-align: left;
+    background: #ffffff !important; padding: 30px !important; border-radius: 16px !important; 
+    width: 90% !important; max-width: 500px !important; position: relative !important; 
+    border-top: 6px solid #40916c !important; /* Detalle esmeralda */
+    box-shadow: 0 15px 50px rgba(8, 28, 21, 0.4) !important; 
+    max-height: 85vh !important; overflow-y: auto !important; text-align: left;
 }
 
 .cerrar-modal {
-    position: absolute !important; 
-    top: 15px !important; 
-    right: 20px !important; 
-    font-size: 28px !important; 
-    cursor: pointer !important; 
-    color: #777 !important;
-    font-weight: bold !important;
-    line-height: 1 !important;
+    position: absolute !important; top: 15px !important; right: 20px !important; 
+    font-size: 28px !important; cursor: pointer !important; color: #52796f !important;
+    font-weight: bold !important; line-height: 1 !important;
 }
-.cerrar-modal:hover { color: #d32f2f !important; }
-
-/* --- ESTILOS DE LA NUEVA PORTADA (HERO SECTION) --- */
-.hero-section {
-    /* Imagen de prueba - Cámbiala luego por una foto de tu territorio */
-    background-image: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1920&q=80'); 
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    margin: -20px -20px 40px -20px; /* Ignora los márgenes del body para ocupar el 100% del ancho */
-    color: white;
-    text-align: center;
-    border-bottom: 6px solid #386641;
-}
-
-.hero-overlay {
-    background: rgba(27, 51, 21, 0.65); /* Capa verde oscuro para que el texto sea muy legible */
-    padding: 80px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.hero-logo {
-    width: 140px;
-    border-radius: 50%;
-    border: 4px solid white;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    margin-bottom: 20px;
-    background-color: white;
-}
-
-.hero-title {
-    font-size: 3.5em;
-    margin: 0 0 5px 0;
-    color: #ffffff;
-    text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-    letter-spacing: 2px;
-}
-
-.hero-subtitle {
-    font-size: 1.5em;
-    font-weight: 600;
-    margin: 0 0 25px 0;
-    color: #a3c9a8;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-}
-
-.hero-text {
-    max-width: 650px;
-    font-size: 1.15em;
-    line-height: 1.7;
-    margin: 0;
-    color: #f4f7f6;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-}
-
-/* --- ESTILOS DEL PIE DE PÁGINA DISCRETO --- */
-.footer-discreto {
-    text-align: center;
-    margin-top: 60px;
-    padding: 30px 20px;
-    border-top: 1px solid #bcdec1;
-    color: #4a7c59;
-    font-size: 14px;
-}
-
-.footer-discreto span {
-    color: #888;
-    cursor: pointer;
-    font-size: 12px;
-    transition: color 0.3s;
-    display: inline-block;
-    margin-top: 10px;
-}
-
-.footer-discreto span:hover {
-    color: #386641;
-    text-decoration: underline;
-}
-
-/* Quitamos el fondo blanco de los botones viejos de admin */
-.footer-admin { display: none; }
+.cerrar-modal:hover { color: #e07a5f !important; }
