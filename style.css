@@ -2,66 +2,81 @@
 
 body { 
     font-family: 'Poppins', sans-serif; 
-    /* Fondo: Blanco perla luminoso hacia un verde agua muy suave */
+    /* Fondo general: Blanco perla luminoso hacia un verde agua muy suave */
     background: linear-gradient(135deg, #fdfefe 0%, #e0ece4 100%); 
-    color: #0d2818; /* Verde selva muy oscuro para el texto */
+    color: #0d2818; 
     padding: 20px; 
     min-height: 100vh;
     margin: 0;
 }
-/* --- ESTILOS DE LA PORTADA (HERO SECTION) --- */
+
+/* --- ESTILOS DE LA PORTADA FOTOGRÁFICA (HERO SECTION) --- */
 .hero-section {
-    background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%); /* Verde selva a esmeralda */
+    /* Fotografía de bosque de fondo */
+    background-image: url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1920&q=80'); 
+    background-size: cover;
+    background-position: center;
     position: relative;
     margin: -20px -20px 40px -20px;
     color: white;
-    text-align: center;
-    border-bottom: 6px solid #74c69d;
+    text-align: center; /* Obliga a centrar el texto general */
+    border-bottom: 6px solid #40916c;
 }
 
 .hero-overlay {
-    padding: 50px 20px;
+    background: rgba(8, 28, 21, 0.75); /* Filtro verde selva muy oscuro para tapar un poco la foto y que el texto brille */
+    padding: 70px 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center; /* Centra los elementos de la columna */
     justify-content: center;
+    text-align: center; /* Reasegura el centro para todo lo interno */
 }
 
 .hero-logo {
-    width: 130px;
+    width: 140px;
     border-radius: 50%;
     border: 4px solid #ffffff;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     margin-bottom: 20px;
     background-color: white;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .hero-title {
-    font-size: 3em;
+    font-size: 3.2em;
     margin: 0 0 5px 0;
     color: #ffffff;
     font-weight: 700;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
 }
 
 .hero-subtitle {
-    font-size: 1.3em;
+    font-size: 1.4em;
     font-weight: 500;
-    margin: 0 0 15px 0;
-    color: #d8eadd;
+    margin: 0 0 20px 0;
+    color: #74c69d; /* Acento verde brillante */
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
 }
 
 .hero-text {
     max-width: 650px;
-    font-size: 1.05em;
+    font-size: 1.1em;
     line-height: 1.6;
-    margin: 0;
+    margin: 0 auto; /* El auto a los lados obliga al párrafo a centrarse en la pantalla */
     color: #f1f7f3;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
 }
+
+
+/* --- PANEL DE ADMINISTRACIÓN --- */
 .tarjeta-admin { 
     background: #ffffff; padding: 25px; border-radius: 16px; 
     box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08); 
     max-width: 600px; margin: 0 auto 30px auto; 
-    border-top: 5px solid #2d6a4f; /* Verde esmeralda fuerte */
+    border-top: 5px solid #2d6a4f; 
 }
 
 /* Panel de Estadísticas / Totales */
@@ -69,8 +84,7 @@ body {
     display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px;
 }
 .stat {
-    background-color: #f1f7f3; /* Blanco verdoso muy fresco */
-    padding: 15px 5px; border-radius: 12px; width: 32%; text-align: center;
+    background-color: #f1f7f3; padding: 15px 5px; border-radius: 12px; width: 32%; text-align: center;
     border: 1px solid #d8eadd;
 }
 .stat h4 { margin: 0 0 10px 0; font-size: 0.85em; color: #2d6a4f; }
@@ -95,21 +109,20 @@ input:focus, select:focus, textarea:focus {
 }
 
 button.btn-principal { 
-    background: #2d6a4f; /* Verde principal */ 
-    color: white; border: none; cursor: pointer; font-weight: 600; border-radius: 10px;
+    background: #2d6a4f; color: white; border: none; cursor: pointer; font-weight: 600; border-radius: 10px;
     transition: background 0.3s;
 }
 button.btn-principal:hover { background: #1b4332; }
 
-/* DISEÑO EN MOSAICO (GRID) */
+
+/* --- DISEÑO EN MOSAICO (GRID) --- */
 #listaPlantulas {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;
     padding: 0; margin: 0; list-style: none; max-width: 1200px; margin: 0 auto;
 }
 
 .item-planta { 
-    background: #ffffff; /* Blanco perla puro */
-    border-radius: 16px; overflow: hidden; border: 1px solid #eef4f0;
+    background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #eef4f0;
     box-shadow: 0 8px 20px rgba(27, 67, 50, 0.06); 
     display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -119,9 +132,9 @@ button.btn-principal:hover { background: #1b4332; }
 
 .img-arbol {
     width: 100%; height: 200px; object-fit: cover; background: #e0ece4; 
-    border-bottom: 3px solid #74c69d; /* Acento verde brillante y vivo */
+    border-bottom: 3px solid #74c69d; 
 }
-.info-arbol { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+.info-arbol { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; text-align: left; }
 .info-arbol h3 { margin: 0 0 2px 0; color: #1b4332; font-size: 19px; font-weight: 600; }
 .info-arbol i { color: #52796f; font-size: 13px; display: block; margin-bottom: 12px; }
 .info-arbol p { font-size: 13.5px; color: #354f52; line-height: 1.6; margin-bottom: 15px; flex-grow: 1; }
@@ -137,45 +150,61 @@ button.btn-principal:hover { background: #1b4332; }
 
 /* Botones de acción en tarjetas */
 .btn-retirar {
-    background: #e07a5f; /* Un coral suave para contrastar con el verde */ 
-    color: white; border: none; padding: 8px 12px; 
+    background: #e07a5f; color: white; border: none; padding: 8px 12px; 
     font-size: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
 }
 .btn-retirar:hover { background: #cb6246; }
 
 .btn-editar {
-    background: #40916c; /* Verde esmeralda claro */
-    color: white; border: none; padding: 8px 12px; 
+    background: #40916c; color: white; border: none; padding: 8px 12px; 
     font-size: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
 }
 .btn-editar:hover { background: #2d6a4f; }
 
-/* Botón inferior secreto */
-.footer-admin { text-align: center; margin-top: 40px; padding-bottom: 20px; }
-.footer-admin span { 
-    color: #2d6a4f; font-size: 14px; cursor: pointer; font-weight: bold; 
-    background: #ffffff; padding: 10px 20px; border-radius: 20px; 
-    box-shadow: 0 4px 10px rgba(27, 67, 50, 0.08); border: 1px solid #eef4f0;
-}
-.footer-admin span:hover { background: #f1f7f3; }
 
-/* --- VENTANAS FLOTANTES (MODALES) CENTRADAS Y RESALTADAS --- */
+/* --- PIE DE PÁGINA (VISITANTES) --- */
+.footer-discreto {
+    text-align: center;
+    margin-top: 60px;
+    padding: 30px 20px;
+    border-top: 1px solid #c7dcd0;
+    color: #52796f;
+    font-size: 14px;
+}
+
+.footer-discreto span {
+    color: #888;
+    cursor: pointer;
+    font-size: 12px;
+    transition: color 0.3s;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.footer-discreto span:hover {
+    color: #2d6a4f;
+    text-decoration: underline;
+}
+
+/* Ocultar el viejo boton gigante que tenías antes */
+.footer-admin { display: none; }
+
+
+/* --- VENTANAS FLOTANTES (MODALES) --- */
 .oculto { display: none !important; }
 
 .modal {
     position: fixed !important; z-index: 9999 !important; left: 0 !important; top: 0 !important; 
     width: 100vw !important; height: 100vh !important;
-    background-color: rgba(8, 28, 21, 0.75) !important; /* Verde muy oscuro semitransparente */
+    background-color: rgba(8, 28, 21, 0.75) !important; 
     backdrop-filter: blur(5px) !important; 
     display: flex; justify-content: center !important; align-items: center !important;
 }
 
-.modal.oculto { display: none !important; }
-
 .modal-contenido {
     background: #ffffff !important; padding: 30px !important; border-radius: 16px !important; 
     width: 90% !important; max-width: 500px !important; position: relative !important; 
-    border-top: 6px solid #40916c !important; /* Detalle esmeralda */
+    border-top: 6px solid #40916c !important; 
     box-shadow: 0 15px 50px rgba(8, 28, 21, 0.4) !important; 
     max-height: 85vh !important; overflow-y: auto !important; text-align: left;
 }
