@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const jwt = require('jsonwebtoken'); // Importado al inicio por orden
-const bcrypt = require('bcrypt');    // Importado al inicio por orden
+const jwt = require('jsonwebtoken'); 
+const bcrypt = require('bcrypt');    
 
 const app = express();
 app.use(cors());         
@@ -15,11 +15,11 @@ const uri = process.env.MONGO_URI;
 mongoose.connect(uri)
   .then(() => {
     console.log('¡Conexión a MongoDB Atlas exitosa!');
-    crearUsuarioAdmin(); // <-- Llama a la función que crea tu cuenta maestra
+    crearUsuarioAdmin(); 
   })
   .catch(err => console.error('Error conectando a la base de datos:', err));
 
-// --- 2. MODELOS DE DATOS ---
+// --- 2. MODELOS DE DATOS (VERSIÓN 2.0 - TRAZABILIDAD) ---
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -27,31 +27,54 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-const plantulaSchema = new mongoose.Schema({
-  especie: String,
-  nombreCientifico: String,
-  caracteristicas: String,
-  imagenUrl: String,
-  cantidad: Number,
-  estado: { type: String, enum: ['Germinación', 'Vivero', 'Lista'] }
+// 2.1 Catálogo Botánico (Especies)
+const especieSchema = new mongoose.Schema({
+    nombreComun: { type: String, required: true, unique: true },
+    nombreCientifico: { type: String, default: '' },
+    caracteristicas: { type: String, default: '' },
+    imagenUrl: { type: String, default: '' },
+    saberCampesino: { type: String, default: '' },
+    fechaRegistro: { type: Date, default: Date.now }
 });
-const Plantula = mongoose.model('Plantula', plantulaSchema);
+const Especie = mongoose.model('Especie', especieSchema);
 
-// --- 3. AUTO-CREACIÓN DE TU USUARIO (BLINDADA) ---
+// 2.2 Motor de Trazabilidad (Lotes)
+const loteSchema = new mongoose.Schema({
+    codigoLote: { type: String, required: true, unique: true }, 
+    especieId: { type: mongoose.Schema.Types.ObjectId, ref: 'Especie', required: true },
+    
+    origen: {
+        finca: { type: String, required: true },
+        responsableRecoleccion: { type: String, required: true },
+        arbolMadreInfo: { type: String, default: 'No especificado' },
+        fechaRecoleccion: { type: Date, required: true }
+    },
+    
+    cantidadInicial: { type: Number, required: true }, 
+    cantidadActual: { type: Number, required: true },  
+    estadoActual: { 
+        type: String, 
+        enum: ['Semillero', 'Germinación', 'Vivero', 'Crecimiento', 'Lista para transplante', 'Sembrada'],
+        default: 'Semillero'
+    },
+    
+    historial: [{
+        fechaEvento: { type: Date, default: Date.now },
+        estadoAlcanzado: { type: String },
+        cantidadSuperviviente: { type: Number },
+        observaciones: { type: String },
+        responsable: { type: String } 
+    }]
+});
+const Lote = mongoose.model('Lote', loteSchema);
+
 // --- 3. AUTO-CREACIÓN DE TU USUARIO BASE ---
 async function crearUsuarioAdmin() {
   try {
-    // Buscamos el nuevo usuario maestro
     const usuarioExiste = await User.findOne({ email: 'bosquesinos' });
     if (!usuarioExiste) {
-      // Encriptamos la clave exacta que pediste
       const passwordEncriptada = await bcrypt.hash('bosquesinas', 10);
-      
-      const nuevoUsuario = new User({ 
-        email: 'bosquesinos', 
-        password: passwordEncriptada, 
-        rol: 'Admin' 
-      });
+      const nuevoUsuario = new User({ email: 'bosquesinos', password: passwordEncriptada, rol: 'Admin' });
       await nuevoUsuario.save();
       console.log('✅ Usuario base creado: bosquesinos');
     } else {
@@ -62,44 +85,33 @@ async function crearUsuarioAdmin() {
   }
 }
 
-// --- MIDDLEWARE DE SEGURIDAD ("EL PORTERO") ---
+// --- MIDDLEWARE DE SEGURIDAD ---
 function verificarAdmin(req, res, next) {
     const token = req.headers['authorization'];
-    
-    if (!token) {
-        return res.status(403).json({ error: 'Acceso denegado, falta tu credencial' });
-    }
+    if (!token) return res.status(403).json({ error: 'Acceso denegado, falta tu credencial' });
 
     try {
         const tokenLimpio = token.replace('Bearer ', '');
         const decodificado = jwt.verify(tokenLimpio, process.env.JWT_SECRET);
         
-        if (decodificado.rol !== 'Admin') {
-            return res.status(403).json({ error: 'No tienes permisos de Administrador' });
+        if (decodificado.rol !== 'Admin' && decodificado.rol !== 'Asociado') {
+            return res.status(403).json({ error: 'No tienes permisos en el sistema' });
         }
-
+        req.usuarioActual = decodificado.email; // Guardamos quién hace la acción para el historial
         next(); 
     } catch (error) {
         return res.status(401).json({ error: 'Token inválido o expirado' });
     }
 }
 
-// --- 4. RUTAS DE AUTENTICACIÓN Y GESTIÓN DE USUARIOS ---
-
-// Registro de asociados (Protegido por verificarAdmin y con contraseña cifrada)
+// --- 4. RUTAS DE AUTENTICACIÓN ---
 app.post('/api/registrar-asociado', verificarAdmin, async (req, res) => {
     try {
         const email = String(req.body.email);
         const passwordPlana = String(req.body.password);
-        
         const passwordEncriptada = await bcrypt.hash(passwordPlana, 10);
         
-        const nuevoAsociado = new User({ 
-            email: email, 
-            password: passwordEncriptada, 
-            rol: 'Asociado' 
-        });
-        
+        const nuevoAsociado = new User({ email: email, password: passwordEncriptada, rol: 'Asociado' });
         await nuevoAsociado.save();
         res.status(201).json({ mensaje: '¡Nuevo asociado registrado con éxito!' });
     } catch (error) {
@@ -107,107 +119,112 @@ app.post('/api/registrar-asociado', verificarAdmin, async (req, res) => {
     }
 });
 
-// Login (Blindado contra inyección NoSQL y emitiendo Token JWT)
 app.post('/api/login', async (req, res) => {
     try {
-        const email = String(req.body.email);
-        const passwordPlana = String(req.body.password);
+        const usuario = await User.findOne({ email: String(req.body.email) });
+        if (!usuario) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
-        const usuario = await User.findOne({ email: email });
-        
-        if (!usuario) {
-            return res.status(401).json({ error: 'Credenciales incorrectas' });
-        }
+        const claveValida = await bcrypt.compare(String(req.body.password), usuario.password);
+        if (!claveValida) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
-        const claveValida = await bcrypt.compare(passwordPlana, usuario.password);
-        
-        if (!claveValida) {
-            return res.status(401).json({ error: 'Credenciales incorrectas' });
-        }
-
-        const token = jwt.sign(
-            { id: usuario._id, email: usuario.email, rol: usuario.rol }, 
-            process.env.JWT_SECRET, 
-            { expiresIn: '2h' }     
-        );
-
-        res.json({ 
-            mensaje: '¡Bienvenido al sistema!', 
-            token: token, 
-            rol: usuario.rol 
-        });
-
+        const token = jwt.sign({ id: usuario._id, email: usuario.email, rol: usuario.rol }, process.env.JWT_SECRET, { expiresIn: '8h' });
+        res.json({ mensaje: '¡Bienvenido al sistema!', token: token, rol: usuario.rol });
     } catch (error) { 
         res.status(500).json({ error: 'Error en el servidor' });
     }
 });
 
-
-// --- 5. RUTAS DEL INVENTARIO (PLÁNTULAS) ---
-
-// Obtener catálogo (PÚBLICA - No lleva verificarAdmin porque cualquiera puede ver el catálogo)
-app.get('/api/plantulas', async (req, res) => {
+// --- 5. RUTAS DE ESPECIES (CATÁLOGO) ---
+app.get('/api/especies', async (req, res) => {
   try {
-    const inventario = await Plantula.find();
-    res.json(inventario);
+    const especies = await Especie.find();
+    res.json(especies);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener catálogo' });
+    res.status(500).json({ error: 'Error al obtener especies' });
   }
 });
 
-// Crear plántula (PROTEGIDA)
-app.post('/api/plantulas', verificarAdmin, async (req, res) => {
+app.post('/api/especies', verificarAdmin, async (req, res) => {
   try {
-    const nuevaPlantula = new Plantula(req.body); 
-    await nuevaPlantula.save();
-    res.status(201).json({ mensaje: 'Plántula registrada' });
+    const nuevaEspecie = new Especie(req.body); 
+    await nuevaEspecie.save();
+    res.status(201).json({ mensaje: 'Especie registrada en el catálogo botánico' });
   } catch (error) {
-    res.status(400).json({ error: 'Error al registrar' });
+    res.status(400).json({ error: 'Error al registrar especie. Verifica que el nombre no esté repetido.' });
   }
 });
 
-// Retirar stock de plántula (PROTEGIDA)
-app.post('/api/plantulas/retirar', verificarAdmin, async (req, res) => {
+// --- 6. RUTAS DE LOTES (TRAZABILIDAD) ---
+app.get('/api/lotes', async (req, res) => {
   try {
-    const { id, cantidadRetirar } = req.body;
-    const plantula = await Plantula.findById(id);
+    // populate() trae los datos de la especie conectada al lote
+    const lotes = await Lote.find().populate('especieId');
+    res.json(lotes);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener los lotes' });
+  }
+});
 
-    if (!plantula) return res.status(404).json({ error: 'Plántula no encontrada' });
+// Registrar una nueva recolección de semillas (Crear Lote)
+app.post('/api/lotes', verificarAdmin, async (req, res) => {
+  try {
+    const { especieId, origen, cantidadInicial } = req.body;
+    
+    // Generar código único (Ej: BQ-1026-8A3F)
+    const sufijoAleatorio = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const codigoLote = `BQ-${new Date().getMonth()+1}${new Date().getFullYear().toString().slice(-2)}-${sufijoAleatorio}`;
 
-    plantula.cantidad -= Number(cantidadRetirar);
-    const fechaSalida = new Date().toLocaleString();
+    const nuevoLote = new Lote({
+        codigoLote,
+        especieId,
+        origen,
+        cantidadInicial,
+        cantidadActual: cantidadInicial,
+        estadoActual: 'Semillero',
+        historial: [{
+            estadoAlcanzado: 'Recolección y Semillero',
+            cantidadSuperviviente: cantidadInicial,
+            observaciones: 'Lote inicial registrado en el sistema.',
+            responsable: req.usuarioActual
+        }]
+    });
 
-    if (plantula.cantidad <= 0) {
-      await Plantula.findByIdAndDelete(id);
-      console.log(`[LOG] - Retiro: ${cantidadRetirar} | Fecha: ${fechaSalida} | Stock agotado (Registro eliminado).`);
-      res.json({ mensaje: 'Stock agotado. Espacio liberado.' });
-    } else {
-      await plantula.save();
-      console.log(`[LOG] - Retiro: ${cantidadRetirar} | Fecha: ${fechaSalida} | Quedan: ${plantula.cantidad}.`);
-      res.json({ mensaje: 'Inventario actualizado.' });
+    await nuevoLote.save();
+    res.status(201).json({ mensaje: `Lote ${codigoLote} registrado exitosamente.`, lote: nuevoLote });
+  } catch (error) {
+    res.status(400).json({ error: 'Error al crear el lote de semillas' });
+  }
+});
+
+// Avanzar el lote a la siguiente etapa
+app.post('/api/lotes/avanzar', verificarAdmin, async (req, res) => {
+    try {
+        const { loteId, nuevoEstado, cantidadSuperviviente, observaciones } = req.body;
+        const lote = await Lote.findById(loteId);
+
+        if (!lote) return res.status(404).json({ error: 'Lote no encontrado' });
+
+        // Actualizamos el estado actual
+        lote.estadoActual = nuevoEstado;
+        lote.cantidadActual = cantidadSuperviviente;
+
+        // Inyectamos el evento en la historia
+        lote.historial.push({
+            estadoAlcanzado: nuevoEstado,
+            cantidadSuperviviente: cantidadSuperviviente,
+            observaciones: observaciones || '',
+            responsable: req.usuarioActual
+        });
+
+        await lote.save();
+        res.json({ mensaje: `Lote avanzado a etapa: ${nuevoEstado}` });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar el historial del lote' });
     }
-  } catch (error) {
-    res.status(500).json({ error: 'Error al procesar salida' });
-  }
-});
-
-// Editar plántula (PROTEGIDA)
-app.put('/api/plantulas/:id', verificarAdmin, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const datosActualizados = req.body;
-    
-    const plantula = await Plantula.findByIdAndUpdate(id, datosActualizados, { new: true });
-    
-    if (!plantula) return res.status(404).json({ error: 'Plántula no encontrada' });
-    res.json({ mensaje: 'Inventario actualizado correctamente', plantula });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar la plántula' });
-  }
 });
 
 
-// --- 6. FRONTEND Y PUERTO ---
+// --- 7. FRONTEND Y PUERTO ---
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
