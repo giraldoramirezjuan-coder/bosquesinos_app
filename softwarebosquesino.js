@@ -221,6 +221,25 @@ app.post('/api/especies', verificarAdmin, async (req, res) => {
   }
 });
 
+// Actualizar descripción y saber tradicional de una especie (PROTEGIDA)
+app.put('/api/especies/:id', verificarAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { caracteristicas, saberCampesino } = req.body;
+
+        const especie = await Especie.findByIdAndUpdate(
+            id,
+            { caracteristicas, saberCampesino },
+            { new: true }
+        );
+
+        if (!especie) return res.status(404).json({ error: 'Especie no encontrada' });
+        res.json({ mensaje: 'Información botánica y tradicional actualizada', especie });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la especie' });
+    }
+});
+
 // --- 6. RUTAS DE LOTES (TRAZABILIDAD) ---
 app.get('/api/lotes', async (req, res) => {
   try {

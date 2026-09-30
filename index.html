@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Portal Bosquesinos 2.0 - Trazabilidad</title>
+    <title>Bosquesinos San Luis</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -26,10 +26,10 @@
             <!-- FORMULARIO 1: REGISTRAR ESPECIE (CATÁLOGO) -->
             <div style="flex: 1; min-width: 300px; background: #f8fbf9; padding: 15px; border-radius: 12px; border: 1px solid #d8eadd;">
                 <h4 style="color: #2d6a4f; margin-top: 0;">1. Registrar Nueva Especie Botánica</h4>
-                <form id="formEspecie">
-                    <input type="text" id="esp-nombre" placeholder="Nombre común (Ej. Guayacán)" required>
-                    <input type="text" id="esp-cientifico" placeholder="Nombre científico (Opcional)">
-                    <input type="url" id="esp-imagen" placeholder="URL de la fotografía">
+                <form id="formEspecie" autocomplete="off">
+                    <input type="text" id="esp-nombre" placeholder="Nombre común (Ej. Guayacán)" autocomplete="off" required>
+                    <input type="text" id="esp-cientifico" placeholder="Nombre científico (Opcional)" autocomplete="off">
+                    <input type="url" id="esp-imagen" placeholder="URL de la fotografía" autocomplete="off">
                     <textarea id="esp-caracteristicas" placeholder="Características biológicas..."></textarea>
                     <button type="submit" class="btn-principal" style="background: #40916c;">Guardar Ficha Botánica</button>
                 </form>
@@ -38,22 +38,23 @@
             <!-- FORMULARIO 2: REGISTRAR RECOLECCIÓN (NUEVO LOTE) -->
             <div style="flex: 1; min-width: 300px; background: #f8fbf9; padding: 15px; border-radius: 12px; border: 1px solid #d8eadd;">
                 <h4 style="color: #2d6a4f; margin-top: 0;">2. Registrar Recolección de Semillas</h4>
-                <form id="formLote">
+                <form id="formLote" autocomplete="off">
                     <select id="lote-especie" required>
                         <option value="">-- Selecciona una Especie --</option>
                     </select>
                     <input type="number" id="lote-cantidad" placeholder="Cantidad de semillas recolectadas" required>
-                    <input type="text" id="lote-finca" placeholder="Finca de recolección" required>
-                    <input type="text" id="lote-arbol" placeholder="Datos del Árbol Madre (Opcional)">
-                    <input type="text" id="lote-responsable" placeholder="Responsable de la recolección" required>
+                    <input type="text" id="lote-finca" placeholder="Finca de recolección" autocomplete="off" required>
+                    <input type="text" id="lote-arbol" placeholder="Datos del Árbol Madre (Opcional)" autocomplete="off">
+                    <input type="text" id="lote-responsable" placeholder="Responsable de la recolección" autocomplete="off" required>
                     <input type="date" id="lote-fecha" required>
                     <button type="submit" class="btn-principal" style="background: #e07a5f;">Generar Nuevo Lote</button>
                 </form>
             </div>
         </div>
 
-        <hr style="border: 1px solid #bcdec1; margin: 20px 0;">
-        <div style="text-align: center;">
+        <!-- CONTENEDOR EXCLUSIVO PARA ADMINISTRADORES -->
+        <div id="seccionCrearBosquesino" class="oculto" style="text-align: center;">
+            <hr style="border: 1px solid #bcdec1; margin: 20px 0;">
             <button class="btn-principal" style="background: #386641; width: auto; padding: 10px 20px;" onclick="abrirModalBosquesino()">Agregar Nuevo Bosquesino</button>
         </div>
     </div>
@@ -64,8 +65,8 @@
             <span class="cerrar-modal" onclick="cerrarModalLogin()">&times;</span>
             <h3 style="color: #2a4d31; margin-top: 0;">Acceso de bosquesinos</h3>
             <p style="font-size: 13px; color: #555; margin-bottom: 20px;">Ingresa tus credenciales para administrar el inventario y trazabilidad.</p>
-            <input type="text" id="login-email" placeholder="Usuario" required>
-            <input type="password" id="login-password" placeholder="Contraseña" required>
+            <input type="text" id="login-email" placeholder="Usuario" autocomplete="off" required>
+            <input type="password" id="login-password" placeholder="Contraseña" autocomplete="new-password" required>
             <button class="btn-principal" onclick="procesarLogin()">Ingresar</button>
         </div>
     </div>
@@ -75,9 +76,9 @@
         <div class="modal-contenido" style="max-width: 400px; text-align: center;">
             <span class="cerrar-modal" onclick="cerrarModalBosquesino()">&times;</span>
             <h3 style="color: #2a4d31; margin-top: 0;">Agregar Nuevo Bosquesino</h3>
-            <form id="formRegistrarAsociado">
-                <input type="text" id="nuevo-email" placeholder="Usuario (Ej. asoc_carlos)" required>
-                <input type="password" id="nueva-password" placeholder="Contraseña segura" required>
+            <form id="formRegistrarAsociado" autocomplete="off">
+                <input type="text" id="nuevo-email" placeholder="Usuario (Ej. asoc_carlos)" autocomplete="off" required>
+                <input type="password" id="nueva-password" placeholder="Contraseña segura" autocomplete="new-password" required>
                 <button type="submit" class="btn-principal" style="background: #386641;">Crear Bosquesino</button>
             </form>
         </div>
@@ -98,8 +99,10 @@
             <div class="total-carrito">
                 <strong>Plántulas seleccionadas:</strong> <span id="totalPlantaCarrito">0</span>
             </div>
-            <button class="btn-principal" style="background: #25D366; font-size: 16px;" onclick="enviarWhatsApp()">
-                📲 Contactar al vivero por WhatsApp
+            
+            <!-- BOTÓN DE CONTACTO NEUTRAL Y FORMAL -->
+            <button class="btn-classic-primary" style="font-size: 14px; padding: 12px; margin-top: 10px; background-color: #2d6a4f; border-color: #1b4332;" onclick="enviarWhatsApp()">
+                Enviar solicitud por WhatsApp
             </button>
         </div>
     </div>
@@ -108,19 +111,43 @@
     <div id="modalDetalleEspecie" class="modal oculto">
         <div class="modal-contenido" style="max-width: 550px; text-align: center;">
             <span class="cerrar-modal" onclick="cerrarModalDetalle()">&times;</span>
-            <img id="detalle-imagen" src="" alt="Especie" style="width:100%; height:250px; object-fit:cover; border-radius:12px; margin-bottom:15px; border-bottom: 4px solid #74c69d; display: none;">
-            <h2 id="detalle-nombre" style="color: #1b4332; margin: 0 0 5px 0; font-size: 26px;"></h2>
-            <i id="detalle-cientifico" style="color: #52796f; font-size: 15px; display: block; margin-bottom: 15px;"></i>
-            <p id="detalle-caracteristicas" style="font-size: 14.5px; color: #354f52; line-height: 1.6; margin-bottom: 20px; text-align: left;"></p>
+            <img id="detalle-imagen" src="" alt="Especie" style="width:100%; height:220px; object-fit:cover; border-radius:8px; margin-bottom:15px; border-bottom: 3px solid #74c69d; display: none;">
             
-            <div style="background: #f1f7f3; padding: 15px; border-radius: 8px; border: 1px dashed #40916c; margin-bottom: 25px; text-align: left;">
-                <strong style="color: #2d6a4f; font-size: 13px;">🌱 Saber campesino y tradicional:</strong>
-                <p style="font-size: 13px; color: #52796f; margin: 5px 0 0 0;">(Próximamente añadiremos más detalles sobre la historia, usos y la importancia de esta especie en el territorio de San Luis).</p>
+            <h2 id="detalle-nombre" style="color: #1b4332; margin: 0 0 5px 0; font-size: 24px;"></h2>
+            <i id="detalle-cientifico" style="color: #52796f; font-size: 14px; display: block; margin-bottom: 15px;"></i>
+            
+            <!-- VISTA LECTURA -->
+            <div id="vistaLecturaEspecie">
+                <p id="detalle-caracteristicas" style="font-size: 14px; color: #354f52; line-height: 1.5; margin-bottom: 15px; text-align: left;"></p>
+                
+                <div style="background: #f1f7f3; padding: 15px; border-radius: 8px; border: 1px dashed #40916c; margin-bottom: 20px; text-align: left;">
+                    <strong style="color: #2d6a4f; font-size: 13px;">🌱 Saber campesino y tradicional:</strong>
+                    <p id="detalle-saber" style="font-size: 13px; color: #52796f; margin: 6px 0 0 0; line-height: 1.4;"></p>
+                </div>
+            </div>
+
+            <!-- VISTA EDICIÓN (SOLO ASOCIADOS) -->
+            <form id="formEditarEspecie" class="oculto" autocomplete="off" style="text-align: left; margin-bottom: 15px;">
+                <label style="font-size:12px; color:#57606a; font-weight:600;">Descripción botánica / Características:</label>
+                <textarea id="edit-caracteristicas-esp" style="width:100%; min-height:80px; margin-top:4px;" required></textarea>
+                
+                <label style="font-size:12px; color:#57606a; font-weight:600; margin-top:10px; display:block;">Saber campesino y tradicional (usos, historia, floración):</label>
+                <textarea id="edit-saber-esp" style="width:100%; min-height:90px; margin-top:4px;" placeholder="Relata usos medicinales, épocas de semilla en el territorio, valor para el bosque..."></textarea>
+                
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button type="submit" class="btn-classic-primary" style="flex:1;">Guardar Cambios</button>
+                    <button type="button" class="btn-classic-secondary" style="flex:1;" onclick="cancelarEdicionEspecie()">Cancelar</button>
+                </div>
+            </form>
+
+            <!-- BOTÓN ACTIVAR EDICIÓN (VISIBLE SI ES ASOCIADO O ADMIN) -->
+            <div id="contenedorBotonEditarFicha" class="oculto" style="margin-bottom: 15px;">
+                <button class="btn-classic-secondary" style="font-size: 12px; padding: 6px;" onclick="activarEdicionEspecie()">✏️ Editar descripción y saber tradicional</button>
             </div>
 
             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <button class="btn-principal" style="background: #e07a5f; flex: 1; min-width: 200px;" onclick="apadrinarArbol()">💚 Apadrina un árbol</button>
-                <button class="btn-principal" style="background: #2d6a4f; flex: 1; min-width: 200px;" onclick="adquirirEjemplar()">🛒 Deseo adquirir ejemplares</button>
+                <button class="btn-principal" style="background: #e07a5f; flex: 1; min-width: 180px;" onclick="apadrinarArbol()">💚 Apadrina un árbol</button>
+                <button class="btn-principal" style="background: #2d6a4f; flex: 1; min-width: 180px;" onclick="adquirirEjemplar()">🛒 Deseo adquirir ejemplares</button>
             </div>
         </div>
     </div>
@@ -142,7 +169,7 @@
             <span class="cerrar-modal" onclick="cerrarModalAvanzar()">&times;</span>
             <h3 style="color: #2a4d31; margin-top: 0;">Avanzar Etapa de Lote</h3>
             <p id="textoCodigoLote" style="font-size: 14px; color: #4a7c59; font-weight:bold;"></p>
-            <form id="formAvanzar">
+            <form id="formAvanzar" autocomplete="off">
                 <input type="hidden" id="avanzar-loteId">
                 <label style="font-size: 12px; color:#555; text-align:left; display:block;">Nueva Etapa:</label>
                 <select id="avanzar-estado" required>
@@ -166,12 +193,12 @@
             <span class="cerrar-modal" onclick="cerrarModalRetiroLote()">&times;</span>
             <h3 style="color: #1f2328; margin-top: 0;">Retirar plántulas del lote</h3>
             <p id="textoRetiroLote" style="font-size: 13px; color: #57606a;"></p>
-            <form id="formRetirarLote">
+            <form id="formRetirarLote" autocomplete="off">
                 <input type="hidden" id="retirar-loteId">
                 <label style="font-size:12px; color:#57606a; display:block; text-align:left;">Cantidad a retirar:</label>
                 <input type="number" id="retirar-loteCantidad" min="1" required>
                 <label style="font-size:12px; color:#57606a; display:block; text-align:left;">Motivo de salida:</label>
-                <input type="text" id="retirar-loteMotivo" placeholder="Ej. Siembra comunitaria, venta o merma" required>
+                <input type="text" id="retirar-loteMotivo" placeholder="Ej. Siembra comunitaria, venta o merma" autocomplete="off" required>
                 <button type="submit" class="btn-classic-danger" style="width:100%; padding:8px; margin-top:8px;">Confirmar Retiro</button>
             </form>
         </div>
@@ -192,6 +219,7 @@
     
     window.especiesGlobal = [];
     window.lotesGlobal = [];
+    let especieActualId = null;
     let especieSeleccionadaMicrositio = null;
 
     function obtenerCabecerasSeguras() {
@@ -458,17 +486,32 @@
         }
     });
 
-    // --- MICROSITIO DE LA ESPECIE (PÚBLICO) ---
+    // --- MICROSITIO DE LA ESPECIE (PÚBLICO Y EDICIÓN) ---
     function abrirMicrositio(id) {
         const especie = window.especiesGlobal.find(item => item._id === id);
         if (!especie) return;
         
+        especieActualId = especie._id;
         especieSeleccionadaMicrositio = especie.nombreComun; 
 
         document.getElementById('detalle-nombre').innerText = especie.nombreComun;
         document.getElementById('detalle-cientifico').innerText = especie.nombreCientifico || 'No registrado';
-        document.getElementById('detalle-caracteristicas').innerText = especie.caracteristicas || 'Sin descripción.';
+        document.getElementById('detalle-caracteristicas').innerText = especie.caracteristicas || 'Sin descripción disponible aún.';
         
+        const textoSaber = especie.saberCampesino && especie.saberCampesino.trim() !== '' 
+            ? especie.saberCampesino 
+            : '(Próximamente añadiremos más detalles sobre la historia, usos y la importancia de esta especie en el territorio de San Luis).';
+        document.getElementById('detalle-saber').innerText = textoSaber;
+
+        const btnEditContenedor = document.getElementById('contenedorBotonEditarFicha');
+        if (modoAdminActivo) {
+            btnEditContenedor.classList.remove('oculto');
+        } else {
+            btnEditContenedor.classList.add('oculto');
+        }
+
+        cancelarEdicionEspecie();
+
         const imgEl = document.getElementById('detalle-imagen');
         if (especie.imagenUrl && especie.imagenUrl.trim() !== '') {
             imgEl.src = especie.imagenUrl;
@@ -482,6 +525,50 @@
     function cerrarModalDetalle() { 
         document.getElementById('modalDetalleEspecie').classList.add('oculto'); 
     }
+
+    function activarEdicionEspecie() {
+        const especie = window.especiesGlobal.find(item => item._id === especieActualId);
+        if (!especie) return;
+
+        document.getElementById('edit-caracteristicas-esp').value = especie.caracteristicas || '';
+        document.getElementById('edit-saber-esp').value = especie.saberCampesino || '';
+
+        document.getElementById('vistaLecturaEspecie').classList.add('oculto');
+        document.getElementById('formEditarEspecie').classList.remove('oculto');
+        document.getElementById('contenedorBotonEditarFicha').classList.add('oculto');
+    }
+
+    function cancelarEdicionEspecie() {
+        document.getElementById('vistaLecturaEspecie').classList.remove('oculto');
+        document.getElementById('formEditarEspecie').classList.add('oculto');
+        if (modoAdminActivo) {
+            document.getElementById('contenedorBotonEditarFicha').classList.remove('oculto');
+        }
+    }
+
+    document.getElementById('formEditarEspecie').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const datos = {
+            caracteristicas: document.getElementById('edit-caracteristicas-esp').value,
+            saberCampesino: document.getElementById('edit-saber-esp').value
+        };
+
+        const res = await fetch(`${hostUrl}/api/especies/${especieActualId}`, {
+            method: 'PUT',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify(datos)
+        });
+
+        if (res.ok) {
+            await cargarCatalogo();
+            document.getElementById('detalle-caracteristicas').innerText = datos.caracteristicas;
+            document.getElementById('detalle-saber').innerText = datos.saberCampesino || '(Próximamente añadiremos más detalles sobre la historia, usos y la importancia de esta especie en el territorio de San Luis).';
+            cancelarEdicionEspecie();
+        } else {
+            const data = await res.json();
+            alert('Error al guardar: ' + data.error);
+        }
+    });
 
     function apadrinarArbol() {
         const url = `https://wa.me/573135398959?text=${encodeURIComponent(`Hola equipo de Bosquesinos 🌿. Quiero ser parte de la conservación y me gustaría apadrinar un árbol de la especie *${especieSeleccionadaMicrositio}*. ¿Me pueden dar más información de cómo hacerlo?`)}`;
@@ -544,9 +631,9 @@
     function cerrarModalCarrito() { document.getElementById('modalCarrito').classList.add('oculto'); }
     
     function enviarWhatsApp() {
-        let m = `Hola equipo de Bosquesinos 🌿. Me interesa apoyar el proyecto y me gustaría obtener información sobre estas especies:\n\n`;
+        let m = `Hola equipo de Bosquesinos. Me interesa apoyar el proyecto y me gustaría obtener información sobre estas especies nativas:\n\n`;
         carrito.forEach(i => m += `- ${i.cantidad}x ${i.nombre}\n`);
-        m += "\n¿Me podrían compartir disponibilidad y logística? Muchas gracias.";
+        m += "\n¿Me podrían compartir disponibilidad y logística de entrega? Muchas gracias.";
         window.open(`https://wa.me/573135398959?text=${encodeURIComponent(m)}`, '_blank');
     }
 
@@ -555,7 +642,9 @@
         if (modoAdminActivo) {
             modoAdminActivo = false;
             localStorage.removeItem('tokenAdmin');
+            localStorage.removeItem('rolUsuario');
             document.getElementById('panelAdmin').classList.add('oculto');
+            document.getElementById('seccionCrearBosquesino').classList.add('oculto');
             document.getElementById('btnModoAdmin').innerText = 'Acceso interno de la red';
             cargarCatalogo();
         } else {
@@ -582,10 +671,19 @@
             const data = await res.json();
             if (res.ok) {
                 localStorage.setItem('tokenAdmin', data.token);
+                localStorage.setItem('rolUsuario', data.rol);
                 modoAdminActivo = true;
                 cerrarModalLogin();
                 document.getElementById('panelAdmin').classList.remove('oculto');
                 document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión de Asociado';
+                
+                const btnCrear = document.getElementById('seccionCrearBosquesino');
+                if (data.rol === 'Admin') {
+                    btnCrear.classList.remove('oculto');
+                } else {
+                    btnCrear.classList.add('oculto');
+                }
+
                 cargarCatalogo(); 
             } else { 
                 alert('Acceso denegado: ' + data.error); 
@@ -631,6 +729,15 @@
             modoAdminActivo = true;
             document.getElementById('panelAdmin').classList.remove('oculto');
             document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión de Asociado';
+            
+            const rol = localStorage.getItem('rolUsuario');
+            const btnCrear = document.getElementById('seccionCrearBosquesino');
+            if (rol === 'Admin') {
+                btnCrear.classList.remove('oculto');
+            } else {
+                btnCrear.classList.add('oculto');
+            }
+
             cargarCatalogo(); 
         }
     };
