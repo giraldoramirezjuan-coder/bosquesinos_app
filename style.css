@@ -70,7 +70,6 @@ body {
     text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
 }
 
-
 /* --- PANEL DE ADMINISTRACIÓN --- */
 .tarjeta-admin { 
     background: #ffffff; padding: 25px; border-radius: 16px; 
@@ -113,7 +112,6 @@ button.btn-principal {
     transition: background 0.3s;
 }
 button.btn-principal:hover { background: #1b4332; }
-
 
 /* --- DISEÑO EN MOSAICO (GRID) --- */
 #listaPlantulas {
@@ -161,7 +159,6 @@ button.btn-principal:hover { background: #1b4332; }
 }
 .btn-editar:hover { background: #2d6a4f; }
 
-
 /* --- PIE DE PÁGINA (VISITANTES) --- */
 .footer-discreto {
     text-align: center;
@@ -186,9 +183,8 @@ button.btn-principal:hover { background: #1b4332; }
     text-decoration: underline;
 }
 
-/* Ocultar el viejo boton gigante que tenías antes */
+/* Ocultar el viejo boton gigante */
 .footer-admin { display: none; }
-
 
 /* --- VENTANAS FLOTANTES (MODALES) --- */
 .oculto { display: none !important; }
