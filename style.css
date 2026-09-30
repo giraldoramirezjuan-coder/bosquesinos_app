@@ -215,3 +215,39 @@ button.btn-principal:hover { background: #1b4332; }
     font-weight: bold !important; line-height: 1 !important;
 }
 .cerrar-modal:hover { color: #e07a5f !important; }
+
+/* --- CARRITO DE COTIZACIONES --- */
+.carrito-flotante {
+    position: fixed; bottom: 30px; right: 30px;
+    background: #2d6a4f; color: white;
+    padding: 15px 25px; border-radius: 50px;
+    font-size: 20px; cursor: pointer;
+    box-shadow: 0 10px 20px rgba(27, 67, 50, 0.4);
+    display: flex; align-items: center; gap: 10px;
+    transition: transform 0.3s, background 0.3s;
+    z-index: 1000;
+}
+.carrito-flotante:hover { transform: scale(1.05); background: #1b4332; }
+.carrito-flotante span {
+    background: #e07a5f; font-size: 15px; padding: 2px 10px;
+    border-radius: 20px; font-weight: bold;
+}
+
+.lista-carrito { list-style: none; padding: 0; margin: 0 0 20px 0; max-height: 250px; overflow-y: auto; }
+.lista-carrito li { 
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid #eef4f0; font-size: 14px;
+}
+.lista-carrito button.btn-quitar { 
+    background: #e07a5f; border: none; color: white; border-radius: 5px;
+    cursor: pointer; padding: 4px 8px; font-size: 12px; margin-bottom: 0; width: auto;
+}
+.total-carrito { font-size: 15px; color: #1b4332; margin-bottom: 20px; text-align: right; }
+
+/* Botón añadir en la tarjeta */
+.btn-add-carrito {
+    background: #f1f7f3; color: #2d6a4f; border: 1px solid #d8eadd;
+    padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600;
+    width: 100%; margin-top: 15px; transition: background 0.3s;
+}
+.btn-add-carrito:hover { background: #d8eadd; }

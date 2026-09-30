@@ -120,6 +120,29 @@
         </div>
     </div>
 
+<!-- BOTÓN FLOTANTE DEL CARRITO -->
+    <div id="btnCarrito" class="carrito-flotante oculto" onclick="abrirModalCarrito()">
+        🛒 <span id="contadorCarrito">0</span>
+    </div>
+
+    <!-- MODAL DEL CARRITO DE COMPRAS -->
+    <div id="modalCarrito" class="modal oculto">
+        <div class="modal-contenido" style="max-width: 450px;">
+            <span class="cerrar-modal" onclick="cerrarModalCarrito()">&times;</span>
+            <h3 style="color: #1b4332; margin-top: 0;">🌱 Tu pedido en Bosquesinos</h3>
+            <p style="font-size: 13px; color: #52796f; margin-bottom: 15px;">Ajusta las cantidades y envíanos tu solicitud para cotizar el envío.</p>
+            
+            <ul id="listaCarrito" class="lista-carrito"></ul>
+            
+            <div class="total-carrito">
+                <strong>Total plántulas a cotizar:</strong> <span id="totalPlantaCarrito">0</span>
+            </div>
+            <button class="btn-principal" style="background: #25D366; font-size: 16px;" onclick="enviarWhatsApp()">
+                📲 Cotizar pedido por WhatsApp
+            </button>
+        </div>
+    </div>
+
     <!-- MOSAICO DE INVENTARIO -->
     <ul id="listaPlantulas"></ul>
 
@@ -214,6 +237,12 @@
                         </div>
                         ${botonesAdmin}
                     </div>
+                    <div class="estadisticas">
+                            <span style="font-size: 13px; font-weight: 600; color: #386641;">📦 ${cantidadNum} uds.</span>
+                            <span class="estado-tag">${pl.estado}</span>
+                        </div>
+                        <button class="btn-add-carrito" onclick="agregarAlCarrito('${nombreSeguro}')">🛒 Añadir al pedido</button>
+                        ${botonesAdmin}
                 `;
                 lista.appendChild(item);
             });
@@ -428,6 +457,91 @@
             const data = await respuesta.json();
             alert("Error al retirar: " + data.error);
         }
+    }
+
+// =========================================================
+    // LÓGICA DEL CARRITO DE COTIZACIONES
+    // =========================================================
+    let carrito = [];
+
+    function agregarAlCarrito(especie) {
+        // Busca si ya está en el carrito, si sí, le suma 1
+        let item = carrito.find(i => i.nombre === especie);
+        if (item) {
+            item.cantidad += 1;
+        } else {
+            carrito.push({ nombre: especie, cantidad: 1 });
+        }
+        actualizarUI();
+    }
+
+    function quitarDelCarrito(especie) {
+        carrito = carrito.filter(i => i.nombre !== especie);
+        actualizarUI();
+    }
+
+    function cambiarCantidad(especie, delta) {
+        let item = carrito.find(i => i.nombre === especie);
+        if (item) {
+            item.cantidad += delta;
+            if (item.cantidad <= 0) quitarDelCarrito(especie);
+        }
+        actualizarUI();
+    }
+
+    function actualizarUI() {
+        const btnFlotante = document.getElementById('btnCarrito');
+        const contador = document.getElementById('contadorCarrito');
+        const lista = document.getElementById('listaCarrito');
+        const totalHtml = document.getElementById('totalPlantaCarrito');
+        
+        let totalPlantas = 0;
+        lista.innerHTML = '';
+
+        carrito.forEach(item => {
+            totalPlantas += item.cantidad;
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span style="font-weight:600; color:#1b4332;">${item.nombre}</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button class="btn-quitar" onclick="cambiarCantidad('${item.nombre}', -1)">-</button>
+                    <span>${item.cantidad}</span>
+                    <button class="btn-quitar" style="background:#40916c;" onclick="cambiarCantidad('${item.nombre}', 1)">+</button>
+                    <button class="btn-quitar" style="background:#b25b5d; margin-left:10px;" onclick="quitarDelCarrito('${item.nombre}')">🗑️</button>
+                </div>
+            `;
+            lista.appendChild(li);
+        });
+
+        contador.innerText = totalPlantas;
+        totalHtml.innerText = totalPlantas;
+
+        // Mostrar u ocultar el botón flotante según si hay cosas en el carrito
+        if (totalPlantas > 0) {
+            btnFlotante.classList.remove('oculto');
+        } else {
+            btnFlotante.classList.add('oculto');
+            cerrarModalCarrito(); // Si vacía el carrito, cierra la ventana
+        }
+    }
+
+    function abrirModalCarrito() { document.getElementById('modalCarrito').classList.remove('oculto'); }
+    function cerrarModalCarrito() { document.getElementById('modalCarrito').classList.add('oculto'); }
+
+    function enviarWhatsApp() {
+        // AQUÍ PONES TU NÚMERO DE TELÉFONO OFICIAL DE BOSQUESINOS (Ej: 573210000000)
+        const numeroWhatsApp = "573135398959"; 
+        
+        let mensaje = "Hola equipo de Bosquesinos 🌿. Me gustaría cotizar el siguiente pedido:\n\n";
+        
+        carrito.forEach(item => {
+            mensaje += `🌱 ${item.cantidad}x ${item.nombre}\n`;
+        });
+        
+        mensaje += "\n¿Me podrían confirmar disponibilidad, precios y costos de envío a mi ubicación? ¡Gracias!";
+        
+        const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+        window.open(url, '_blank');
     }
 
     // Cargar todo al iniciar
