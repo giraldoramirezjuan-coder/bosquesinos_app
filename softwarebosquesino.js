@@ -38,15 +38,37 @@ const especieSchema = new mongoose.Schema({
 });
 const Especie = mongoose.model('Especie', especieSchema);
 
+// 2.2 Árboles Matriz (Individuos Élite en las fincas)
+const arbolMatrizSchema = new mongoose.Schema({
+    codigoArbol: { type: String, required: true, unique: true }, // Ej: ABARCO-MATRIZ-01
+    especieId: { type: mongoose.Schema.Types.ObjectId, ref: 'Especie', required: true },
+    finca: { type: String, required: true },
+    custodio: { type: String, required: true }, // El bosquesino responsable
+    fechaSeleccion: { type: Date, default: Date.now },
+    coordenadasGPS: { type: String, default: '' },
+    
+    // La Bitácora Fenológica
+    monitoreos: [{
+        fechaObservacion: { type: Date, default: Date.now },
+        estadoFenologico: { 
+            type: String, 
+            enum: ['Vegetativo', 'Botón floral', 'Floración abierta', 'Fructificación inmadura', 'Semillando'],
+            required: true
+        },
+        observaciones: { type: String },
+        fotoUrl: { type: String },
+        registrador: { type: String } // Quién hizo el reporte
+    }]
+});
+const ArbolMatriz = mongoose.model('ArbolMatriz', arbolMatrizSchema);
+
 // 2.2 Motor de Trazabilidad (Lotes)
 const loteSchema = new mongoose.Schema({
     codigoLote: { type: String, required: true, unique: true }, 
     especieId: { type: mongoose.Schema.Types.ObjectId, ref: 'Especie', required: true },
     
     origen: {
-        finca: { type: String, required: true },
-        responsableRecoleccion: { type: String, required: true },
-        arbolMadreInfo: { type: String, default: 'No especificado' },
+        arbolMatrizId: { type: mongoose.Schema.Types.ObjectId, ref: 'ArbolMatriz', required: true },
         fechaRecoleccion: { type: Date, required: true }
     },
     
@@ -131,6 +153,51 @@ app.post('/api/login', async (req, res) => {
         res.json({ mensaje: '¡Bienvenido al sistema!', token: token, rol: usuario.rol });
     } catch (error) { 
         res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+
+// --- RUTAS DE ÁRBOLES MATRIZ ---
+// 1. Obtener todos los árboles matriz
+app.get('/api/arboles-matriz', async (req, res) => {
+    try {
+        const arboles = await ArbolMatriz.find().populate('especieId');
+        res.json(arboles);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al cargar los árboles matriz' });
+    }
+});
+
+// 2. Registrar un nuevo Árbol Matriz
+app.post('/api/arboles-matriz', verificarAdmin, async (req, res) => {
+    try {
+        const nuevoArbol = new ArbolMatriz(req.body);
+        await nuevoArbol.save();
+        res.status(201).json({ mensaje: `Árbol matriz ${nuevoArbol.codigoArbol} registrado.` });
+    } catch (error) {
+        res.status(400).json({ error: 'Error al registrar el árbol. Verifica el código.' });
+    }
+});
+
+// 3. Registrar un nuevo monitoreo (estado de floración/semilla)
+app.post('/api/arboles-matriz/:id/monitoreo', verificarAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { estadoFenologico, observaciones, fotoUrl } = req.body;
+        
+        const arbol = await ArbolMatriz.findById(id);
+        if (!arbol) return res.status(404).json({ error: 'Árbol no encontrado' });
+
+        arbol.monitoreos.push({
+            estadoFenologico,
+            observaciones,
+            fotoUrl,
+            registrador: req.usuarioActual
+        });
+
+        await arbol.save();
+        res.json({ mensaje: 'Monitoreo registrado exitosamente.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al guardar el monitoreo' });
     }
 });
 
@@ -232,4 +299,34 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor en línea en el puerto ${PORT}`);
+});
+
+// Retirar plántulas de un lote específico (salida por siembra, venta o merma)
+app.post('/api/lotes/retirar', verificarAdmin, async (req, res) => {
+    try {
+        const { loteId, cantidadRetirar, motivo } = req.body;
+        const lote = await Lote.findById(loteId);
+
+        if (!lote) return res.status(404).json({ error: 'Lote no encontrado' });
+
+        const cant = Number(cantidadRetirar);
+        if (cant <= 0 || cant > lote.cantidadActual) {
+            return res.status(400).json({ error: 'Cantidad no válida o superior a las plantas disponibles' });
+        }
+
+        lote.cantidadActual -= cant;
+        
+        // Se registra el motivo del retiro en la bitácora
+        lote.historial.push({
+            estadoAlcanzado: lote.estadoActual,
+            cantidadSuperviviente: lote.cantidadActual,
+            observaciones: `Retiro de ${cant} unidades. Motivo: ${motivo || 'Salida de vivero'}`,
+            responsable: req.usuarioActual
+        });
+
+        await lote.save();
+        res.json({ mensaje: `Se retiraron ${cant} unidades del lote ${lote.codigoLote}.` });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al procesar el retiro del lote' });
+    }
 });

@@ -58,7 +58,6 @@
         </div>
     </div>
 
-    <!-- MODALES EXISTENTES... -->
     <!-- MODAL DE LOGIN -->
     <div id="modalLogin" class="modal oculto">
         <div class="modal-contenido" style="max-width: 400px; text-align: center;">
@@ -126,20 +125,18 @@
         </div>
     </div>
 
-    <!-- NUEVO MODAL: GESTIÓN DE LOTES PARA ADMINS -->
+    <!-- MODAL: GESTIÓN DE LOTES PARA ADMINS -->
     <div id="modalGestionLotes" class="modal oculto">
         <div class="modal-contenido" style="max-width: 600px;">
             <span class="cerrar-modal" onclick="cerrarModalLotes()">&times;</span>
             <h3 style="color: #1b4332; margin-top: 0;">📦 Trazabilidad de Lotes</h3>
             <p style="font-size: 13px; color: #52796f; margin-bottom: 15px;">Gestiona el avance de las plántulas de <strong id="nombreEspecieLotes"></strong>.</p>
             
-            <div id="contenedorLotesActivos" style="max-height: 350px; overflow-y: auto;">
-                <!-- Aquí se inyectarán los lotes de esta especie -->
-            </div>
+            <div id="contenedorLotesActivos" style="max-height: 350px; overflow-y: auto;"></div>
         </div>
     </div>
 
-    <!-- NUEVO MODAL: AVANZAR LOTE -->
+    <!-- MODAL: AVANZAR LOTE -->
     <div id="modalAvanzarLote" class="modal oculto" style="z-index: 10000 !important;">
         <div class="modal-contenido" style="max-width: 400px; text-align: center;">
             <span class="cerrar-modal" onclick="cerrarModalAvanzar()">&times;</span>
@@ -163,6 +160,23 @@
         </div>
     </div>
 
+    <!-- MODAL: RETIRO DE UNIDADES DE LOTE -->
+    <div id="modalRetiroLote" class="modal oculto" style="z-index: 10000 !important;">
+        <div class="modal-contenido" style="max-width: 400px;">
+            <span class="cerrar-modal" onclick="cerrarModalRetiroLote()">&times;</span>
+            <h3 style="color: #1f2328; margin-top: 0;">Retirar plántulas del lote</h3>
+            <p id="textoRetiroLote" style="font-size: 13px; color: #57606a;"></p>
+            <form id="formRetirarLote">
+                <input type="hidden" id="retirar-loteId">
+                <label style="font-size:12px; color:#57606a; display:block; text-align:left;">Cantidad a retirar:</label>
+                <input type="number" id="retirar-loteCantidad" min="1" required>
+                <label style="font-size:12px; color:#57606a; display:block; text-align:left;">Motivo de salida:</label>
+                <input type="text" id="retirar-loteMotivo" placeholder="Ej. Siembra comunitaria, venta o merma" required>
+                <button type="submit" class="btn-classic-danger" style="width:100%; padding:8px; margin-top:8px;">Confirmar Retiro</button>
+            </form>
+        </div>
+    </div>
+
     <!-- MOSAICO DE INVENTARIO -->
     <ul id="listaPlantulas"></ul>
 
@@ -173,10 +187,9 @@
     </footer>
 
     <script>
-    const hostUrl = ''; // Mantén vacío si backend y frontend están en el mismo servidor de Render
+    const hostUrl = ''; 
     let modoAdminActivo = false;
     
-    // Variables globales para el nuevo sistema
     window.especiesGlobal = [];
     window.lotesGlobal = [];
     let especieSeleccionadaMicrositio = null;
@@ -197,11 +210,9 @@
         try {
             lista.innerHTML = '<p style="text-align:center; width:100%; color:#555;">Cargando ecosistema...</p>';
             
-            // 1. Obtener Especies
             const resEspecies = await fetch(`${hostUrl}/api/especies`);
             window.especiesGlobal = await resEspecies.json();
             
-            // 2. Obtener Lotes
             const resLotes = await fetch(`${hostUrl}/api/lotes`);
             window.lotesGlobal = await resLotes.json();
             
@@ -213,23 +224,18 @@
                 return;
             }
 
-            // Procesar cada especie para la vista pública y el selector del panel admin
             window.especiesGlobal.forEach(especie => {
-                // Agregar al selector del formulario de recolección
                 selectEspecie.innerHTML += `<option value="${especie._id}">${especie.nombreComun}</option>`;
 
-                // Filtrar los lotes que pertenecen a esta especie específica
                 const misLotes = window.lotesGlobal.filter(lote => lote.especieId && lote.especieId._id === especie._id);
                 
-                // Calcular el total de plantas vivas sumando los lotes
                 let cantidadTotalVivas = 0;
                 misLotes.forEach(lote => {
-                    if(lote.estadoActual !== 'Sembrada') { // No contamos las que ya se fueron
+                    if (lote.estadoActual !== 'Sembrada') {
                         cantidadTotalVivas += lote.cantidadActual;
                     }
                 });
 
-                // Construir la tarjeta
                 let elementoImagen = '';
                 if (especie.imagenUrl && especie.imagenUrl.trim() !== '') {
                     elementoImagen = `<img src="${especie.imagenUrl}" alt="${especie.nombreComun}" class="img-arbol" onerror="this.style.display='none'">`;
@@ -240,11 +246,8 @@
                 const nomCientifico = especie.nombreCientifico ? `<i>${especie.nombreCientifico}</i>` : '';
                 const descrip = especie.caracteristicas ? `<p>${especie.caracteristicas.substring(0, 80)}...</p>` : '';
 
-                // Botones Administrativos (Solo visibles si es Admin)
                 const botonesAdmin = modoAdminActivo 
-                    ? `<div style="display:flex; flex-direction:column; gap:5px; margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
-                           <button class="btn-editar" style="margin-top:0; background:#386641;" onclick="abrirGestionLotes('${especie._id}')">📦 Gestionar Lotes (${misLotes.length})</button>
-                       </div>` 
+                    ? `<button class="btn-classic-secondary" onclick="abrirGestionLotes('${especie._id}')">Gestionar Lotes (${misLotes.length})</button>` 
                     : '';
 
                 const item = document.createElement('li');
@@ -255,11 +258,14 @@
                         <h3>${especie.nombreComun}</h3>
                         ${nomCientifico}
                         ${descrip}
-                        <div class="estadisticas" style="margin-top:auto;">
-                            <span style="font-size: 13px; font-weight: 600; color: #386641;">📦 ${cantidadTotalVivas} uds. vivas</span>
+                        <div class="estadisticas">
+                            <span>Disponibles</span>
+                            <strong>${cantidadTotalVivas} uds.</strong>
                         </div>
-                        <button class="btn-add-carrito" onclick="abrirMicrositio('${especie._id}')">🌿 Conocer especie</button>
-                        ${botonesAdmin}
+                        <div class="acciones-tarjeta">
+                            <button class="btn-classic-primary" onclick="abrirMicrositio('${especie._id}')">Conocer especie</button>
+                            ${botonesAdmin}
+                        </div>
                     </div>
                 `;
                 lista.appendChild(item);
@@ -272,7 +278,6 @@
     }
 
     // --- FORMULARIOS ADMIN 2.0 ---
-    // 1. Guardar Especie
     document.getElementById('formEspecie').addEventListener('submit', async (e) => {
         e.preventDefault();
         const datos = {
@@ -293,11 +298,11 @@
             alert('Ficha botánica guardada');
             cargarCatalogo(); 
         } else {
-            const data = await res.json(); alert('Error: ' + data.error);
+            const data = await res.json(); 
+            alert('Error: ' + data.error);
         }
     });
 
-    // 2. Guardar Lote Nuevo
     document.getElementById('formLote').addEventListener('submit', async (e) => {
         e.preventDefault();
         const datos = {
@@ -320,10 +325,11 @@
         if (res.ok) {
             document.getElementById('formLote').reset();
             const data = await res.json();
-            alert(data.mensaje); // Muestra el código de lote generado
+            alert(data.mensaje);
             cargarCatalogo(); 
         } else {
-            const data = await res.json(); alert('Error: ' + data.error);
+            const data = await res.json(); 
+            alert('Error: ' + data.error);
         }
     });
 
@@ -336,23 +342,33 @@
         const contenedor = document.getElementById('contenedorLotesActivos');
         contenedor.innerHTML = '';
 
-        if(misLotes.length === 0){
+        if (misLotes.length === 0) {
             contenedor.innerHTML = '<p style="font-size:13px; color:#666;">No hay lotes (recolecciones) registradas para esta especie.</p>';
         } else {
             misLotes.forEach(lote => {
                 const f = new Date(lote.origen.fechaRecoleccion).toLocaleDateString();
                 contenedor.innerHTML += `
-                    <div style="background:#f1f7f3; padding:15px; border-radius:8px; margin-bottom:10px; border-left:4px solid #40916c;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <strong style="color:#1b4332;">${lote.codigoLote}</strong>
+                    <div style="background:#f6f8fa; border:1px solid #d0d7de; border-radius:6px; padding:12px; margin-bottom:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <strong style="color:#0969da; font-size:14px;">${lote.codigoLote}</strong>
                             <span class="estado-tag">${lote.estadoActual}</span>
                         </div>
-                        <p style="margin:0 0 5px 0; font-size:12px; color:#555;">📍 ${lote.origen.finca} | 👤 ${lote.origen.responsableRecoleccion} | 📅 ${f}</p>
-                        <p style="margin:0 0 10px 0; font-size:13px; color:#2d6a4f; font-weight:bold;">Plantas Vivas: ${lote.cantidadActual} / Iniciales: ${lote.cantidadInicial}</p>
-                        
-                        <button class="btn-editar" style="background:#e07a5f; margin:0;" onclick="prepararAvanceLote('${lote._id}', '${lote.codigoLote}', ${lote.cantidadActual}, '${lote.estadoActual}')">
-                            🚀 Registrar avance de etapa
-                        </button>
+                        <div style="font-size:12px; color:#57606a; margin-bottom:8px;">
+                            <span>Finca: ${lote.origen.finca}</span> | 
+                            <span>Resp: ${lote.origen.responsableRecoleccion}</span> | 
+                            <span>Fecha: ${f}</span>
+                        </div>
+                        <div style="font-size:13px; font-weight:600; color:#1f2328; margin-bottom:10px;">
+                            Vivas: ${lote.cantidadActual} / Iniciales: ${lote.cantidadInicial}
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn-classic-secondary" style="flex:1;" onclick="prepararAvanceLote('${lote._id}', '${lote.codigoLote}', ${lote.cantidadActual}, '${lote.estadoActual}')">
+                                Avanzar etapa
+                            </button>
+                            <button class="btn-classic-danger" onclick="prepararRetiroLote('${lote._id}', '${lote.codigoLote}', ${lote.cantidadActual})">
+                                Retirar unidades
+                            </button>
+                        </div>
                     </div>
                 `;
             });
@@ -360,9 +376,11 @@
         document.getElementById('modalGestionLotes').classList.remove('oculto');
     }
 
-    function cerrarModalLotes() { document.getElementById('modalGestionLotes').classList.add('oculto'); }
+    function cerrarModalLotes() { 
+        document.getElementById('modalGestionLotes').classList.add('oculto'); 
+    }
 
-    // Avanzar Lote (La trazabilidad en acción)
+    // Avanzar Etapa
     function prepararAvanceLote(id, codigo, cantidad, estadoActual) {
         document.getElementById('textoCodigoLote').innerText = `Lote: ${codigo}`;
         document.getElementById('avanzar-loteId').value = id;
@@ -373,7 +391,9 @@
         document.getElementById('modalAvanzarLote').classList.remove('oculto');
     }
 
-    function cerrarModalAvanzar() { document.getElementById('modalAvanzarLote').classList.add('oculto'); }
+    function cerrarModalAvanzar() { 
+        document.getElementById('modalAvanzarLote').classList.add('oculto'); 
+    }
 
     document.getElementById('formAvanzar').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -393,12 +413,50 @@
         if (res.ok) {
             cerrarModalAvanzar();
             cerrarModalLotes();
-            cargarCatalogo(); // Recarga todo para actualizar las estadísticas
+            cargarCatalogo(); 
         } else {
-            const data = await res.json(); alert('Error: ' + data.error);
+            const data = await res.json(); 
+            alert('Error: ' + data.error);
         }
     });
 
+    // Retirar Unidades de Lote
+    function prepararRetiroLote(id, codigo, disponibles) {
+        document.getElementById('textoRetiroLote').innerText = `Lote ${codigo} (${disponibles} disponibles)`;
+        document.getElementById('retirar-loteId').value = id;
+        document.getElementById('retirar-loteCantidad').max = disponibles;
+        document.getElementById('retirar-loteCantidad').value = '';
+        document.getElementById('retirar-loteMotivo').value = '';
+        document.getElementById('modalRetiroLote').classList.remove('oculto');
+    }
+
+    function cerrarModalRetiroLote() {
+        document.getElementById('modalRetiroLote').classList.add('oculto');
+    }
+
+    document.getElementById('formRetirarLote').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const datos = {
+            loteId: document.getElementById('retirar-loteId').value,
+            cantidadRetirar: parseInt(document.getElementById('retirar-loteCantidad').value),
+            motivo: document.getElementById('retirar-loteMotivo').value
+        };
+
+        const res = await fetch(`${hostUrl}/api/lotes/retirar`, {
+            method: 'POST',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify(datos)
+        });
+
+        if (res.ok) {
+            cerrarModalRetiroLote();
+            cerrarModalLotes();
+            cargarCatalogo();
+        } else {
+            const data = await res.json();
+            alert('Error: ' + data.error);
+        }
+    });
 
     // --- MICROSITIO DE LA ESPECIE (PÚBLICO) ---
     function abrirMicrositio(id) {
@@ -421,7 +479,9 @@
         document.getElementById('modalDetalleEspecie').classList.remove('oculto');
     }
 
-    function cerrarModalDetalle() { document.getElementById('modalDetalleEspecie').classList.add('oculto'); }
+    function cerrarModalDetalle() { 
+        document.getElementById('modalDetalleEspecie').classList.add('oculto'); 
+    }
 
     function apadrinarArbol() {
         const url = `https://wa.me/573135398959?text=${encodeURIComponent(`Hola equipo de Bosquesinos 🌿. Quiero ser parte de la conservación y me gustaría apadrinar un árbol de la especie *${especieSeleccionadaMicrositio}*. ¿Me pueden dar más información de cómo hacerlo?`)}`;
@@ -434,7 +494,6 @@
         abrirModalCarrito(); 
     }
 
-
     // --- CARRITO DE COTIZACIONES ---
     let carrito = [];
     function agregarAlCarrito(nombre) {
@@ -443,10 +502,12 @@
         else carrito.push({ nombre: nombre, cantidad: 1 });
         actualizarUI();
     }
+
     function quitarDelCarrito(nombre) {
         carrito = carrito.filter(i => i.nombre !== nombre);
         actualizarUI();
     }
+
     function cambiarCantidad(nombre, delta) {
         let item = carrito.find(i => i.nombre === nombre);
         if (item) {
@@ -455,10 +516,12 @@
         }
         actualizarUI();
     }
+
     function actualizarUI() {
         const btnFlotante = document.getElementById('btnCarrito');
         const lista = document.getElementById('listaCarrito');
-        let totalPlantas = 0; lista.innerHTML = '';
+        let totalPlantas = 0; 
+        lista.innerHTML = '';
         carrito.forEach(item => {
             totalPlantas += item.cantidad;
             lista.innerHTML += `
@@ -476,15 +539,16 @@
         document.getElementById('totalPlantaCarrito').innerText = totalPlantas;
         totalPlantas > 0 ? btnFlotante.classList.remove('oculto') : (btnFlotante.classList.add('oculto'), cerrarModalCarrito());
     }
+
     function abrirModalCarrito() { document.getElementById('modalCarrito').classList.remove('oculto'); }
     function cerrarModalCarrito() { document.getElementById('modalCarrito').classList.add('oculto'); }
+    
     function enviarWhatsApp() {
         let m = `Hola equipo de Bosquesinos 🌿. Me interesa apoyar el proyecto y me gustaría obtener información sobre estas especies:\n\n`;
         carrito.forEach(i => m += `- ${i.cantidad}x ${i.nombre}\n`);
         m += "\n¿Me podrían compartir disponibilidad y logística? Muchas gracias.";
         window.open(`https://wa.me/573135398959?text=${encodeURIComponent(m)}`, '_blank');
     }
-
 
     // --- AUTENTICACIÓN Y LOGIN ---
     function toggleAdmin() {
@@ -501,14 +565,19 @@
 
     function cerrarModalLogin() {
         document.getElementById('modalLogin').classList.add('oculto');
-        document.getElementById('login-email').value = ''; document.getElementById('login-password').value = '';
+        document.getElementById('login-email').value = ''; 
+        document.getElementById('login-password').value = '';
     }
 
     async function procesarLogin() {
         try {
             const res = await fetch(`${hostUrl}/api/login`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: document.getElementById('login-email').value, password: document.getElementById('login-password').value })
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    email: document.getElementById('login-email').value, 
+                    password: document.getElementById('login-password').value 
+                })
             });
             const data = await res.json();
             if (res.ok) {
@@ -518,24 +587,41 @@
                 document.getElementById('panelAdmin').classList.remove('oculto');
                 document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión de Asociado';
                 cargarCatalogo(); 
-            } else { alert('Acceso denegado: ' + data.error); }
-        } catch (err) { alert('Sin conexión con el servidor.'); }
+            } else { 
+                alert('Acceso denegado: ' + data.error); 
+            }
+        } catch (err) { 
+            alert('Sin conexión con el servidor.'); 
+        }
     }
 
     function abrirModalBosquesino() { document.getElementById('modalBosquesino').classList.remove('oculto'); }
-    function cerrarModalBosquesino() { document.getElementById('modalBosquesino').classList.add('oculto'); document.getElementById('formRegistrarAsociado').reset(); }
+    function cerrarModalBosquesino() { 
+        document.getElementById('modalBosquesino').classList.add('oculto'); 
+        document.getElementById('formRegistrarAsociado').reset(); 
+    }
 
     document.getElementById('formRegistrarAsociado').addEventListener('submit', async (e) => {
         e.preventDefault(); 
         try {
             const res = await fetch(`${hostUrl}/api/registrar-asociado`, {
-                method: 'POST', headers: obtenerCabecerasSeguras(),
-                body: JSON.stringify({ email: document.getElementById('nuevo-email').value, password: document.getElementById('nueva-password').value })
+                method: 'POST', 
+                headers: obtenerCabecerasSeguras(),
+                body: JSON.stringify({ 
+                    email: document.getElementById('nuevo-email').value, 
+                    password: document.getElementById('nueva-password').value 
+                })
             });
             const data = await res.json();
-            if (res.ok) { alert('Éxito: ' + data.mensaje); cerrarModalBosquesino(); } 
-            else { alert('Error: ' + data.error); }
-        } catch (err) { alert('Error de conexión.'); }
+            if (res.ok) { 
+                alert('Éxito: ' + data.mensaje); 
+                cerrarModalBosquesino(); 
+            } else { 
+                alert('Error: ' + data.error); 
+            }
+        } catch (err) { 
+            alert('Error de conexión.'); 
+        }
     });
 
     // --- INICIO ---
