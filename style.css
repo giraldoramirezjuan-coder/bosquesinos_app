@@ -39,8 +39,8 @@ body {
 }
 
 .hero-logo {
-    width: 80px;
-    height: 80px;
+    width: 180px;
+    height: 180px;
     object-fit: contain;
     margin-bottom: 12px;
 }
