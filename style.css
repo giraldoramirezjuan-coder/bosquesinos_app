@@ -10,12 +10,12 @@ body {
     margin: 0;
 }
 
-/* --- HERO SECTION --- */
+/* --- HERO SECTION ORIGINAL --- */
 .hero-section {
     position: relative;
     width: 100%;
-    min-height: 420px;
-    background-image: url('https://i.imgur.com/aQb45Sp.jpeg');
+    min-height: 380px;
+    background-image: url('https://i.imgur.com/jbebAua.jpeg');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -28,8 +28,8 @@ body {
 .hero-overlay {
     width: 100%;
     height: 100%;
-    min-height: 420px;
-    background: radial-gradient(circle, rgba(10, 25, 18, 0.70) 0%, rgba(5, 15, 10, 0.92) 100%);
+    min-height: 380px;
+    background: radial-gradient(circle, rgba(10, 25, 18, 0.75) 0%, rgba(5, 15, 10, 0.92) 100%);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -38,23 +38,34 @@ body {
     box-sizing: border-box;
 }
 
-/* Control estricto del tamaño del logo blanco */
-.hero-logo-banner {
-    width: 100%;
-    max-width: 380px;      /* Controla el ancho normal para que no se desborde */
-    height: auto;          /* Mantiene la proporción correcta */
+.hero-logo {
+    width: 80px;
+    height: 80px;
     object-fit: contain;
-    margin-bottom: 20px;
-    display: block;
+    margin-bottom: 12px;
+}
+
+.hero-title {
+    color: #ffffff;
+    font-size: 38px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.5px;
+}
+
+.hero-subtitle {
+    color: #52b788;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 14px 0;
 }
 
 .hero-text {
     color: #e5e7eb;
-    font-size: 14.5px;
-    max-width: 600px;
+    font-size: 14px;
+    max-width: 580px;
     line-height: 1.5;
     margin: 0 auto;
-    font-weight: 400;
 }
 
 /* --- PANEL DE ADMINISTRACIÓN --- */
