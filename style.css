@@ -39,10 +39,12 @@ body {
 }
 
 .hero-logo {
-    width: 350px;
-    height: 350px;
+    width: 100%;
+    max-width: 320px;       /* Evita que se desborde y mantiene la nitidez */
+    height: auto;           /* Conserva la proporción original del PNG */
     object-fit: contain;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    display: block;
 }
 
 .hero-title {
