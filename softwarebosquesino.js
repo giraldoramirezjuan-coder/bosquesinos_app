@@ -19,9 +19,7 @@ mongoose.connect(uri)
   })
   .catch(err => console.error('Error conectando a la base de datos:', err));
 
-// --- 2. MODELOS DE DATOS (UN VIVERO, MÚLTIPLES ORÍGENES) ---
-
-// 2.1 Usuarios (Todos pertenecen a la misma Asociación Bosquesinos)
+// --- 2. MODELOS DE DATOS ---
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -29,7 +27,6 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-// 2.2 Catálogo Botánico (Con muro de saberes individuales)
 const especieSchema = new mongoose.Schema({
     nombreComun: { type: String, required: true, unique: true },
     nombreCientifico: { type: String, default: '' },
@@ -44,31 +41,31 @@ const especieSchema = new mongoose.Schema({
 });
 const Especie = mongoose.model('Especie', especieSchema);
 
-// 2.3 Árboles Matriz (Rastreo geográfico)
+// 2.3 Árboles Matriz (Bajo Protocolo de Ofuscación Geográfica Preventiva)
 const arbolMatrizSchema = new mongoose.Schema({
     codigoArbol: { type: String, required: true, unique: true }, 
     especieId: { type: mongoose.Schema.Types.ObjectId, ref: 'Especie', required: true },
-    finca: { type: String, required: true }, // Dónde está el árbol en el territorio
-    custodio: { type: String, required: true }, // Quién lo cuida
+    finca: { type: String, required: true },
+    veredaSector: { type: String, required: true }, // Macrolocalización preventiva (sin GPS exacto)
+    custodio: { type: String, required: true },     // Nombre del campesino/asociado custodio
+    registradoPor: { type: String, required: true },// Correo del asociado en sesión
     fechaSeleccion: { type: Date, default: Date.now },
-    coordenadasGPS: { type: String, default: '' },
     monitoreos: [{
         fechaObservacion: { type: Date, default: Date.now },
-        estadoFenologico: { type: String, required: true },
+        estadoFenologico: { type: String, required: true }, // Ej: Floración, Fructificación, Semilla madura
         observaciones: { type: String },
-        fotoUrl: { type: String },
-        registrador: { type: String } 
+        registrador: { type: String }
     }]
 });
+
 const ArbolMatriz = mongoose.model('ArbolMatriz', arbolMatrizSchema);
 
-// 2.4 Motor de Trazabilidad (Inventario comunal con origen específico)
 const loteSchema = new mongoose.Schema({
     codigoLote: { type: String, required: true, unique: true }, 
     especieId: { type: mongoose.Schema.Types.ObjectId, ref: 'Especie', required: true },
-    registradoPor: { type: String, required: true }, // NUEVO: Guarda el correo de quien lo subió
+    registradoPor: { type: String, required: true },
     origen: {
-        arbolMadreInfo: { type: String, default: '' }, // Ajustado para coincidir con el formulario
+        arbolMadreInfo: { type: String, default: '' },
         finca: { type: String, required: true }, 
         fechaRecoleccion: { type: Date, required: true },
         responsableRecoleccion: { type: String, required: true } 
@@ -101,26 +98,25 @@ async function crearUsuarioAdmin() {
   }
 }
 
-// --- MIDDLEWARE DE SEGURIDAD INTERNA ---
+// --- MIDDLEWARE DE SEGURIDAD ---
 function verificarAcceso(req, res, next) {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(403).json({ error: 'Acceso denegado' });
+    const headerAuth = req.headers['authorization'];
+    if (!headerAuth) return res.status(403).json({ error: 'Acceso denegado: falta token' });
 
     try {
-        const tokenLimpio = token.replace('Bearer ', '');
+        const tokenLimpio = headerAuth.replace('Bearer ', '').trim();
         const decodificado = jwt.verify(tokenLimpio, process.env.JWT_SECRET);
         req.usuarioActual = decodificado.email; 
         req.rol = decodificado.rol;
         next(); 
     } catch (error) {
-        return res.status(401).json({ error: 'Token inválido' });
+        return res.status(401).json({ error: 'Token inválido o expirado' });
     }
 }
 
 // =======================================================
-//   RUTAS PÚBLICAS (VITRINA PARA VISITANTES)
+//   RUTAS PÚBLICAS
 // =======================================================
-
 app.get('/api/especies', async (req, res) => {
     try {
       const especies = await Especie.find();
@@ -141,33 +137,48 @@ app.get('/api/lotes', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
     try {
-        const usuario = await User.findOne({ email: String(req.body.email) });
+        const usuario = await User.findOne({ email: String(req.body.email).trim() });
         if (!usuario) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
         const claveValida = await bcrypt.compare(String(req.body.password), usuario.password);
         if (!claveValida) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
-        const token = jwt.sign({ id: usuario._id, email: usuario.email, rol: usuario.rol }, process.env.JWT_SECRET, { expiresIn: '8h' });
+        const token = jwt.sign(
+            { id: usuario._id, email: usuario.email, rol: usuario.rol }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '12h' }
+        );
         
-        // AGREGAMOS el email en la respuesta para que la página web sepa quién está logueado
-        res.json({ mensaje: 'Bienvenido', token: token, rol: usuario.rol, email: usuario.email });
+        res.json({ mensaje: 'Bienvenido', token, rol: usuario.rol, email: usuario.email });
     } catch (error) { 
-        res.status(500).json({ error: 'Error en el servidor' });
+        res.status(500).json({ error: 'Error en el servidor durante el login' });
     }
 });
 
 // =======================================================
-//   RUTAS PRIVADAS (GESTIÓN EXCLUSIVA DE LA ASOCIACIÓN)
+//   RUTAS PROTEGIDAS (ASOCIACIÓN)
 // =======================================================
 
+// Solo el ADMIN puede registrar nuevos asociados
 app.post('/api/registrar-asociado', verificarAcceso, async (req, res) => {
     try {
+        if (req.rol !== 'Admin') {
+            return res.status(403).json({ error: 'Permiso denegado: solo el Administrador puede crear cuentas.' });
+        }
+
+        const existe = await User.findOne({ email: String(req.body.email).trim() });
+        if (existe) return res.status(400).json({ error: 'Este usuario ya está registrado' });
+
         const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
-        const nuevoAsociado = new User({ email: String(req.body.email), password: passwordEncriptada, rol: 'Operario' });
+        const nuevoAsociado = new User({ 
+            email: String(req.body.email).trim(), 
+            password: passwordEncriptada, 
+            rol: 'Operario' 
+        });
         await nuevoAsociado.save();
-        res.status(201).json({ mensaje: 'Asociado registrado' });
+        res.status(201).json({ mensaje: `Asociado ${nuevoAsociado.email} registrado con éxito.` });
     } catch (error) {
-        res.status(400).json({ error: 'Error al registrar' });
+        res.status(400).json({ error: 'Error al registrar el asociado' });
     }
 });
 
@@ -175,35 +186,35 @@ app.post('/api/especies', verificarAcceso, async (req, res) => {
     try {
       const nuevaEspecie = new Especie(req.body); 
       await nuevaEspecie.save();
-      res.status(201).json({ mensaje: 'Especie registrada' });
+      res.status(201).json({ mensaje: 'Especie registrada exitosamente' });
     } catch (error) {
-      res.status(400).json({ error: 'Error al registrar especie' });
+      res.status(400).json({ error: 'Error al registrar especie (posible nombre duplicado)' });
     }
 });
   
 app.put('/api/especies/:id', verificarAcceso, async (req, res) => {
-      try {
-          const { id } = req.params;
-          const { caracteristicas, nuevoSaber } = req.body;
-  
-          const especie = await Especie.findById(id);
-          if (!especie) return res.status(404).json({ error: 'Especie no encontrada' });
-  
-          if (caracteristicas) especie.caracteristicas = caracteristicas;
-  
-          if (nuevoSaber && nuevoSaber.autor && nuevoSaber.descripcion) {
-              especie.saberes.push({
-                  autor: nuevoSaber.autor,
-                  descripcion: nuevoSaber.descripcion,
-                  fechaAporte: new Date()
-              });
-          }
-  
-          await especie.save();
-          res.json({ mensaje: 'Ficha actualizada', especie });
-      } catch (error) {
-          res.status(500).json({ error: 'Error al actualizar' });
-      }
+    try {
+        const { id } = req.params;
+        const { caracteristicas, nuevoSaber } = req.body;
+
+        const especie = await Especie.findById(id);
+        if (!especie) return res.status(404).json({ error: 'Especie no encontrada' });
+
+        if (caracteristicas) especie.caracteristicas = caracteristicas;
+
+        if (nuevoSaber && nuevoSaber.autor && nuevoSaber.descripcion) {
+            especie.saberes.push({
+                autor: nuevoSaber.autor,
+                descripcion: nuevoSaber.descripcion,
+                fechaAporte: new Date()
+            });
+        }
+
+        await especie.save();
+        res.json({ mensaje: 'Ficha actualizada con éxito', especie });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la ficha' });
+    }
 });
 
 app.post('/api/lotes', verificarAcceso, async (req, res) => {
@@ -214,7 +225,7 @@ app.post('/api/lotes', verificarAcceso, async (req, res) => {
       const nuevoLote = new Lote({
           codigoLote,
           especieId,
-          registradoPor: req.usuarioActual, // El sistema registra automáticamente el correo del operario
+          registradoPor: req.usuarioActual,
           origen,
           cantidadInicial,
           cantidadActual: cantidadInicial,
@@ -228,34 +239,101 @@ app.post('/api/lotes', verificarAcceso, async (req, res) => {
       });
   
       await nuevoLote.save();
-      res.status(201).json({ mensaje: `Lote ${codigoLote} registrado.` });
+      res.status(201).json({ mensaje: `Lote ${codigoLote} registrado correctamente.` });
     } catch (error) {
-      res.status(400).json({ error: 'Faltan datos o hubo un error al crear el lote' });
+      res.status(400).json({ error: 'Faltan datos requeridos para registrar el lote' });
     }
 });
 
+// Obtener árboles matriz (EXCLUSIVO ASOCIADOS - NUNCA PÚBLICO)
+app.get('/api/arboles-matriz', verificarAcceso, async (req, res) => {
+    try {
+        let filtro = {};
+        // Si es operario, audita solo los árboles que registró o custodia en su finca
+        if (req.rol !== 'Admin') {
+            filtro = { registradoPor: req.usuarioActual };
+        }
+        const arboles = await ArbolMatriz.find(filtro).populate('especieId');
+        res.json(arboles);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al consultar árboles semilleros' });
+    }
+});
+
+// Registrar nuevo árbol matriz en finca
+app.post('/api/arboles-matriz', verificarAcceso, async (req, res) => {
+    try {
+        const { codigoArbol, especieId, finca, veredaSector, custodio } = req.body;
+
+        const existe = await ArbolMatriz.findOne({ codigoArbol: String(codigoArbol).trim().toUpperCase() });
+        if (existe) return res.status(400).json({ error: 'El código de árbol ya existe' });
+
+        const nuevoArbol = new ArbolMatriz({
+            codigoArbol: String(codigoArbol).trim().toUpperCase(),
+            especieId,
+            finca,
+            veredaSector,
+            custodio,
+            registradoPor: req.usuarioActual
+        });
+
+        await nuevoArbol.save();
+        res.status(201).json({ mensaje: `Árbol matriz ${nuevoArbol.codigoArbol} registrado con éxito bajo custodia comunitaria.` });
+    } catch (error) {
+        res.status(400).json({ error: 'Error al registrar el árbol matriz' });
+    }
+});
+
+// Añadir seguimiento fenológico a un árbol matriz
+app.post('/api/arboles-matriz/:id/monitoreo', verificarAcceso, async (req, res) => {
+    try {
+        const { estadoFenologico, observaciones } = req.body;
+        const arbol = await ArbolMatriz.findById(req.params.id);
+        if (!arbol) return res.status(404).json({ error: 'Árbol matriz no encontrado' });
+
+        arbol.monitoreos.push({
+            estadoFenologico,
+            observaciones,
+            registrador: req.usuarioActual,
+            fechaObservacion: new Date()
+        });
+
+        await arbol.save();
+        res.json({ mensaje: 'Monitoreo fenológico registrado exitosamente' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al registrar seguimiento' });
+    }
+});
+
+// Tanto Admin como Asociados pueden avanzar etapas
 app.post('/api/lotes/avanzar', verificarAcceso, async (req, res) => {
     try {
         const { loteId, nuevoEstado, cantidadSuperviviente, observaciones } = req.body;
         const lote = await Lote.findById(loteId);
         if (!lote) return res.status(404).json({ error: 'Lote no encontrado' });
 
+        const cant = Number(cantidadSuperviviente);
+        if (isNaN(cant) || cant < 0) {
+            return res.status(400).json({ error: 'Cantidad superviviente no válida' });
+        }
+
         lote.estadoActual = nuevoEstado;
-        lote.cantidadActual = cantidadSuperviviente;
+        lote.cantidadActual = cant;
         lote.historial.push({
             estadoAlcanzado: nuevoEstado,
-            cantidadSuperviviente: cantidadSuperviviente,
-            observaciones: observaciones || '',
+            cantidadSuperviviente: cant,
+            observaciones: observaciones || 'Avance de etapa',
             responsable: req.usuarioActual
         });
 
         await lote.save();
-        res.json({ mensaje: 'Lote avanzado' });
+        res.json({ mensaje: `Lote ${lote.codigoLote} avanzado a ${nuevoEstado}.` });
     } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar lote' });
+        res.status(500).json({ error: 'Error al procesar avance del lote' });
     }
 });
 
+// Tanto Admin como Asociados pueden registrar salidas/mermas
 app.post('/api/lotes/retirar', verificarAcceso, async (req, res) => {
     try {
         const { loteId, cantidadRetirar, motivo } = req.body;
@@ -263,19 +341,22 @@ app.post('/api/lotes/retirar', verificarAcceso, async (req, res) => {
         if (!lote) return res.status(404).json({ error: 'Lote no encontrado' });
 
         const cant = Number(cantidadRetirar);
+        if (isNaN(cant) || cant <= 0 || cant > lote.cantidadActual) {
+            return res.status(400).json({ error: 'Cantidad a retirar inválida o superior a las plantas vivas' });
+        }
+
         lote.cantidadActual -= cant;
-        
         lote.historial.push({
             estadoAlcanzado: lote.estadoActual,
             cantidadSuperviviente: lote.cantidadActual,
-            observaciones: `Retiro: ${motivo}`,
+            observaciones: `Retiro de ${cant} uds. Motivo: ${motivo || 'Salida de vivero'}`,
             responsable: req.usuarioActual
         });
 
         await lote.save();
-        res.json({ mensaje: 'Unidades retiradas' });
+        res.json({ mensaje: `Se retiraron ${cant} unidades del lote ${lote.codigoLote}.` });
     } catch (error) {
-        res.status(500).json({ error: 'Error al retirar' });
+        res.status(500).json({ error: 'Error al procesar el retiro del lote' });
     }
 });
 
@@ -285,5 +366,5 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Servidor en línea en el puerto ${PORT}`);
+  console.log(`Servidor Bosquesinos activo en puerto ${PORT}`);
 });

@@ -59,6 +59,28 @@
             </div>
         </details>
 
+        <!-- ACORDEÓN 3: ÁRBOLES MATRIZ Y FINCAS (CUSTODIA SEGURA) -->
+        <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
+            <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer; user-select: none;">
+                🌳 3. Custodia: Registrar Árbol Matriz / Semillero en Finca
+            </summary>
+            <div style="padding: 0 15px 15px 15px;">
+                <p style="font-size: 11.5px; color: #52796f; margin: 4px 0 10px 0; line-height: 1.4;">
+                    🛡️ <strong>Protocolo de Seguridad:</strong> Por defensa contra biopiratería y tala ilegal, registre únicamente la vereda o sector. No se solicitan coordenadas satelitales exactas.
+                </p>
+                <form id="formArbolMatriz" autocomplete="off">
+                    <select id="arbol-especie" required>
+                        <option value="">-- Selecciona Especie del Árbol --</option>
+                    </select>
+                    <input type="text" id="arbol-codigo" placeholder="Código Único (Ej: AM-GUAY-01)" autocomplete="off" required>
+                    <input type="text" id="arbol-finca" placeholder="Nombre de la Finca" autocomplete="off" required>
+                    <input type="text" id="arbol-vereda" placeholder="Vereda o Sector de San Luis" autocomplete="off" required>
+                    <input type="text" id="arbol-custodio" placeholder="Campesino o Asociado Custodio" autocomplete="off" required>
+                    <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero</button>
+                </form>
+            </div>
+        </details>
+
         <!-- CONTENEDOR EXCLUSIVO PARA ADMINISTRADORES -->
         <div id="seccionCrearBosquesino" class="oculto" style="text-align: center;">
             <hr style="border: 1px solid #bcdec1; margin: 20px 0;">
@@ -224,7 +246,34 @@
         <span id="btnModoAdmin" onclick="toggleAdmin()">Acceso interno de la red</span>
     </footer>
     <script>
-    const hostUrl = 'https://bosquesinos-sanluis.onrender.com'; // RECUERDA PONER TU ENLACE AQUÍ
+   
+   // Guardar Árbol Matriz
+    document.getElementById('formArbolMatriz').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const datos = {
+            especieId: document.getElementById('arbol-especie').value,
+            codigoArbol: document.getElementById('arbol-codigo').value,
+            finca: document.getElementById('arbol-finca').value,
+            veredaSector: document.getElementById('arbol-vereda').value,
+            custodio: document.getElementById('arbol-custodio').value
+        };
+
+        const res = await fetch(`${hostUrl}/api/arboles-matriz`, {
+            method: 'POST',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify(datos)
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            document.getElementById('formArbolMatriz').reset();
+            alert(data.mensaje);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+   
+   const hostUrl = 'https://bosquesinos-sanluis.onrender.com'; // RECUERDA PONER TU ENLACE AQUÍ
     let modoAdminActivo = false;
     
     window.especiesGlobal = [];
