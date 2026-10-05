@@ -224,7 +224,7 @@ app.post('/api/arboles-matriz', verificarAcceso, async (req, res) => {
 
 // --- 5. RUTAS DE ESPECIES (CATÁLOGO GLOBAL) ---
 // Las especies no se filtran por vivero porque el saber es compartido
-app.get('/api/especies', verificarAcceso, async (req, res) => {
+app.get('/api/especies', async (req, res) => {
   try {
     const especies = await Especie.find();
     res.json(especies);
@@ -272,10 +272,9 @@ app.put('/api/especies/:id', verificarAcceso, async (req, res) => {
 });
 
 // --- 6. RUTAS DE LOTES (TRAZABILIDAD) ---
-app.get('/api/lotes', verificarAcceso, async (req, res) => {
+app.get('/api/lotes', async (req, res) => {
   try {
-    // Solo trae los lotes del vivero del usuario que pregunta
-    const lotes = await Lote.find({ viveroId: req.viveroId }).populate('especieId');
+    const lotes = await Lote.find().populate('especieId');
     res.json(lotes);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener los lotes' });
