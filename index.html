@@ -106,7 +106,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE DETALLE DE ESPECIE (MICROSITIO) -->
+   <!-- MODAL DE DETALLE DE ESPECIE (MICROSITIO 3.0 - SABERES INDIVIDUALES) -->
     <div id="modalDetalleEspecie" class="modal oculto">
         <div class="modal-contenido" style="max-width: 550px; text-align: center;">
             <span class="cerrar-modal" onclick="cerrarModalDetalle()">&times;</span>
@@ -120,28 +120,32 @@
                 <p id="detalle-caracteristicas" style="font-size: 14px; color: #354f52; line-height: 1.5; margin-bottom: 15px; text-align: left;"></p>
                 
                 <div style="background: #f1f7f3; padding: 15px; border-radius: 8px; border: 1px dashed #40916c; margin-bottom: 20px; text-align: left;">
-                    <strong style="color: #2d6a4f; font-size: 13px;">🌱 Saber campesino y tradicional:</strong>
-                    <p id="detalle-saber" style="font-size: 13px; color: #52796f; margin: 6px 0 0 0; line-height: 1.4;"></p>
+                    <strong style="color: #2d6a4f; font-size: 13px;">🌱 Saberes campesinos y tradicionales:</strong>
+                    <!-- Aquí se inyectarán los saberes con sus autores -->
+                    <div id="contenedor-saberes" style="margin-top: 10px;"></div>
                 </div>
             </div>
 
-            <!-- VISTA EDICIÓN (SOLO ASOCIADOS) -->
+            <!-- VISTA EDICIÓN (AGREGAR NUEVO SABER) -->
             <form id="formEditarEspecie" class="oculto" autocomplete="off" style="text-align: left; margin-bottom: 15px;">
-                <label style="font-size:12px; color:#57606a; font-weight:600;">Descripción botánica / Características:</label>
-                <textarea id="edit-caracteristicas-esp" style="width:100%; min-height:80px; margin-top:4px;" required></textarea>
+                <label style="font-size:12px; color:#57606a; font-weight:600;">Actualizar Descripción botánica:</label>
+                <textarea id="edit-caracteristicas-esp" style="width:100%; min-height:60px; margin-top:4px;" required></textarea>
                 
-                <label style="font-size:12px; color:#57606a; font-weight:600; margin-top:10px; display:block;">Saber campesino y tradicional (usos, historia, floración):</label>
-                <textarea id="edit-saber-esp" style="width:100%; min-height:90px; margin-top:4px;" placeholder="..."></textarea>
+                <hr style="border: 0.5px solid #d8eadd; margin: 15px 0;">
+                
+                <label style="font-size:12px; color:#2d6a4f; font-weight:bold; display:block;">➕ Agregar Saber Campesino / Tradicional:</label>
+                <input type="text" id="edit-saber-autor" placeholder="Tu nombre (Ej. Juan Manuel)" style="width:100%; margin-top:4px; margin-bottom: 8px;">
+                <textarea id="edit-saber-desc" style="width:100%; min-height:70px;" placeholder="Describe el uso, tratamiento de germinación, historia..."></textarea>
                 
                 <div style="display: flex; gap: 8px; margin-top: 10px;">
-                    <button type="submit" class="btn-classic-primary" style="flex:1;">Guardar Cambios</button>
+                    <button type="submit" class="btn-classic-primary" style="flex:1;">Guardar Aporte</button>
                     <button type="button" class="btn-classic-secondary" style="flex:1;" onclick="cancelarEdicionEspecie()">Cancelar</button>
                 </div>
             </form>
 
-            <!-- BOTÓN ACTIVAR EDICIÓN (VISIBLE SI ES ASOCIADO O ADMIN) -->
+            <!-- BOTÓN ACTIVAR EDICIÓN -->
             <div id="contenedorBotonEditarFicha" class="oculto" style="margin-bottom: 15px;">
-                <button class="btn-classic-secondary" style="font-size: 12px; padding: 6px;" onclick="activarEdicionEspecie()">✏️ Editar descripción y saber tradicional</button>
+                <button class="btn-classic-secondary" style="font-size: 12px; padding: 6px;" onclick="activarEdicionEspecie()">✏️ Editar o agregar saber</button>
             </div>
 
             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
@@ -485,7 +489,7 @@
         }
     });
 
-    // --- MICROSITIO DE LA ESPECIE (PÚBLICO Y EDICIÓN) ---
+   // --- MICROSITIO DE LA ESPECIE (PÚBLICO Y EDICIÓN) ---
     function abrirMicrositio(id) {
         const especie = window.especiesGlobal.find(item => item._id === id);
         if (!especie) return;
@@ -497,10 +501,22 @@
         document.getElementById('detalle-cientifico').innerText = especie.nombreCientifico || 'No registrado';
         document.getElementById('detalle-caracteristicas').innerText = especie.caracteristicas || 'Sin descripción disponible aún.';
         
-        const textoSaber = especie.saberCampesino && especie.saberCampesino.trim() !== '' 
-            ? especie.saberCampesino 
-            : '(Próximamente añadiremos más detalles sobre la historia, usos y la importancia de esta especie en el territorio de San Luis).';
-        document.getElementById('detalle-saber').innerText = textoSaber;
+        // --- MAGIA: Renderizar la lista de saberes ---
+        const contenedorSaberes = document.getElementById('contenedor-saberes');
+        contenedorSaberes.innerHTML = ''; // Limpiamos
+        
+        if (especie.saberes && especie.saberes.length > 0) {
+            especie.saberes.forEach(saber => {
+                const fecha = new Date(saber.fechaAporte).toLocaleDateString();
+                contenedorSaberes.innerHTML += `
+                <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #c9e4d6;">
+                    <p style="margin: 0; font-size: 13px; color: #354f52; line-height: 1.4;">"${saber.descripcion}"</p>
+                    <small style="color: #2d6a4f; font-weight: bold; display:block; margin-top:4px;">— Aporte de: ${saber.autor} (${fecha})</small>
+                </div>`;
+            });
+        } else {
+            contenedorSaberes.innerHTML = '<p style="font-size: 13px; color: #52796f; margin: 0;">(Aún no hay saberes registrados. ¡Sé el primero en aportar!)</p>';
+        }
 
         const btnEditContenedor = document.getElementById('contenedorBotonEditarFicha');
         if (modoAdminActivo) {
@@ -521,36 +537,36 @@
         document.getElementById('modalDetalleEspecie').classList.remove('oculto');
     }
 
-    function cerrarModalDetalle() { 
-        document.getElementById('modalDetalleEspecie').classList.add('oculto'); 
-    }
-
     function activarEdicionEspecie() {
         const especie = window.especiesGlobal.find(item => item._id === especieActualId);
         if (!especie) return;
 
         document.getElementById('edit-caracteristicas-esp').value = especie.caracteristicas || '';
-        document.getElementById('edit-saber-esp').value = especie.saberCampesino || '';
+        document.getElementById('edit-saber-autor').value = ''; // Limpiamos para el nuevo aporte
+        document.getElementById('edit-saber-desc').value = '';
 
         document.getElementById('vistaLecturaEspecie').classList.add('oculto');
         document.getElementById('formEditarEspecie').classList.remove('oculto');
         document.getElementById('contenedorBotonEditarFicha').classList.add('oculto');
     }
 
-    function cancelarEdicionEspecie() {
-        document.getElementById('vistaLecturaEspecie').classList.remove('oculto');
-        document.getElementById('formEditarEspecie').classList.add('oculto');
-        if (modoAdminActivo) {
-            document.getElementById('contenedorBotonEditarFicha').classList.remove('oculto');
-        }
-    }
-
     document.getElementById('formEditarEspecie').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const datos = {
-            caracteristicas: document.getElementById('edit-caracteristicas-esp').value,
-            saberCampesino: document.getElementById('edit-saber-esp').value
-        };
+        
+        const nuevaCaract = document.getElementById('edit-caracteristicas-esp').value;
+        const nuevoSaberAutor = document.getElementById('edit-saber-autor').value;
+        const nuevoSaberDesc = document.getElementById('edit-saber-desc').value;
+
+        // Construimos el paquete de datos
+        const datos = { caracteristicas: nuevaCaract };
+        
+        // Si el usuario llenó los campos de saber, los empaquetamos
+        if (nuevoSaberAutor.trim() !== '' && nuevoSaberDesc.trim() !== '') {
+            datos.nuevoSaber = {
+                autor: nuevoSaberAutor,
+                descripcion: nuevoSaberDesc
+            };
+        }
 
         const res = await fetch(`${hostUrl}/api/especies/${especieActualId}`, {
             method: 'PUT',
@@ -559,26 +575,13 @@
         });
 
         if (res.ok) {
-            await cargarCatalogo();
-            document.getElementById('detalle-caracteristicas').innerText = datos.caracteristicas;
-            document.getElementById('detalle-saber').innerText = datos.saberCampesino || '(Próximamente añadiremos más detalles sobre la historia, usos y la importancia de esta especie en el territorio de San Luis).';
-            cancelarEdicionEspecie();
+            await cargarCatalogo(); // Recargamos de la base de datos
+            abrirMicrositio(especieActualId); // Actualizamos la vista visualmente
         } else {
             const data = await res.json();
             alert('Error al guardar: ' + data.error);
         }
     });
-
-    function apadrinarArbol() {
-        const url = `https://wa.me/573135398959?text=${encodeURIComponent(`Hola equipo de Bosquesinos 🌿. Quiero ser parte de la conservación y me gustaría apadrinar un árbol de la especie *${especieSeleccionadaMicrositio}*. ¿Me pueden dar más información de cómo hacerlo?`)}`;
-        window.open(url, '_blank');
-    }
-
-    function adquirirEjemplar() {
-        agregarAlCarrito(especieSeleccionadaMicrositio);
-        cerrarModalDetalle();
-        abrirModalCarrito(); 
-    }
 
     // --- CARRITO DE COTIZACIONES ---
     let carrito = [];
