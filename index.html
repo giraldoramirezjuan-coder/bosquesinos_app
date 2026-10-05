@@ -215,9 +215,8 @@
         <p>Cultivando vida y protegiendo nuestros ríos desde San Luis, Antioquia.</p>
         <span id="btnModoAdmin" onclick="toggleAdmin()">Acceso interno de la red</span>
     </footer>
-
     <script>
-    const hostUrl = 'https://bosquesinos-sanluis.onrender.com'; 
+    const hostUrl = 'https://TU-PROYECTO.onrender.com'; // RECUERDA PONER TU ENLACE AQUÍ
     let modoAdminActivo = false;
     
     window.especiesGlobal = [];
@@ -233,7 +232,7 @@
         };
     }
 
-    // --- CARGA DE DATOS 2.0 ---
+    // --- CARGA DE DATOS ---
     async function cargarCatalogo() {
         const lista = document.getElementById('listaPlantulas');
         const selectEspecie = document.getElementById('lote-especie');
@@ -267,16 +266,14 @@
                     }
                 });
 
-                let elementoImagen = '';
-                if (especie.imagenUrl && especie.imagenUrl.trim() !== '') {
-                    elementoImagen = `<img src="${especie.imagenUrl}" alt="${especie.nombreComun}" class="img-arbol" onerror="this.style.display='none'">`;
-                } else {
-                    elementoImagen = `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
-                }
+                let elementoImagen = especie.imagenUrl && especie.imagenUrl.trim() !== ''
+                    ? `<img src="${especie.imagenUrl}" alt="${especie.nombreComun}" class="img-arbol" onerror="this.style.display='none'">`
+                    : `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
 
                 const nomCientifico = especie.nombreCientifico ? `<i>${especie.nombreCientifico}</i>` : '';
                 const descrip = especie.caracteristicas ? `<p>${especie.caracteristicas.substring(0, 80)}...</p>` : '';
 
+                // SEGURIDAD VISUAL: Solo inyecta el botón de lotes si está logueado
                 const botonesAdmin = modoAdminActivo 
                     ? `<button class="btn-classic-secondary" onclick="abrirGestionLotes('${especie._id}')">Gestionar Lotes (${misLotes.length})</button>` 
                     : '';
@@ -308,7 +305,117 @@
         }
     }
 
-    // --- FORMULARIOS ADMIN 2.0 ---
+    // --- MICROSITIO Y SABERES (PÚBLICO Y PRIVADO) ---
+    function abrirMicrositio(id) {
+        const especie = window.especiesGlobal.find(item => item._id === id);
+        if (!especie) return;
+        
+        especieActualId = especie._id;
+        especieSeleccionadaMicrositio = especie.nombreComun; 
+
+        document.getElementById('detalle-nombre').innerText = especie.nombreComun;
+        document.getElementById('detalle-cientifico').innerText = especie.nombreCientifico || 'No registrado';
+        document.getElementById('detalle-caracteristicas').innerText = especie.caracteristicas || 'Sin descripción disponible aún.';
+        
+        const contenedorSaberes = document.getElementById('contenedor-saberes');
+        contenedorSaberes.innerHTML = ''; 
+        
+        if (especie.saberes && especie.saberes.length > 0) {
+            especie.saberes.forEach(saber => {
+                const fecha = new Date(saber.fechaAporte).toLocaleDateString();
+                contenedorSaberes.innerHTML += `
+                <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #c9e4d6;">
+                    <p style="margin: 0; font-size: 13px; color: #354f52; line-height: 1.4;">"${saber.descripcion}"</p>
+                    <small style="color: #2d6a4f; font-weight: bold; display:block; margin-top:4px;">— Aporte de: ${saber.autor} (${fecha})</small>
+                </div>`;
+            });
+        } else {
+            contenedorSaberes.innerHTML = '<p style="font-size: 13px; color: #52796f; margin: 0;">(Aún no hay saberes registrados).</p>';
+        }
+
+        // SEGURIDAD VISUAL: Ocultar o mostrar botón de editar ficha
+        const btnEditContenedor = document.getElementById('contenedorBotonEditarFicha');
+        if (modoAdminActivo) {
+            btnEditContenedor.classList.remove('oculto');
+        } else {
+            btnEditContenedor.classList.add('oculto');
+        }
+
+        cancelarEdicionEspecie();
+
+        const imgEl = document.getElementById('detalle-imagen');
+        if (especie.imagenUrl && especie.imagenUrl.trim() !== '') {
+            imgEl.src = especie.imagenUrl;
+            imgEl.style.display = 'block';
+        } else {
+            imgEl.style.display = 'none';
+        }
+        document.getElementById('modalDetalleEspecie').classList.remove('oculto');
+    }
+
+    function cerrarModalDetalle() { 
+        document.getElementById('modalDetalleEspecie').classList.add('oculto'); 
+    }
+
+    function activarEdicionEspecie() {
+        const especie = window.especiesGlobal.find(item => item._id === especieActualId);
+        if (!especie) return;
+
+        document.getElementById('edit-caracteristicas-esp').value = especie.caracteristicas || '';
+        document.getElementById('edit-saber-autor').value = ''; 
+        document.getElementById('edit-saber-desc').value = '';
+
+        document.getElementById('vistaLecturaEspecie').classList.add('oculto');
+        document.getElementById('formEditarEspecie').classList.remove('oculto');
+        document.getElementById('contenedorBotonEditarFicha').classList.add('oculto');
+    }
+
+    // ESTA ERA LA FUNCIÓN QUE FALTABA
+    function cancelarEdicionEspecie() {
+        document.getElementById('vistaLecturaEspecie').classList.remove('oculto');
+        document.getElementById('formEditarEspecie').classList.add('oculto');
+        
+        // Bloqueo estricto del botón según permisos
+        const btnEditContenedor = document.getElementById('contenedorBotonEditarFicha');
+        if (modoAdminActivo) {
+            btnEditContenedor.classList.remove('oculto');
+        } else {
+            btnEditContenedor.classList.add('oculto');
+        }
+    }
+
+    document.getElementById('formEditarEspecie').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const nuevaCaract = document.getElementById('edit-caracteristicas-esp').value;
+        const nuevoSaberAutor = document.getElementById('edit-saber-autor').value;
+        const nuevoSaberDesc = document.getElementById('edit-saber-desc').value;
+
+        const datos = { caracteristicas: nuevaCaract };
+        
+        if (nuevoSaberAutor.trim() !== '' && nuevoSaberDesc.trim() !== '') {
+            datos.nuevoSaber = {
+                autor: nuevoSaberAutor,
+                descripcion: nuevoSaberDesc
+            };
+        }
+
+        const res = await fetch(`${hostUrl}/api/especies/${especieActualId}`, {
+            method: 'PUT',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify(datos)
+        });
+
+        if (res.ok) {
+            await cargarCatalogo(); 
+            abrirMicrositio(especieActualId); 
+        } else {
+            const data = await res.json();
+            alert('Error al guardar: ' + data.error);
+        }
+    });
+
+    // --- FORMULARIOS ADMIN Y LOTES (OCULTOS POR DEFECTO) ---
     document.getElementById('formEspecie').addEventListener('submit', async (e) => {
         e.preventDefault();
         const datos = {
@@ -355,8 +462,7 @@
         
         if (res.ok) {
             document.getElementById('formLote').reset();
-            const data = await res.json();
-            alert(data.mensaje);
+            alert('Lote creado');
             cargarCatalogo(); 
         } else {
             const data = await res.json(); 
@@ -364,7 +470,6 @@
         }
     });
 
-    // --- GESTIÓN DE LOTES (VENTANAS ADMIN) ---
     function abrirGestionLotes(especieId) {
         const especie = window.especiesGlobal.find(e => e._id === especieId);
         document.getElementById('nombreEspecieLotes').innerText = especie.nombreComun;
@@ -374,7 +479,7 @@
         contenedor.innerHTML = '';
 
         if (misLotes.length === 0) {
-            contenedor.innerHTML = '<p style="font-size:13px; color:#666;">No hay lotes (recolecciones) registradas para esta especie.</p>';
+            contenedor.innerHTML = '<p style="font-size:13px; color:#666;">No hay lotes registradas.</p>';
         } else {
             misLotes.forEach(lote => {
                 const f = new Date(lote.origen.fechaRecoleccion).toLocaleDateString();
@@ -394,10 +499,10 @@
                         </div>
                         <div style="display:flex; gap:8px;">
                             <button class="btn-classic-secondary" style="flex:1;" onclick="prepararAvanceLote('${lote._id}', '${lote.codigoLote}', ${lote.cantidadActual}, '${lote.estadoActual}')">
-                                Avanzar etapa
+                                Avanzar
                             </button>
                             <button class="btn-classic-danger" onclick="prepararRetiroLote('${lote._id}', '${lote.codigoLote}', ${lote.cantidadActual})">
-                                Retirar unidades
+                                Retirar
                             </button>
                         </div>
                     </div>
@@ -407,24 +512,18 @@
         document.getElementById('modalGestionLotes').classList.remove('oculto');
     }
 
-    function cerrarModalLotes() { 
-        document.getElementById('modalGestionLotes').classList.add('oculto'); 
-    }
+    function cerrarModalLotes() { document.getElementById('modalGestionLotes').classList.add('oculto'); }
 
-    // Avanzar Etapa
     function prepararAvanceLote(id, codigo, cantidad, estadoActual) {
         document.getElementById('textoCodigoLote').innerText = `Lote: ${codigo}`;
         document.getElementById('avanzar-loteId').value = id;
         document.getElementById('avanzar-cantidad').value = cantidad;
         document.getElementById('avanzar-estado').value = estadoActual;
         document.getElementById('avanzar-obs').value = '';
-        
         document.getElementById('modalAvanzarLote').classList.remove('oculto');
     }
 
-    function cerrarModalAvanzar() { 
-        document.getElementById('modalAvanzarLote').classList.add('oculto'); 
-    }
+    function cerrarModalAvanzar() { document.getElementById('modalAvanzarLote').classList.add('oculto'); }
 
     document.getElementById('formAvanzar').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -436,22 +535,14 @@
         };
 
         const res = await fetch(`${hostUrl}/api/lotes/avanzar`, {
-            method: 'POST',
-            headers: obtenerCabecerasSeguras(),
-            body: JSON.stringify(datos)
+            method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify(datos)
         });
         
         if (res.ok) {
-            cerrarModalAvanzar();
-            cerrarModalLotes();
-            cargarCatalogo(); 
-        } else {
-            const data = await res.json(); 
-            alert('Error: ' + data.error);
+            cerrarModalAvanzar(); cerrarModalLotes(); cargarCatalogo(); 
         }
     });
 
-    // Retirar Unidades de Lote
     function prepararRetiroLote(id, codigo, disponibles) {
         document.getElementById('textoRetiroLote').innerText = `Lote ${codigo} (${disponibles} disponibles)`;
         document.getElementById('retirar-loteId').value = id;
@@ -461,9 +552,7 @@
         document.getElementById('modalRetiroLote').classList.remove('oculto');
     }
 
-    function cerrarModalRetiroLote() {
-        document.getElementById('modalRetiroLote').classList.add('oculto');
-    }
+    function cerrarModalRetiroLote() { document.getElementById('modalRetiroLote').classList.add('oculto'); }
 
     document.getElementById('formRetirarLote').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -474,134 +563,34 @@
         };
 
         const res = await fetch(`${hostUrl}/api/lotes/retirar`, {
-            method: 'POST',
-            headers: obtenerCabecerasSeguras(),
-            body: JSON.stringify(datos)
+            method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify(datos)
         });
 
         if (res.ok) {
-            cerrarModalRetiroLote();
-            cerrarModalLotes();
-            cargarCatalogo();
-        } else {
-            const data = await res.json();
-            alert('Error: ' + data.error);
+            cerrarModalRetiroLote(); cerrarModalLotes(); cargarCatalogo();
         }
     });
 
-   // --- MICROSITIO DE LA ESPECIE (PÚBLICO Y EDICIÓN) ---
-    function abrirMicrositio(id) {
-        const especie = window.especiesGlobal.find(item => item._id === id);
-        if (!especie) return;
-        
-        especieActualId = especie._id;
-        especieSeleccionadaMicrositio = especie.nombreComun; 
-
-        document.getElementById('detalle-nombre').innerText = especie.nombreComun;
-        document.getElementById('detalle-cientifico').innerText = especie.nombreCientifico || 'No registrado';
-        document.getElementById('detalle-caracteristicas').innerText = especie.caracteristicas || 'Sin descripción disponible aún.';
-        
-        // --- MAGIA: Renderizar la lista de saberes ---
-        const contenedorSaberes = document.getElementById('contenedor-saberes');
-        contenedorSaberes.innerHTML = ''; // Limpiamos
-        
-        if (especie.saberes && especie.saberes.length > 0) {
-            especie.saberes.forEach(saber => {
-                const fecha = new Date(saber.fechaAporte).toLocaleDateString();
-                contenedorSaberes.innerHTML += `
-                <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #c9e4d6;">
-                    <p style="margin: 0; font-size: 13px; color: #354f52; line-height: 1.4;">"${saber.descripcion}"</p>
-                    <small style="color: #2d6a4f; font-weight: bold; display:block; margin-top:4px;">— Aporte de: ${saber.autor} (${fecha})</small>
-                </div>`;
-            });
-        } else {
-            contenedorSaberes.innerHTML = '<p style="font-size: 13px; color: #52796f; margin: 0;">(Aún no hay saberes registrados. ¡Sé el primero en aportar!)</p>';
-        }
-
-        const btnEditContenedor = document.getElementById('contenedorBotonEditarFicha');
-        if (modoAdminActivo) {
-            btnEditContenedor.classList.remove('oculto');
-        } else {
-            btnEditContenedor.classList.add('oculto');
-        }
-
-        cancelarEdicionEspecie();
-
-        const imgEl = document.getElementById('detalle-imagen');
-        if (especie.imagenUrl && especie.imagenUrl.trim() !== '') {
-            imgEl.src = especie.imagenUrl;
-            imgEl.style.display = 'block';
-        } else {
-            imgEl.style.display = 'none';
-        }
-        document.getElementById('modalDetalleEspecie').classList.remove('oculto');
-    }
-
-    function activarEdicionEspecie() {
-        const especie = window.especiesGlobal.find(item => item._id === especieActualId);
-        if (!especie) return;
-
-        document.getElementById('edit-caracteristicas-esp').value = especie.caracteristicas || '';
-        document.getElementById('edit-saber-autor').value = ''; // Limpiamos para el nuevo aporte
-        document.getElementById('edit-saber-desc').value = '';
-
-        document.getElementById('vistaLecturaEspecie').classList.add('oculto');
-        document.getElementById('formEditarEspecie').classList.remove('oculto');
-        document.getElementById('contenedorBotonEditarFicha').classList.add('oculto');
-    }
-
-    document.getElementById('formEditarEspecie').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const nuevaCaract = document.getElementById('edit-caracteristicas-esp').value;
-        const nuevoSaberAutor = document.getElementById('edit-saber-autor').value;
-        const nuevoSaberDesc = document.getElementById('edit-saber-desc').value;
-
-        // Construimos el paquete de datos
-        const datos = { caracteristicas: nuevaCaract };
-        
-        // Si el usuario llenó los campos de saber, los empaquetamos
-        if (nuevoSaberAutor.trim() !== '' && nuevoSaberDesc.trim() !== '') {
-            datos.nuevoSaber = {
-                autor: nuevoSaberAutor,
-                descripcion: nuevoSaberDesc
-            };
-        }
-
-        const res = await fetch(`${hostUrl}/api/especies/${especieActualId}`, {
-            method: 'PUT',
-            headers: obtenerCabecerasSeguras(),
-            body: JSON.stringify(datos)
-        });
-
-        if (res.ok) {
-            await cargarCatalogo(); // Recargamos de la base de datos
-            abrirMicrositio(especieActualId); // Actualizamos la vista visualmente
-        } else {
-            const data = await res.json();
-            alert('Error al guardar: ' + data.error);
-        }
-    });
-
-    // --- CARRITO DE COTIZACIONES ---
+    // --- CARRITO PÚBLICO ---
     let carrito = [];
-    function agregarAlCarrito(nombre) {
-        let item = carrito.find(i => i.nombre === nombre);
-        if (item) item.cantidad += 1;
-        else carrito.push({ nombre: nombre, cantidad: 1 });
-        actualizarUI();
+    function apadrinarArbol() {
+        const url = `https://wa.me/573135398959?text=${encodeURIComponent(`Hola equipo de Bosquesinos 🌿. Quiero apadrinar un árbol de *${especieSeleccionadaMicrositio}*.`)}`;
+        window.open(url, '_blank');
     }
 
-    function quitarDelCarrito(nombre) {
-        carrito = carrito.filter(i => i.nombre !== nombre);
+    function adquirirEjemplar() {
+        let item = carrito.find(i => i.nombre === especieSeleccionadaMicrositio);
+        if (item) item.cantidad += 1; else carrito.push({ nombre: especieSeleccionadaMicrositio, cantidad: 1 });
         actualizarUI();
+        cerrarModalDetalle();
+        document.getElementById('modalCarrito').classList.remove('oculto');
     }
 
     function cambiarCantidad(nombre, delta) {
         let item = carrito.find(i => i.nombre === nombre);
         if (item) {
             item.cantidad += delta;
-            if (item.cantidad <= 0) quitarDelCarrito(nombre);
+            if (item.cantidad <= 0) carrito = carrito.filter(i => i.nombre !== nombre);
         }
         actualizarUI();
     }
@@ -620,26 +609,23 @@
                         <button class="btn-quitar" onclick="cambiarCantidad('${item.nombre}', -1)">-</button>
                         <span>${item.cantidad}</span>
                         <button class="btn-quitar" style="background:#40916c;" onclick="cambiarCantidad('${item.nombre}', 1)">+</button>
-                        <button class="btn-quitar" style="background:#b25b5d; margin-left:10px;" onclick="quitarDelCarrito('${item.nombre}')">Quitar</button>
                     </div>
                 </li>`;
         });
         document.getElementById('contadorCarrito').innerText = totalPlantas;
         document.getElementById('totalPlantaCarrito').innerText = totalPlantas;
-        totalPlantas > 0 ? btnFlotante.classList.remove('oculto') : (btnFlotante.classList.add('oculto'), cerrarModalCarrito());
+        totalPlantas > 0 ? btnFlotante.classList.remove('oculto') : (btnFlotante.classList.add('oculto'), document.getElementById('modalCarrito').classList.add('oculto'));
     }
 
-    function abrirModalCarrito() { document.getElementById('modalCarrito').classList.remove('oculto'); }
     function cerrarModalCarrito() { document.getElementById('modalCarrito').classList.add('oculto'); }
     
     function enviarWhatsApp() {
-        let m = `Hola equipo de Bosquesinos. Me interesa apoyar el proyecto y me gustaría obtener información sobre estas especies nativas:\n\n`;
+        let m = `Hola Bosquesinos. Me interesa apoyar con estas especies:\n`;
         carrito.forEach(i => m += `- ${i.cantidad}x ${i.nombre}\n`);
-        m += "\n¿Me podrían compartir disponibilidad y logística de entrega? Muchas gracias.";
         window.open(`https://wa.me/573135398959?text=${encodeURIComponent(m)}`, '_blank');
     }
 
-    // --- AUTENTICACIÓN Y LOGIN ---
+    // --- LOGIN Y SEGURIDAD ---
     function toggleAdmin() {
         if (modoAdminActivo) {
             modoAdminActivo = false;
@@ -648,7 +634,7 @@
             document.getElementById('panelAdmin').classList.add('oculto');
             document.getElementById('seccionCrearBosquesino').classList.add('oculto');
             document.getElementById('btnModoAdmin').innerText = 'Acceso interno de la red';
-            cargarCatalogo();
+            cargarCatalogo(); // Recarga para ocultar botones
         } else {
             document.getElementById('modalLogin').classList.remove('oculto');
         }
@@ -679,67 +665,34 @@
                 document.getElementById('panelAdmin').classList.remove('oculto');
                 document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión de Asociado';
                 
-                const btnCrear = document.getElementById('seccionCrearBosquesino');
-                if (data.rol === 'Admin') {
-                    btnCrear.classList.remove('oculto');
-                } else {
-                    btnCrear.classList.add('oculto');
-                }
-
-                cargarCatalogo(); 
+                if (data.rol === 'Admin') document.getElementById('seccionCrearBosquesino').classList.remove('oculto');
+                cargarCatalogo(); // Recarga para mostrar botones
             } else { 
                 alert('Acceso denegado: ' + data.error); 
             }
-        } catch (err) { 
-            alert('Sin conexión con el servidor.'); 
-        }
+        } catch (err) { alert('Sin conexión con el servidor.'); }
     }
 
     function abrirModalBosquesino() { document.getElementById('modalBosquesino').classList.remove('oculto'); }
-    function cerrarModalBosquesino() { 
-        document.getElementById('modalBosquesino').classList.add('oculto'); 
-        document.getElementById('formRegistrarAsociado').reset(); 
-    }
+    function cerrarModalBosquesino() { document.getElementById('modalBosquesino').classList.add('oculto'); }
 
     document.getElementById('formRegistrarAsociado').addEventListener('submit', async (e) => {
         e.preventDefault(); 
-        try {
-            const res = await fetch(`${hostUrl}/api/registrar-asociado`, {
-                method: 'POST', 
-                headers: obtenerCabecerasSeguras(),
-                body: JSON.stringify({ 
-                    email: document.getElementById('nuevo-email').value, 
-                    password: document.getElementById('nueva-password').value 
-                })
-            });
-            const data = await res.json();
-            if (res.ok) { 
-                alert('Éxito: ' + data.mensaje); 
-                cerrarModalBosquesino(); 
-            } else { 
-                alert('Error: ' + data.error); 
-            }
-        } catch (err) { 
-            alert('Error de conexión.'); 
-        }
+        const res = await fetch(`${hostUrl}/api/registrar-asociado`, {
+            method: 'POST', headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify({ email: document.getElementById('nuevo-email').value, password: document.getElementById('nueva-password').value })
+        });
+        if (res.ok) { alert('Bosquesino creado'); cerrarModalBosquesino(); }
     });
 
-    // --- INICIO ---
+    // --- ARRANQUE ---
     cargarCatalogo();
     window.onload = () => {
         if (localStorage.getItem('tokenAdmin')) {
             modoAdminActivo = true;
             document.getElementById('panelAdmin').classList.remove('oculto');
             document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión de Asociado';
-            
-            const rol = localStorage.getItem('rolUsuario');
-            const btnCrear = document.getElementById('seccionCrearBosquesino');
-            if (rol === 'Admin') {
-                btnCrear.classList.remove('oculto');
-            } else {
-                btnCrear.classList.add('oculto');
-            }
-
+            if (localStorage.getItem('rolUsuario') === 'Admin') document.getElementById('seccionCrearBosquesino').classList.remove('oculto');
             cargarCatalogo(); 
         }
     };
