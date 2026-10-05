@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="bosquesinos.jpg" alt="Logo Bosquesinos" width="600">
+  <img src="bosquesinos.png" alt="Logo Bosquesinos" width="600">
 </div>
 
 # 🌱 Plataforma Web Bosquesinos: Nuestro Vivero Digital
