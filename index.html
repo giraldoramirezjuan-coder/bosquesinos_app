@@ -233,11 +233,16 @@
     let especieSeleccionadaMicrositio = null;
 
     function obtenerCabecerasSeguras() {
-        const token = localStorage.getItem('tokenAdmin');
-        return {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-        };
+       const token = localStorage.getItem('tokenAdmin'); 
+
+fetch(`${hostUrl}/api/lotes`, { // Aplica para /api/especies y /api/registrar-asociado también
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` // <- Esto es lo que soluciona el "Token inválido"
+    },
+    body: JSON.stringify(datos)
+})
     }
 
     // --- CARGA DE DATOS ---
@@ -715,6 +720,64 @@
             cargarCatalogo(); 
         }
     };
+   
+    // Función para el botón de Avanzar Lote
+async function prepararAvanceLote(loteId, codigoLote, cantidadActual, estadoActual) {
+    const nuevoEstado = prompt(`Avanzando lote ${codigoLote}.\nEstado actual: ${estadoActual}\nIngresa el nuevo estado (ej. Germinación, Vivero, Sembrado):`);
+    if (!nuevoEstado) return; 
+
+    const cantidadSuperviviente = prompt(`¿Cuántas plántulas sobrevivieron para pasar a ${nuevoEstado}?`, cantidadActual);
+    if (!cantidadSuperviviente) return;
+
+    const token = localStorage.getItem('tokenAdmin');
+    try {
+        const res = await fetch(`${hostUrl}/api/lotes/avanzar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({
+                loteId: loteId,
+                nuevoEstado: nuevoEstado,
+                cantidadSuperviviente: Number(cantidadSuperviviente),
+                observaciones: 'Avanzado por operario'
+            })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            alert('¡Lote avanzado con éxito!');
+            location.reload(); // Recarga la página para actualizar la vista
+        } else {
+            alert('Error al avanzar: ' + data.error);
+        }
+    } catch (err) {
+        alert('Error de conexión con el servidor.');
+    }
+}
+
+// Función para el botón de Retirar (Mermas o Adopciones)
+async function prepararRetiroLote(loteId, codigoLote, cantidadActual) {
+    const cantidadRetirar = prompt(`Retirando plántulas del lote ${codigoLote}.\nDisponibles: ${cantidadActual}\n¿Cuántas vas a retirar?`);
+    if (!cantidadRetirar || isNaN(cantidadRetirar) || cantidadRetirar > cantidadActual) return alert('Cantidad inválida');
+
+    const motivo = prompt('¿Cuál es el motivo del retiro? (ej. Adopción, Enfermedad, Siembra)');
+    if (!motivo) return;
+    
+    const token = localStorage.getItem('tokenAdmin');
+    try {
+        const res = await fetch(`${hostUrl}/api/lotes/retirar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ loteId, cantidadRetirar: Number(cantidadRetirar), motivo })
+        });
+        if (res.ok) {
+            alert('¡Unidades retiradas del inventario!');
+            location.reload();
+        } else {
+            alert('Error al retirar');
+        }
+    } catch (err) {
+        alert('Error de conexión.');
+    }
+}
     </script>
 </body>
 </html>
