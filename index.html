@@ -17,14 +17,17 @@
         </div>
     </header>
 
-    <!-- PANEL ADMINISTRADOR 2.0 -->
-    <div id="panelAdmin" class="tarjeta-admin oculto" style="max-width: 800px;">
-        <h3 style="color: #2a4d31; margin-top: 0; text-align: center;">Panel de Trazabilidad y Vivero</h3>
+    <!-- PANEL ADMINISTRADOR 3.0 (ACORDEONES Y ESPACIADO) -->
+    <div id="panelAdmin" class="tarjeta-admin oculto" style="max-width: 800px; margin-bottom: 60px;">
+        <h3 style="color: #2a4d31; margin-top: 0; text-align: center;">Panel de Control Bosquesino</h3>
         
-        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-            <!-- FORMULARIO 1: REGISTRAR ESPECIE (CATÁLOGO) -->
-            <div style="flex: 1; min-width: 300px; background: #f8fbf9; padding: 15px; border-radius: 12px; border: 1px solid #d8eadd;">
-                <h4 style="color: #2d6a4f; margin-top: 0;">1. Registrar Nueva Especie Botánica</h4>
+        <!-- ACORDEÓN 1: ESPECIE (CATÁLOGO GENERAL) -->
+        <details style="background: #f8fbf9; margin-bottom: 15px; border-radius: 8px; border: 1px solid #d8eadd;">
+            <summary style="padding: 15px; font-weight: bold; color: #2d6a4f; cursor: pointer;">
+                📖 1. Gestión de Catálogo: Registrar Especie Botánica
+            </summary>
+            <div style="padding: 0 15px 15px 15px;">
+                <p style="font-size: 12px; color: #555;">(Crea la ficha general de la planta en el sistema. Esto es independiente de las semillas recolectadas).</p>
                 <form id="formEspecie" autocomplete="off">
                     <input type="text" id="esp-nombre" placeholder="Nombre común (Ej. Guayacán)" autocomplete="off" required>
                     <input type="text" id="esp-cientifico" placeholder="Nombre científico (Opcional)" autocomplete="off">
@@ -33,10 +36,15 @@
                     <button type="submit" class="btn-principal" style="background: #40916c;">Guardar Ficha Botánica</button>
                 </form>
             </div>
+        </details>
 
-            <!-- FORMULARIO 2: REGISTRAR RECOLECCIÓN (NUEVO LOTE) -->
-            <div style="flex: 1; min-width: 300px; background: #f8fbf9; padding: 15px; border-radius: 12px; border: 1px solid #d8eadd;">
-                <h4 style="color: #2d6a4f; margin-top: 0;">2. Registrar Recolección de Semillas</h4>
+        <!-- ACORDEÓN 2: RECOLECCIÓN (DEL BOSQUE AL VIVERO) -->
+        <details style="background: #f8fbf9; margin-bottom: 15px; border-radius: 8px; border: 1px solid #d8eadd;">
+            <summary style="padding: 15px; font-weight: bold; color: #e07a5f; cursor: pointer;">
+                🌱 2. Trazabilidad: Ingresar Semillas al Vivero
+            </summary>
+            <div style="padding: 0 15px 15px 15px;">
+                <p style="font-size: 12px; color: #555;">(Registra la cantidad de semillas, su árbol madre de origen y la finca desde donde se extrajeron para iniciar la germinación).</p>
                 <form id="formLote" autocomplete="off">
                     <select id="lote-especie" required>
                         <option value="">-- Selecciona una Especie --</option>
@@ -49,7 +57,7 @@
                     <button type="submit" class="btn-principal" style="background: #e07a5f;">Generar Nuevo Lote</button>
                 </form>
             </div>
-        </div>
+        </details>
 
         <!-- CONTENEDOR EXCLUSIVO PARA ADMINISTRADORES -->
         <div id="seccionCrearBosquesino" class="oculto" style="text-align: center;">
@@ -134,7 +142,7 @@
                 <hr style="border: 0.5px solid #d8eadd; margin: 15px 0;">
                 
                 <label style="font-size:12px; color:#2d6a4f; font-weight:bold; display:block;">➕ Agregar Saber Campesino / Tradicional:</label>
-                <input type="text" id="edit-saber-autor" placeholder="Tu nombre (Ej. Juan Manuel)" style="width:100%; margin-top:4px; margin-bottom: 8px;">
+                <input type="text" id="edit-saber-autor" placeholder="Tu nombre (Ej. Manuel Ramírez)" style="width:100%; margin-top:4px; margin-bottom: 8px;">
                 <textarea id="edit-saber-desc" style="width:100%; min-height:70px;" placeholder="Describe el uso, tratamiento de germinación, historia..."></textarea>
                 
                 <div style="display: flex; gap: 8px; margin-top: 10px;">
@@ -474,12 +482,22 @@
         const especie = window.especiesGlobal.find(e => e._id === especieId);
         document.getElementById('nombreEspecieLotes').innerText = especie.nombreComun;
         
-        const misLotes = window.lotesGlobal.filter(l => l.especieId && l.especieId._id === especieId);
+        const rol = localStorage.getItem('rolUsuario');
+        const miEmail = localStorage.getItem('emailUsuario');
+
+        // Buscamos todos los lotes de esta especie
+        let misLotes = window.lotesGlobal.filter(l => l.especieId && l.especieId._id === especieId);
+
+        // MAGIA DE PERMISOS: Si es operario, ocultamos los lotes de los demás compañeros
+        if (rol !== 'Admin') {
+            misLotes = misLotes.filter(l => l.registradoPor === miEmail);
+        }
+
         const contenedor = document.getElementById('contenedorLotesActivos');
         contenedor.innerHTML = '';
 
         if (misLotes.length === 0) {
-            contenedor.innerHTML = '<p style="font-size:13px; color:#666;">No hay lotes registradas.</p>';
+            contenedor.innerHTML = '<p style="font-size:13px; color:#666;">No hay lotes registradas bajo tu usuario para esta especie.</p>';
         } else {
             misLotes.forEach(lote => {
                 const f = new Date(lote.origen.fechaRecoleccion).toLocaleDateString();
@@ -662,15 +680,14 @@
             if (res.ok) {
                 localStorage.setItem('tokenAdmin', data.token);
                 localStorage.setItem('rolUsuario', data.rol);
+                localStorage.setItem('emailUsuario', data.email); // NUEVO: Guardamos quién es
                 modoAdminActivo = true;
                 cerrarModalLogin();
                 document.getElementById('panelAdmin').classList.remove('oculto');
                 document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión de Asociado';
                 
                 if (data.rol === 'Admin') document.getElementById('seccionCrearBosquesino').classList.remove('oculto');
-                cargarCatalogo(); // Recarga para mostrar botones
-            } else { 
-                alert('Acceso denegado: ' + data.error); 
+                cargarCatalogo(); 
             }
         } catch (err) { alert('Sin conexión con el servidor.'); }
     }
