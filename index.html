@@ -617,6 +617,8 @@
         totalPlantas > 0 ? btnFlotante.classList.remove('oculto') : (btnFlotante.classList.add('oculto'), document.getElementById('modalCarrito').classList.add('oculto'));
     }
 
+    function abrirModalCarrito() { document.getElementById('modalCarrito').classList.remove('oculto'); }
+
     function cerrarModalCarrito() { document.getElementById('modalCarrito').classList.add('oculto'); }
     
     function enviarWhatsApp() {
