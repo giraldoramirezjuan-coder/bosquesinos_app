@@ -227,20 +227,44 @@
 
             window.especiesGlobal.forEach(especie => {
                 const misLotes = window.lotesGlobal.filter(l => l.arbolMatrizId && l.arbolMatrizId.nombreComun === especie.nombreComun);
-                let activas = 0; misLotes.forEach(l => { if (l.estadoActual !== 'Sembrada') activas += l.cantidadActual; });
+                
+                let enGerminacion = 0; 
+                let enVivero = 0;      
 
-                let img = especie.imagenUrl ? `<img src="${especie.imagenUrl}" class="img-arbol">` : `<div class="img-arbol">🌱 Sin foto</div>`;
-                const btnGest = modoAdminActivo ? `<button class="btn-classic-secondary" onclick="abrirGestionLotes('${especie.nombreComun}')">Gestionar Lotes</button>` : '';
+                misLotes.forEach(l => { 
+                    if (l.estadoActual === 'Semillero' || l.estadoActual === 'Germinación') {
+                        enGerminacion += l.cantidadActual;
+                    } else if (l.estadoActual === 'Vivero' || l.estadoActual === 'Lista para transplante') {
+                        enVivero += l.cantidadActual;
+                    }
+                });
+
+                let img = especie.imagenUrl ? `<img src="${especie.imagenUrl}" class="img-arbol">` : `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
+                
+                const btnGest = modoAdminActivo ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionLotes('${especie._id}')">⚙️ Gestionar Lotes</button>` : '';
 
                 lista.innerHTML += `
                     <li class="item-planta">
                         ${img}
                         <div class="info-arbol">
-                            <h3>${especie.nombreComun}</h3> <i>${especie.nombreCientifico}</i>
-                            <p>${especie.caracteristicas.substring(0, 80)}...</p>
-                            <div class="estadisticas"><span>Disponibles</span><strong>${activas} uds.</strong></div>
+                            <h3 style="margin-bottom:2px;">${especie.nombreComun}</h3> 
+                            <i style="color:#52796f; font-size:13px;">${especie.nombreCientifico}</i>
+                            <p style="margin-top:8px;">${especie.caracteristicas.substring(0, 75)}...</p>
+                            
+                            <!-- CAJA DE INVENTARIO SEPARADA -->
+                            <div style="display: flex; justify-content: space-between; background: #f1f7f3; padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #d8eadd;">
+                                <div style="text-align: center; width: 50%;">
+                                    <span style="font-size: 11px; color: #555; font-weight: bold;">🌱 Semillas</span><br>
+                                    <strong style="color: #e07a5f; font-size: 16px;">${enGerminacion}</strong>
+                                </div>
+                                <div style="text-align: center; width: 50%; border-left: 1px solid #c9e4d6;">
+                                    <span style="font-size: 11px; color: #555; font-weight: bold;">🌿 Plántulas</span><br>
+                                    <strong style="color: #2d6a4f; font-size: 16px;">${enVivero}</strong>
+                                </div>
+                            </div>
+
                             <div class="acciones-tarjeta">
-                                <button class="btn-classic-primary" onclick="abrirMicrositio('${especie._id}')">Conocer especie</button>
+                                <button class="btn-classic-primary" style="width: 100%;" onclick="abrirMicrositio('${especie._id}')">Conocer especie</button>
                                 ${btnGest}
                             </div>
                         </div>
@@ -379,13 +403,55 @@
         if(res.ok) { await cargarCatalogo(); abrirMicrositio(especieActualId); }
     });
 
-    // --- LOTES (GESTIÓN) ---
-    function abrirGestionLotes(nombreComun) {
-        document.getElementById('nombreEspecieLotes').innerText = nombreComun;
-        const misLotes = window.lotesGlobal.filter(l => l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun && (localStorage.getItem('rolUsuario') === 'Admin' || l.registradoPor === localStorage.getItem('emailUsuario')));
-        const cont = document.getElementById('contenedorLotesActivos'); cont.innerHTML = '';
+   // --- LOTES (GESTIÓN MEJORADA) ---
+    function abrirGestionLotes(especieId) {
+        // Encontrar el nombre real usando el ID seguro
+        const especie = window.especiesGlobal.find(e => e._id === especieId);
+        if (!especie) return;
+        const nombreComun = especie.nombreComun;
+
+        document.getElementById('nombreEspecieLotes').innerText = `Gestión: ${nombreComun}`;
+        
+        // Filtro seguro: Lotes que tienen árbol matriz, coinciden con la especie y pertenecen al operario (o admin)
+        const misLotes = window.lotesGlobal.filter(l => 
+            l.arbolMatrizId && 
+            l.arbolMatrizId.nombreComun === nombreComun && 
+            (localStorage.getItem('rolUsuario') === 'Admin' || l.registradoPor === localStorage.getItem('emailUsuario'))
+        );
+        
+        const cont = document.getElementById('contenedorLotesActivos'); 
+        cont.innerHTML = '';
+        
+        if (misLotes.length === 0) {
+            cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No tienes lotes activos para esta especie.</p>';
+            document.getElementById('modalGestionLotes').classList.remove('oculto');
+            return;
+        }
+
         misLotes.forEach(l => {
-            cont.innerHTML += `<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;"><b>${l.codigoLote}</b> - ${l.estadoActual}<br>Vivas: ${l.cantidadActual} / Iniciales: ${l.cantidadInicial}<br><button onclick="prepAvanzar('${l._id}')">Avanzar</button> <button onclick="prepRetirar('${l._id}')">Retirar</button></div>`;
+            // Estética diferenciada: Naranja si es semilla, Verde si es plántula
+            const colorEstado = (l.estadoActual === 'Semillero' || l.estadoActual === 'Germinación') ? '#e07a5f' : '#2d6a4f';
+
+            cont.innerHTML += `
+                <div style="border: 1px solid #d8eadd; padding: 12px; border-radius: 8px; margin-bottom: 12px; background: #f8fbf9;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #1b4332;">Lote: ${l.codigoLote}</strong>
+                        <span style="background: ${colorEstado}; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+                            ${l.estadoActual}
+                        </span>
+                    </div>
+                    <div style="font-size: 12px; color: #555; margin-bottom: 10px;">
+                        <span>Sobreviven: <b style="color: #1b4332; font-size: 14px;">${l.cantidadActual}</b> de ${l.cantidadInicial} iniciales</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold;" onclick="prepAvanzar('${l._id}')">
+                            🌱 Avanzar Etapa
+                        </button>
+                        <button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff1f0; border: 1px solid #ffa39e; color: #cf222e;" onclick="prepRetirar('${l._id}')">
+                            🔻 Retirar / Merma
+                        </button>
+                    </div>
+                </div>`;
         });
         document.getElementById('modalGestionLotes').classList.remove('oculto');
     }
