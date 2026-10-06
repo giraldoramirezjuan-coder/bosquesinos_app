@@ -308,14 +308,14 @@
     }
 
     // --- GESTIÓN DE INVENTARIO (SIN "LOTES") ---
+    // --- GESTIÓN BIOLÓGICA (SEMILLERO VS VIVERO) ---
     function abrirGestionInventario(especieId) {
         const especie = window.especiesGlobal.find(e => e._id === especieId);
         if (!especie) return;
         const nombreComun = especie.nombreComun;
 
-        document.getElementById('nombreEspecieLotes').innerText = `Inventario: ${nombreComun}`;
+        document.getElementById('nombreEspecieLotes').innerText = `Gestión de: ${nombreComun}`;
         
-        // Filtro flexible
         const misLotes = window.lotesGlobal.filter(l => 
             ((l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun) || 
             (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id))) &&
@@ -323,38 +323,60 @@
         );
         
         const cont = document.getElementById('contenedorLotesActivos'); 
-        cont.innerHTML = '';
         
         if (misLotes.length === 0) {
-            cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No tienes registros activos para esta especie.</p>';
+            cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No hay registros de esta especie.</p>';
             document.getElementById('modalGestionLotes').classList.remove('oculto');
             return;
         }
 
-        misLotes.forEach(l => {
-            const colorEstado = (l.estadoActual === 'Semillero' || l.estadoActual === 'Germinación') ? '#e07a5f' : '#2d6a4f';
+        // Dividimos la pantalla con el nuevo lenguaje campesino, sin emojis
+        let htmlSemillero = '<h4 style="color:#e07a5f; border-bottom: 2px solid #e07a5f; padding-bottom:5px; margin-top:0;">En Semillero</h4>';
+        let htmlVivero = '<h4 style="color:#2d6a4f; border-bottom: 2px solid #2d6a4f; padding-bottom:5px; margin-top:25px;">En Vivero</h4>';
+        let contadorSemillero = 0;
+        let contadorVivero = 0;
 
-            cont.innerHTML += `
-                <div style="border: 1px solid #d8eadd; padding: 12px; border-radius: 8px; margin-bottom: 12px; background: #f8fbf9;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: #1b4332;">Registro: ${l.codigoLote}</strong>
-                        <span style="background: ${colorEstado}; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">
-                            ${l.estadoActual}
-                        </span>
-                    </div>
-                    <div style="font-size: 12px; color: #555; margin-bottom: 10px;">
-                        <span>Sobreviven: <b style="color: #1b4332; font-size: 14px;">${l.cantidadActual}</b> de ${l.cantidadInicial} iniciales</span>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold;" onclick="prepAvanzar('${l._id}')">
-                            🌱 Avanzar Etapa
-                        </button>
-                        <button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff1f0; border: 1px solid #ffa39e; color: #cf222e;" onclick="prepRetirar('${l._id}')">
-                            🔻 Reportar Merma
-                        </button>
-                    </div>
-                </div>`;
+        misLotes.forEach(l => {
+            // Buscamos quién es la madre para la trazabilidad
+            const madre = l.arbolMatrizId ? l.arbolMatrizId.codigoArbol : 'Madre Antigua';
+
+            if (l.estadoActual === 'Semillero' || l.estadoActual === 'Germinación') {
+                contadorSemillero++;
+                htmlSemillero += `
+                    <div style="border: 1px dashed #e07a5f; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #fffaf8;">
+                        <strong style="color: #c15539;">Madre: ${madre}</strong>
+                        <p style="font-size: 13px; color: #555; margin: 5px 0;"><b>${l.cantidadActual}</b> semillas en tierra.</p>
+                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                            <button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; border-color: #e07a5f; color: #c15539; font-weight: bold;" onclick="prepAvanzar('${l._id}')">
+                                Germinaron
+                            </button>
+                            <button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff; border: 1px solid #e07a5f; color: #e07a5f;" onclick="prepRetirar('${l._id}')">
+                                Registrar pérdida
+                            </button>
+                        </div>
+                    </div>`;
+            } else if (l.estadoActual === 'Vivero' || l.estadoActual === 'Lista para transplante') {
+                contadorVivero++;
+                htmlVivero += `
+                    <div style="border: 1px solid #74c69d; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #f1f7f3;">
+                        <strong style="color: #1b4332;">Madre: ${madre}</strong>
+                        <p style="font-size: 13px; color: #1b4332; margin: 5px 0;"><b>${l.cantidadActual}</b> plántulas en bolsa.</p>
+                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                            <button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; border-color: #2d6a4f; color: #1b4332; font-weight: bold;" onclick="prepAvanzar('${l._id}')">
+                                Sembrar en campo
+                            </button>
+                            <button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff; border: 1px solid #74c69d; color: #2d6a4f;" onclick="prepRetirar('${l._id}')">
+                                Registrar pérdida
+                            </button>
+                        </div>
+                    </div>`;
+            }
         });
+
+        if (contadorSemillero === 0) htmlSemillero += '<p style="font-size:13px; color:#888;">No hay semillas en tierra.</p>';
+        if (contadorVivero === 0) htmlVivero += '<p style="font-size:13px; color:#888;">No hay plántulas en bolsa.</p>';
+
+        cont.innerHTML = htmlSemillero + htmlVivero;
         document.getElementById('modalGestionLotes').classList.remove('oculto');
     }
 
