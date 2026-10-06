@@ -5,6 +5,38 @@
     <title>Bosquesinos San Luis</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Ajustes responsivos para celulares */
+        @media (max-width: 768px) {
+            #panelAdmin {
+                width: 95% !important;
+                margin: 10px auto 40px auto !important;
+                padding: 10px !important;
+            }
+            details summary {
+                font-size: 15px !important;
+                padding: 18px 12px !important; /* Más espacio para tocar con el dedo */
+            }
+            input, select, textarea {
+                font-size: 16px !important; /* Evita que el iPhone haga zoom automático */
+                padding: 14px 10px !important;
+                margin-bottom: 12px !important;
+                height: auto !important;
+            }
+            .btn-principal, .btn-classic-secondary, .btn-classic-danger {
+                padding: 14px !important;
+                font-size: 14px !important;
+            }
+            /* Acomodar los cuadros de Inteligencia Comunitaria */
+            #panelAdmin > details:nth-child(5) > div > div {
+                flex-direction: column;
+            }
+            #panelAdmin > details:nth-child(5) > div > div > div {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -397,11 +429,23 @@
         misArboles.forEach(a => {
             let est = a.monitoreos.length ? a.monitoreos[a.monitoreos.length-1].estadoFenologico : 'Recién registrado';
             let etiq = est === 'Semilla madura' ? `<div style="background:#cf222e;color:white;padding:4px;border-radius:4px;font-size:11px;">🚨 ¡COSECHAR!</div>` : `<div style="background:#d8eadd;padding:4px;border-radius:4px;font-size:11px;">Actual: ${est}</div>`;
-            cont.innerHTML += `<div style="border:1px solid #d0d7de; padding:15px; border-radius:8px; margin-bottom:10px;">${etiq}<h4>${a.codigoArbol} - ${a.nombreComun}</h4><p>📍 ${a.veredaSector}</p>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                    <button onclick="registrarFenologia('${a._id}', 'Hojas')">🍃 Hojas</button><button onclick="registrarFenologia('${a._id}', 'Floración')">🌼 Flor</button>
-                    <button onclick="registrarFenologia('${a._id}', 'Fruto verde')">🍏 Verde</button><button onclick="registrarFenologia('${a._id}', 'Semilla madura')" style="color:red; font-weight:bold;">🌰 Madura</button>
-                </div></div>`;
+            
+            // AQUÍ ES DONDE AGREGAMOS EL BOTÓN DE EDITAR (✏️)
+            cont.innerHTML += `
+                <div style="border:1px solid #d0d7de; padding:15px; border-radius:8px; margin-bottom:10px; position: relative;">
+                    <div style="position: absolute; top: 15px; right: 15px;">
+                        <button style="background: none; border: none; font-size: 16px; cursor: pointer;" onclick="editarArbol('${a._id}')">✏️️</button>
+                    </div>
+                    ${etiq}
+                    <h4 style="margin-top: 10px; width: 85%;">${a.codigoArbol} - ${a.nombreComun}</h4>
+                    <p>📍 ${a.veredaSector}</p>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        <button onclick="registrarFenologia('${a._id}', 'Hojas')">🍃 Hojas</button>
+                        <button onclick="registrarFenologia('${a._id}', 'Floración')">🌼 Flor</button>
+                        <button onclick="registrarFenologia('${a._id}', 'Fruto verde')">🍏 Verde</button>
+                        <button onclick="registrarFenologia('${a._id}', 'Semilla madura')" style="color:red; font-weight:bold;">🌰 Madura</button>
+                    </div>
+                </div>`;
         });
         actualizarDashboard();
     }
