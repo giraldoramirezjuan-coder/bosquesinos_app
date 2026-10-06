@@ -40,7 +40,7 @@
             </div>
         </details>
 
-        <!-- PASO 2: LOTE -->
+        <!-- PASO 2: LOTE (COSECHA) -->
         <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
             <summary style="padding: 14px; font-weight: 600; color: #e07a5f; cursor: pointer;">
                 🌱 2. Registrar Nueva Cosecha De Semillas
@@ -53,7 +53,7 @@
                     <input type="number" id="lote-cantidad" placeholder="Cantidad de semillas recolectadas" min="1" required>
                     <input type="text" id="lote-responsable" placeholder="Responsables del trepado/recolección" required>
                     <input type="date" id="lote-fecha" required>
-                    <button type="submit" class="btn-principal" style="background: #e07a5f;">Generar Lote en Semillero</button>
+                    <button type="submit" class="btn-principal" style="background: #e07a5f;">Generar Registro en Semillero</button>
                 </form>
             </div>
         </details>
@@ -61,7 +61,7 @@
         <!-- PASO 3: VITRINA -->
         <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
             <summary style="padding: 14px; font-weight: 600; color: #2d6a4f; cursor: pointer;">
-                📖 3. Registrar Plantulas
+                📖 3. Registrar Plántulas (Vitrina)
             </summary>
             <div style="padding: 0 15px 15px 15px;">
                 <form id="formEspecie" autocomplete="off">
@@ -92,7 +92,7 @@
                     </div>
                     <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; min-width: 80px; border: 1px solid #eef4f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                         <span style="font-size: 18px; font-weight: bold; color: #e07a5f;" id="stat-lotes">0</span><br>
-                        <span style="font-size: 11px; color: #555; font-weight: 500;">Lotes Activos</span>
+                        <span style="font-size: 11px; color: #555; font-weight: 500;">Registros Activos</span>
                     </div>
                     <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; min-width: 80px; border: 1px solid #eef4f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                         <span style="font-size: 18px; font-weight: bold; color: #cf222e;" id="stat-cosecha">0</span><br>
@@ -106,7 +106,7 @@
             </div>
         </details>
 
-        <!-- BOTÓN DE MONITOREO PERSONAL (FUERA DEL ACORDEÓN) -->
+        <!-- BOTÓN DE MONITOREO PERSONAL -->
         <hr style="border: 0.5px solid #d8eadd; margin: 15px 0;">
         <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalMonitoreo()">
             👀 Seguimiento de Arboles Semilleros
@@ -118,7 +118,7 @@
         </div>
     </div>
 
-    <!-- MODAL MONITOREO FENOLÓGICO MÓVIL (SOLO MIS ÁRBOLES) -->
+    <!-- MODAL MONITOREO FENOLÓGICO -->
     <div id="modalMonitoreoArboles" class="modal oculto" style="z-index: 10005 !important;">
         <div class="modal-contenido" style="max-width: 450px; padding: 20px;">
             <span class="cerrar-modal" onclick="document.getElementById('modalMonitoreoArboles').classList.add('oculto')">&times;</span>
@@ -128,7 +128,7 @@
         </div>
     </div>
 
-    <!-- MODAL DIRECTORIO GENERAL DE LA RED (SOLO LECTURA) -->
+    <!-- MODAL DIRECTORIO RED -->
     <div id="modalDirectorioArboles" class="modal oculto" style="z-index: 10005 !important;">
         <div class="modal-contenido" style="max-width: 500px; padding: 20px;">
             <span class="cerrar-modal" onclick="document.getElementById('modalDirectorioArboles').classList.add('oculto')">&times;</span>
@@ -138,7 +138,7 @@
         </div>
     </div>
 
-    <!-- MODAL MICROSITIO (VITRINA Y SABERES) -->
+    <!-- MODAL MICROSITIO -->
     <div id="modalDetalleEspecie" class="modal oculto">
         <div class="modal-contenido" style="max-width: 550px; text-align: center;">
             <span class="cerrar-modal" onclick="document.getElementById('modalDetalleEspecie').classList.add('oculto')">&times;</span>
@@ -175,15 +175,18 @@
         </div>
     </div>
 
+    <!-- MODAL GESTION INVENTARIO -->
+    <div id="modalGestionLotes" class="modal oculto"><div class="modal-contenido" style="max-width: 600px;"><span class="cerrar-modal" onclick="document.getElementById('modalGestionLotes').classList.add('oculto')">&times;</span><h3 id="nombreEspecieLotes"></h3><div id="contenedorLotesActivos"></div></div></div>
+    
+    <div id="modalAvanzarLote" class="modal oculto" style="z-index: 10000 !important;"><div class="modal-contenido" style="max-width: 400px; text-align: center;"><span class="cerrar-modal" onclick="document.getElementById('modalAvanzarLote').classList.add('oculto')">&times;</span><form id="formAvanzar"><input type="hidden" id="avanzar-loteId"><select id="avanzar-estado"><option value="Semillero">Semillero</option><option value="Vivero">Vivero</option><option value="Lista para transplante">Transplante</option><option value="Sembrada">Sembrada</option></select><input type="number" id="avanzar-cantidad"><input type="text" id="avanzar-obs" placeholder="Obs"><button type="submit" class="btn-principal">Avanzar</button></form></div></div>
+    <div id="modalRetiroLote" class="modal oculto" style="z-index: 10000 !important;"><div class="modal-contenido" style="max-width: 400px;"><span class="cerrar-modal" onclick="document.getElementById('modalRetiroLote').classList.add('oculto')">&times;</span><form id="formRetirarLote"><input type="hidden" id="retirar-loteId"><input type="number" id="retirar-loteCantidad"><input type="text" id="retirar-loteMotivo"><button type="submit" class="btn-classic-danger">Retirar</button></form></div></div>
+
+    <!-- LOGIN Y CARRITO -->
     <div id="modalLogin" class="modal oculto"><div class="modal-contenido" style="max-width: 400px; text-align: center;"><span class="cerrar-modal" onclick="document.getElementById('modalLogin').classList.add('oculto')">&times;</span><input type="text" id="login-email" placeholder="Usuario"><input type="password" id="login-password" placeholder="Contraseña"><button class="btn-principal" onclick="procesarLogin()">Ingresar</button></div></div>
     <div id="modalBosquesino" class="modal oculto"><div class="modal-contenido" style="max-width: 400px; text-align: center;"><span class="cerrar-modal" onclick="document.getElementById('modalBosquesino').classList.add('oculto')">&times;</span><form id="formRegistrarAsociado"><input type="text" id="nuevo-email" placeholder="Usuario"><input type="password" id="nueva-password" placeholder="Contraseña"><button type="submit" class="btn-principal">Crear</button></form></div></div>
     <div id="btnCarrito" class="carrito-flotante oculto" onclick="document.getElementById('modalCarrito').classList.remove('oculto')">🌱 Mi lista <span id="contadorCarrito">0</span></div>
     <div id="modalCarrito" class="modal oculto"><div class="modal-contenido" style="max-width: 450px;"><span class="cerrar-modal" onclick="document.getElementById('modalCarrito').classList.add('oculto')">&times;</span><ul id="listaCarrito" class="lista-carrito"></ul><button class="btn-classic-primary" onclick="enviarWhatsApp()">Enviar WhatsApp</button></div></div>
     
-    <div id="modalGestionLotes" class="modal oculto"><div class="modal-contenido" style="max-width: 600px;"><span class="cerrar-modal" onclick="document.getElementById('modalGestionLotes').classList.add('oculto')">&times;</span><h3 id="nombreEspecieLotes"></h3><div id="contenedorLotesActivos"></div></div></div>
-    <div id="modalAvanzarLote" class="modal oculto" style="z-index: 10000 !important;"><div class="modal-contenido" style="max-width: 400px; text-align: center;"><span class="cerrar-modal" onclick="document.getElementById('modalAvanzarLote').classList.add('oculto')">&times;</span><form id="formAvanzar"><input type="hidden" id="avanzar-loteId"><select id="avanzar-estado"><option value="Semillero">Semillero</option><option value="Vivero">Vivero</option><option value="Lista para transplante">Transplante</option><option value="Sembrada">Sembrada</option></select><input type="number" id="avanzar-cantidad"><input type="text" id="avanzar-obs" placeholder="Obs"><button type="submit" class="btn-principal">Avanzar</button></form></div></div>
-    <div id="modalRetiroLote" class="modal oculto" style="z-index: 10000 !important;"><div class="modal-contenido" style="max-width: 400px;"><span class="cerrar-modal" onclick="document.getElementById('modalRetiroLote').classList.add('oculto')">&times;</span><form id="formRetirarLote"><input type="hidden" id="retirar-loteId"><input type="number" id="retirar-loteCantidad"><input type="text" id="retirar-loteMotivo"><button type="submit" class="btn-classic-danger">Retirar</button></form></div></div>
-
     <ul id="listaPlantulas"></ul>
 
     <footer class="footer-discreto">
@@ -192,7 +195,8 @@
     </footer>
 
     <script>
-    const hostUrl = ''; 
+    const hostUrl = 'https://bosquesinos-sanluis.onrender.com'; 
+    
     let modoAdminActivo = false;
     window.especiesGlobal = []; window.lotesGlobal = []; window.arbolesMatrizGlobal = [];
     let especieActualId = null; let especieSeleccionadaMicrositio = null;
@@ -201,7 +205,7 @@
         return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('tokenAdmin')}` };
     }
 
-    // --- CARGA DE DATOS Y DASHBOARD ---
+    // --- CARGA DE DATOS ---
     async function cargarCatalogo() {
         const lista = document.getElementById('listaPlantulas');
         const selVitrina = document.getElementById('esp-nombre-select');
@@ -209,7 +213,8 @@
         
         try {
             const [resEspecies, resLotes] = await Promise.all([ fetch(`${hostUrl}/api/especies`), fetch(`${hostUrl}/api/lotes`) ]);
-            window.especiesGlobal = await resEspecies.json(); window.lotesGlobal = await resLotes.json();
+            window.especiesGlobal = await resEspecies.json(); 
+            window.lotesGlobal = await resLotes.json();
             
             if (modoAdminActivo) {
                 const resArboles = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
@@ -226,22 +231,24 @@
             if (window.especiesGlobal.length === 0) { lista.innerHTML = '<p style="text-align:center; width:100%;">No hay especies aún.</p>'; actualizarDashboard(); return; }
 
             window.especiesGlobal.forEach(especie => {
-                const misLotes = window.lotesGlobal.filter(l => l.arbolMatrizId && l.arbolMatrizId.nombreComun === especie.nombreComun);
+                // Filtro flexible para datos viejos y nuevos
+                const misLotes = window.lotesGlobal.filter(l => 
+                    (l.arbolMatrizId && l.arbolMatrizId.nombreComun === especie.nombreComun) || 
+                    (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id))
+                );
                 
-                let enGerminacion = 0; 
-                let enVivero = 0;      
-
+                let activas = 0;
                 misLotes.forEach(l => { 
-                    if (l.estadoActual === 'Semillero' || l.estadoActual === 'Germinación') {
-                        enGerminacion += l.cantidadActual;
-                    } else if (l.estadoActual === 'Vivero' || l.estadoActual === 'Lista para transplante') {
-                        enVivero += l.cantidadActual;
+                    // REGLA: Las semillas NO suman hasta que germinan (Plántula)
+                    if (l.estadoActual !== 'Sembrada' && l.estadoActual !== 'Semillero' && l.estadoActual !== 'Germinación') {
+                        activas += l.cantidadActual;
                     }
                 });
 
                 let img = especie.imagenUrl ? `<img src="${especie.imagenUrl}" class="img-arbol">` : `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
                 
-                const btnGest = modoAdminActivo ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionLotes('${especie._id}')">⚙️ Gestionar Lotes</button>` : '';
+                // Botón apunta correctamente a abrirGestionInventario
+                const btnGest = modoAdminActivo ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionInventario('${especie._id}')">⚙️️ Gestionar Inventario</button>` : '';
 
                 lista.innerHTML += `
                     <li class="item-planta">
@@ -251,16 +258,10 @@
                             <i style="color:#52796f; font-size:13px;">${especie.nombreCientifico}</i>
                             <p style="margin-top:8px;">${especie.caracteristicas.substring(0, 75)}...</p>
                             
-                            <!-- CAJA DE INVENTARIO SEPARADA -->
-                            <div style="display: flex; justify-content: space-between; background: #f1f7f3; padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #d8eadd;">
-                                <div style="text-align: center; width: 50%;">
-                                    <span style="font-size: 11px; color: #555; font-weight: bold;">🌱 Semillas</span><br>
-                                    <strong style="color: #e07a5f; font-size: 16px;">${enGerminacion}</strong>
-                                </div>
-                                <div style="text-align: center; width: 50%; border-left: 1px solid #c9e4d6;">
-                                    <span style="font-size: 11px; color: #555; font-weight: bold;">🌿 Plántulas</span><br>
-                                    <strong style="color: #2d6a4f; font-size: 16px;">${enVivero}</strong>
-                                </div>
+                            <!-- VISTA LIMPIA -->
+                            <div class="estadisticas" style="margin-top: 10px; margin-bottom: 10px;">
+                                <span>Plántulas Disponibles</span>
+                                <strong style="font-size: 16px;">${activas} uds.</strong>
                             </div>
 
                             <div class="acciones-tarjeta">
@@ -271,22 +272,21 @@
                     </li>`;
             });
             actualizarDashboard();
-        } catch (error) { lista.innerHTML = `<p>Error de conexión.</p>`; }
+        } catch (error) { console.log(error); }
     }
 
-    // --- LOTES (GESTIÓN MEJORADA Y MATEMÁTICA DE MERMAS) ---
-    function abrirGestionLotes(especieId) {
-        // Encontrar la especie usando el ID seguro
+    // --- GESTIÓN DE INVENTARIO (SIN "LOTES") ---
+    function abrirGestionInventario(especieId) {
         const especie = window.especiesGlobal.find(e => e._id === especieId);
         if (!especie) return;
         const nombreComun = especie.nombreComun;
 
-        document.getElementById('nombreEspecieLotes').innerText = `Gestión: ${nombreComun}`;
+        document.getElementById('nombreEspecieLotes').innerText = `Inventario: ${nombreComun}`;
         
-        // Filtrar los lotes de esta especie que le pertenecen al operario (o a todos si es Admin)
+        // Filtro flexible
         const misLotes = window.lotesGlobal.filter(l => 
-            l.arbolMatrizId && 
-            l.arbolMatrizId.nombreComun === nombreComun && 
+            ((l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun) || 
+            (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id))) &&
             (localStorage.getItem('rolUsuario') === 'Admin' || l.registradoPor === localStorage.getItem('emailUsuario'))
         );
         
@@ -294,19 +294,18 @@
         cont.innerHTML = '';
         
         if (misLotes.length === 0) {
-            cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No tienes lotes activos para esta especie.</p>';
+            cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No tienes registros activos para esta especie.</p>';
             document.getElementById('modalGestionLotes').classList.remove('oculto');
             return;
         }
 
         misLotes.forEach(l => {
-            // Diferenciar color según la etapa biológica
             const colorEstado = (l.estadoActual === 'Semillero' || l.estadoActual === 'Germinación') ? '#e07a5f' : '#2d6a4f';
 
             cont.innerHTML += `
                 <div style="border: 1px solid #d8eadd; padding: 12px; border-radius: 8px; margin-bottom: 12px; background: #f8fbf9;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: #1b4332;">Lote: ${l.codigoLote}</strong>
+                        <strong style="color: #1b4332;">Registro: ${l.codigoLote}</strong>
                         <span style="background: ${colorEstado}; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">
                             ${l.estadoActual}
                         </span>
@@ -319,7 +318,7 @@
                             🌱 Avanzar Etapa
                         </button>
                         <button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff1f0; border: 1px solid #ffa39e; color: #cf222e;" onclick="prepRetirar('${l._id}')">
-                            🔻 Retirar / Merma
+                            🔻 Reportar Merma
                         </button>
                     </div>
                 </div>`;
@@ -329,10 +328,14 @@
 
     function actualizarDashboard() {
         if (!modoAdminActivo) return;
-        let totalPlantas = 0; let lotesActivos = 0; let arbolesCosecha = 0;
+        let totalPlantas = 0; let registrosActivos = 0; let arbolesCosecha = 0;
         
         window.lotesGlobal.forEach(l => {
-            if (l.estadoActual !== 'Sembrada') { totalPlantas += l.cantidadActual; lotesActivos++; }
+            // Solo cuenta como plántula viva si ya pasó la etapa de semilla
+            if (l.estadoActual !== 'Sembrada' && l.estadoActual !== 'Semillero' && l.estadoActual !== 'Germinación') { 
+                totalPlantas += l.cantidadActual; 
+                registrosActivos++; 
+            }
         });
         
         window.arbolesMatrizGlobal.forEach(a => {
@@ -341,11 +344,11 @@
         });
 
         document.getElementById('stat-plantulas').innerText = totalPlantas;
-        document.getElementById('stat-lotes').innerText = lotesActivos;
+        document.getElementById('stat-lotes').innerText = registrosActivos; 
         document.getElementById('stat-cosecha').innerText = arbolesCosecha;
     }
 
-    // --- FORMULARIOS FASE 1, 2 Y 3 ---
+    // --- FORMULARIOS ---
     document.getElementById('formArbolMatriz').addEventListener('submit', async (e) => {
         e.preventDefault();
         const datos = {
@@ -363,7 +366,7 @@
         const res = await fetch(`${hostUrl}/api/lotes`, { method: 'POST', headers: obtenerCabecerasSeguras(), 
             body: JSON.stringify({ arbolMatrizId: document.getElementById('lote-arbolMatriz').value, cantidadInicial: parseInt(document.getElementById('lote-cantidad').value), origen: { responsableRecoleccion: document.getElementById('lote-responsable').value, fechaRecoleccion: document.getElementById('lote-fecha').value } })
         });
-        if (res.ok) { document.getElementById('formLote').reset(); alert('Lote generado.'); cargarCatalogo(); }
+        if (res.ok) { document.getElementById('formLote').reset(); alert('Registro generado.'); cargarCatalogo(); }
     });
 
     document.getElementById('formEspecie').addEventListener('submit', async (e) => {
@@ -384,7 +387,6 @@
         const res = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
         window.arbolesMatrizGlobal = await res.json();
         
-        // FILTRO: Solo veo los de mi cuenta para editarlos
         const misArboles = window.arbolesMatrizGlobal.filter(a => a.registradoPor === localStorage.getItem('emailUsuario'));
         
         cont.innerHTML = '';
@@ -456,58 +458,6 @@
         if(res.ok) { await cargarCatalogo(); abrirMicrositio(especieActualId); }
     });
 
-   // --- LOTES (GESTIÓN MEJORADA) ---
-    function abrirGestionLotes(especieId) {
-        // Encontrar el nombre real usando el ID seguro
-        const especie = window.especiesGlobal.find(e => e._id === especieId);
-        if (!especie) return;
-        const nombreComun = especie.nombreComun;
-
-        document.getElementById('nombreEspecieLotes').innerText = `Gestión: ${nombreComun}`;
-        
-        // Filtro seguro: Lotes que tienen árbol matriz, coinciden con la especie y pertenecen al operario (o admin)
-        const misLotes = window.lotesGlobal.filter(l => 
-            l.arbolMatrizId && 
-            l.arbolMatrizId.nombreComun === nombreComun && 
-            (localStorage.getItem('rolUsuario') === 'Admin' || l.registradoPor === localStorage.getItem('emailUsuario'))
-        );
-        
-        const cont = document.getElementById('contenedorLotesActivos'); 
-        cont.innerHTML = '';
-        
-        if (misLotes.length === 0) {
-            cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No tienes lotes activos para esta especie.</p>';
-            document.getElementById('modalGestionLotes').classList.remove('oculto');
-            return;
-        }
-
-        misLotes.forEach(l => {
-            // Estética diferenciada: Naranja si es semilla, Verde si es plántula
-            const colorEstado = (l.estadoActual === 'Semillero' || l.estadoActual === 'Germinación') ? '#e07a5f' : '#2d6a4f';
-
-            cont.innerHTML += `
-                <div style="border: 1px solid #d8eadd; padding: 12px; border-radius: 8px; margin-bottom: 12px; background: #f8fbf9;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: #1b4332;">Lote: ${l.codigoLote}</strong>
-                        <span style="background: ${colorEstado}; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">
-                            ${l.estadoActual}
-                        </span>
-                    </div>
-                    <div style="font-size: 12px; color: #555; margin-bottom: 10px;">
-                        <span>Sobreviven: <b style="color: #1b4332; font-size: 14px;">${l.cantidadActual}</b> de ${l.cantidadInicial} iniciales</span>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold;" onclick="prepAvanzar('${l._id}')">
-                            🌱 Avanzar Etapa
-                        </button>
-                        <button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff1f0; border: 1px solid #ffa39e; color: #cf222e;" onclick="prepRetirar('${l._id}')">
-                            🔻 Retirar / Merma
-                        </button>
-                    </div>
-                </div>`;
-        });
-        document.getElementById('modalGestionLotes').classList.remove('oculto');
-    }
     function prepAvanzar(id) { document.getElementById('avanzar-loteId').value = id; document.getElementById('modalAvanzarLote').classList.remove('oculto'); }
     function prepRetirar(id) { document.getElementById('retirar-loteId').value = id; document.getElementById('modalRetiroLote').classList.remove('oculto'); }
     
