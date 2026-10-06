@@ -23,7 +23,7 @@
         <!-- PASO 1: ÁRBOL MADRE -->
         <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
             <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">
-                🌳 1. El Origen: Registrar Árbol Madre / Semillero
+                🌳 1. Registrar Nuevo Arbol Semillero
             </summary>
             <div style="padding: 0 15px 15px 15px;">
                 <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ <strong>Seguridad:</strong> Coordenadas GPS se encriptarán en el servidor.</p>
@@ -43,7 +43,7 @@
         <!-- PASO 2: LOTE -->
         <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
             <summary style="padding: 14px; font-weight: 600; color: #e07a5f; cursor: pointer;">
-                🌱 2. El Proceso: Ingresar Semillas al Vivero (Lote)
+                🌱 2. Registrar Nueva Cosecha De Semillas
             </summary>
             <div style="padding: 0 15px 15px 15px;">
                 <form id="formLote" autocomplete="off">
@@ -61,7 +61,7 @@
         <!-- PASO 3: VITRINA -->
         <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
             <summary style="padding: 14px; font-weight: 600; color: #2d6a4f; cursor: pointer;">
-                📖 3. El Resultado: Enriquecer Vitrina Pública
+                📖 3. Registrar Plantulas
             </summary>
             <div style="padding: 0 15px 15px 15px;">
                 <form id="formEspecie" autocomplete="off">
@@ -75,10 +75,41 @@
             </div>
         </details>
 
-        <!-- BOTÓN DE MONITOREO -->
+        <!-- PASO 4: RESUMEN Y DIRECTORIO DE LA RED -->
+        <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
+            <summary style="padding: 14px; font-weight: 600; color: #386641; cursor: pointer; user-select: none;">
+                🌍 4. Inteligencia Comunitaria:
+            </summary>
+            <div style="padding: 15px; text-align: center;">
+                <p style="font-size: 12px; color: #555; margin-top: 0; margin-bottom: 15px; text-align: left;">
+                    Vista previa del esfuerzo colectivo. Aquí puedes consultar el inventario general del vivero y los árboles protegidos por todos los bosquesinos.
+                </p>
+                
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                    <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; min-width: 80px; border: 1px solid #eef4f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        <span style="font-size: 18px; font-weight: bold; color: #2d6a4f;" id="stat-plantulas">0</span><br>
+                        <span style="font-size: 11px; color: #555; font-weight: 500;">Plántulas Vivas</span>
+                    </div>
+                    <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; min-width: 80px; border: 1px solid #eef4f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        <span style="font-size: 18px; font-weight: bold; color: #e07a5f;" id="stat-lotes">0</span><br>
+                        <span style="font-size: 11px; color: #555; font-weight: 500;">Lotes Activos</span>
+                    </div>
+                    <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; min-width: 80px; border: 1px solid #eef4f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        <span style="font-size: 18px; font-weight: bold; color: #cf222e;" id="stat-cosecha">0</span><br>
+                        <span style="font-size: 11px; color: #555; font-weight: 500;">Por Cosechar</span>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 10px; font-size: 13px; font-weight: bold; border-color: #386641; color: #386641;" onclick="abrirModalDirectorio()">
+                    📋 Ver Directorio Completo de Árboles
+                </button>
+            </div>
+        </details>
+
+        <!-- BOTÓN DE MONITOREO PERSONAL (FUERA DEL ACORDEÓN) -->
         <hr style="border: 0.5px solid #d8eadd; margin: 15px 0;">
         <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalMonitoreo()">
-            👀 Ver mis Árboles y Reportar Estado (Trepa)
+            👀 Seguimiento de Arboles Semilleros
         </button>
 
         <div id="seccionCrearBosquesino" class="oculto" style="text-align: center; margin-top: 15px;">
@@ -87,13 +118,23 @@
         </div>
     </div>
 
-    <!-- MODAL MONITOREO FENOLÓGICO MÓVIL -->
+    <!-- MODAL MONITOREO FENOLÓGICO MÓVIL (SOLO MIS ÁRBOLES) -->
     <div id="modalMonitoreoArboles" class="modal oculto" style="z-index: 10005 !important;">
         <div class="modal-contenido" style="max-width: 450px; padding: 20px;">
             <span class="cerrar-modal" onclick="document.getElementById('modalMonitoreoArboles').classList.add('oculto')">&times;</span>
             <h3 style="color: #1b4332; margin-top: 0; font-size: 18px;">🌲 Mis Árboles Custodiados</h3>
-            <p style="font-size: 13px; color: #52796f; margin-bottom: 15px;">Toca el estado actual del árbol en campo.</p>
+            <p style="font-size: 13px; color: #52796f; margin-bottom: 15px;">Toca el estado actual de tu árbol en campo.</p>
             <div id="listaArbolesMonitoreo" style="max-height: 65vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DIRECTORIO GENERAL DE LA RED (SOLO LECTURA) -->
+    <div id="modalDirectorioArboles" class="modal oculto" style="z-index: 10005 !important;">
+        <div class="modal-contenido" style="max-width: 500px; padding: 20px;">
+            <span class="cerrar-modal" onclick="document.getElementById('modalDirectorioArboles').classList.add('oculto')">&times;</span>
+            <h3 style="color: #1b4332; margin-top: 0; font-size: 18px;">🌍 Directorio de la Red</h3>
+            <p style="font-size: 13px; color: #52796f; margin-bottom: 15px;">Todos los árboles semilleros custodiados por la asociación.</p>
+            <div id="listaDirectorioRed" style="max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
     </div>
 
@@ -134,9 +175,6 @@
         </div>
     </div>
 
-    <!-- OTROS MODALES (Login, Registro, Lotes, Avanzar, Retirar, Carrito) -->
-    <!-- Se mantienen igual que en la versión anterior para no alargar el HTML, asegúrate de mantener tus divs de login, lotes y carrito. -->
-
     <div id="modalLogin" class="modal oculto"><div class="modal-contenido" style="max-width: 400px; text-align: center;"><span class="cerrar-modal" onclick="document.getElementById('modalLogin').classList.add('oculto')">&times;</span><input type="text" id="login-email" placeholder="Usuario"><input type="password" id="login-password" placeholder="Contraseña"><button class="btn-principal" onclick="procesarLogin()">Ingresar</button></div></div>
     <div id="modalBosquesino" class="modal oculto"><div class="modal-contenido" style="max-width: 400px; text-align: center;"><span class="cerrar-modal" onclick="document.getElementById('modalBosquesino').classList.add('oculto')">&times;</span><form id="formRegistrarAsociado"><input type="text" id="nuevo-email" placeholder="Usuario"><input type="password" id="nueva-password" placeholder="Contraseña"><button type="submit" class="btn-principal">Crear</button></form></div></div>
     <div id="btnCarrito" class="carrito-flotante oculto" onclick="document.getElementById('modalCarrito').classList.remove('oculto')">🌱 Mi lista <span id="contadorCarrito">0</span></div>
@@ -163,6 +201,7 @@
         return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('tokenAdmin')}` };
     }
 
+    // --- CARGA DE DATOS Y DASHBOARD ---
     async function cargarCatalogo() {
         const lista = document.getElementById('listaPlantulas');
         const selVitrina = document.getElementById('esp-nombre-select');
@@ -184,7 +223,7 @@
             }
             
             lista.innerHTML = '';
-            if (window.especiesGlobal.length === 0) return lista.innerHTML = '<p style="text-align:center; width:100%;">No hay especies aún.</p>';
+            if (window.especiesGlobal.length === 0) { lista.innerHTML = '<p style="text-align:center; width:100%;">No hay especies aún.</p>'; actualizarDashboard(); return; }
 
             window.especiesGlobal.forEach(especie => {
                 const misLotes = window.lotesGlobal.filter(l => l.arbolMatrizId && l.arbolMatrizId.nombreComun === especie.nombreComun);
@@ -207,10 +246,29 @@
                         </div>
                     </li>`;
             });
+            actualizarDashboard();
         } catch (error) { lista.innerHTML = `<p>Error de conexión.</p>`; }
     }
 
-    // FORMULARIOS FASE 1, 2 Y 3
+    function actualizarDashboard() {
+        if (!modoAdminActivo) return;
+        let totalPlantas = 0; let lotesActivos = 0; let arbolesCosecha = 0;
+        
+        window.lotesGlobal.forEach(l => {
+            if (l.estadoActual !== 'Sembrada') { totalPlantas += l.cantidadActual; lotesActivos++; }
+        });
+        
+        window.arbolesMatrizGlobal.forEach(a => {
+            let est = a.monitoreos.length ? a.monitoreos[a.monitoreos.length-1].estadoFenologico : '';
+            if (est === 'Semilla madura') arbolesCosecha++;
+        });
+
+        document.getElementById('stat-plantulas').innerText = totalPlantas;
+        document.getElementById('stat-lotes').innerText = lotesActivos;
+        document.getElementById('stat-cosecha').innerText = arbolesCosecha;
+    }
+
+    // --- FORMULARIOS FASE 1, 2 Y 3 ---
     document.getElementById('formArbolMatriz').addEventListener('submit', async (e) => {
         e.preventDefault();
         const datos = {
@@ -240,15 +298,24 @@
         if (res.ok) { document.getElementById('formEspecie').reset(); alert('Vitrina actualizada.'); cargarCatalogo(); }
     });
 
-    // MONITOREO FENOLÓGICO
+    // --- MONITOREO PERSONAL Y DIRECTORIO GENERAL ---
     async function abrirModalMonitoreo() {
         const cont = document.getElementById('listaArbolesMonitoreo');
         document.getElementById('modalMonitoreoArboles').classList.remove('oculto');
         cont.innerHTML = 'Cargando tus árboles...';
+        
         const res = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
-        const arboles = await res.json();
+        window.arbolesMatrizGlobal = await res.json();
+        
+        // FILTRO: Solo veo los de mi cuenta para editarlos
+        const misArboles = window.arbolesMatrizGlobal.filter(a => a.registradoPor === localStorage.getItem('emailUsuario'));
+        
         cont.innerHTML = '';
-        arboles.forEach(a => {
+        if (misArboles.length === 0) {
+            cont.innerHTML = '<p style="font-size:13px; color:#666;">No tienes árboles bajo tu custodia.</p>'; return;
+        }
+
+        misArboles.forEach(a => {
             let est = a.monitoreos.length ? a.monitoreos[a.monitoreos.length-1].estadoFenologico : 'Recién registrado';
             let etiq = est === 'Semilla madura' ? `<div style="background:#cf222e;color:white;padding:4px;border-radius:4px;font-size:11px;">🚨 ¡COSECHAR!</div>` : `<div style="background:#d8eadd;padding:4px;border-radius:4px;font-size:11px;">Actual: ${est}</div>`;
             cont.innerHTML += `<div style="border:1px solid #d0d7de; padding:15px; border-radius:8px; margin-bottom:10px;">${etiq}<h4>${a.codigoArbol} - ${a.nombreComun}</h4><p>📍 ${a.veredaSector}</p>
@@ -257,6 +324,7 @@
                     <button onclick="registrarFenologia('${a._id}', 'Fruto verde')">🍏 Verde</button><button onclick="registrarFenologia('${a._id}', 'Semilla madura')" style="color:red; font-weight:bold;">🌰 Madura</button>
                 </div></div>`;
         });
+        actualizarDashboard();
     }
 
     async function registrarFenologia(id, estado) {
@@ -265,7 +333,31 @@
         abrirModalMonitoreo();
     }
 
-    // MICROSITIO Y SABERES
+    function abrirModalDirectorio() {
+        const cont = document.getElementById('listaDirectorioRed');
+        document.getElementById('modalDirectorioArboles').classList.remove('oculto');
+        cont.innerHTML = '';
+
+        if (window.arbolesMatrizGlobal.length === 0) {
+            cont.innerHTML = '<p style="font-size:13px; color:#666;">La red aún no tiene árboles registrados.</p>'; return;
+        }
+
+        window.arbolesMatrizGlobal.forEach(a => {
+            let est = a.monitoreos.length ? a.monitoreos[a.monitoreos.length-1].estadoFenologico : 'Sin reporte';
+            let colorBorde = est === 'Semilla madura' ? '#cf222e' : '#d0d7de';
+            let alerta = est === 'Semilla madura' ? '<b style="color:#cf222e;"> (🚨 Listo para cosechar)</b>' : '';
+            
+            cont.innerHTML += `
+                <div style="border:1px solid ${colorBorde}; padding:12px; border-radius:8px; background:#f8fbf9;">
+                    <h4 style="margin: 0 0 5px 0; color:#1f2328; font-size:14px;">${a.codigoArbol} - ${a.nombreComun}</h4>
+                    <p style="margin: 0 0 5px 0; font-size: 12px; color:#57606a;">📍 Vereda: ${a.veredaSector}</p>
+                    <p style="margin: 0; font-size: 12px; color:#57606a;">👤 Custodio: <b>${a.custodio}</b></p>
+                    <p style="margin: 5px 0 0 0; font-size: 12px; color:#1b4332;">Estado: ${est}${alerta}</p>
+                </div>`;
+        });
+    }
+
+    // --- MICROSITIO Y SABERES ---
     function abrirMicrositio(id) {
         const especie = window.especiesGlobal.find(i => i._id === id); especieActualId = id; especieSeleccionadaMicrositio = especie.nombreComun;
         document.getElementById('detalle-nombre').innerText = especie.nombreComun; document.getElementById('detalle-caracteristicas').innerText = especie.caracteristicas;
@@ -287,7 +379,7 @@
         if(res.ok) { await cargarCatalogo(); abrirMicrositio(especieActualId); }
     });
 
-    // LOTES (GESTIÓN)
+    // --- LOTES (GESTIÓN) ---
     function abrirGestionLotes(nombreComun) {
         document.getElementById('nombreEspecieLotes').innerText = nombreComun;
         const misLotes = window.lotesGlobal.filter(l => l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun && (localStorage.getItem('rolUsuario') === 'Admin' || l.registradoPor === localStorage.getItem('emailUsuario')));
@@ -303,12 +395,12 @@
     document.getElementById('formAvanzar').addEventListener('submit', async (e) => { e.preventDefault(); await fetch(`${hostUrl}/api/lotes/avanzar`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ loteId: document.getElementById('avanzar-loteId').value, nuevoEstado: document.getElementById('avanzar-estado').value, cantidadSuperviviente: document.getElementById('avanzar-cantidad').value, observaciones: document.getElementById('avanzar-obs').value }) }); location.reload(); });
     document.getElementById('formRetirarLote').addEventListener('submit', async (e) => { e.preventDefault(); await fetch(`${hostUrl}/api/lotes/retirar`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ loteId: document.getElementById('retirar-loteId').value, cantidadRetirar: document.getElementById('retirar-loteCantidad').value, motivo: document.getElementById('retirar-loteMotivo').value }) }); location.reload(); });
 
-    // CARRITO Y LOGIN (Básicos)
+    // --- CARRITO Y LOGIN ---
     let carrito = [];
     function apadrinarArbol() { window.open(`https://wa.me/573226575786?text=Quiero apadrinar ${especieSeleccionadaMicrositio}`, '_blank'); }
     function adquirirEjemplar() { let i = carrito.find(x => x.n === especieSeleccionadaMicrositio); if(i) i.c++; else carrito.push({n:especieSeleccionadaMicrositio, c:1}); actUI(); document.getElementById('modalCarrito').classList.remove('oculto'); }
     function actUI() { document.getElementById('listaCarrito').innerHTML = carrito.map(i => `<li>${i.n} - ${i.c} uds</li>`).join(''); document.getElementById('btnCarrito').className = carrito.length ? 'carrito-flotante' : 'oculto'; }
-    function enviarWhatsApp() { window.open(`https://wa.me/573105632387text=Interés en: ` + carrito.map(i => `${i.c}x ${i.n}`).join(', '), '_blank'); }
+    function enviarWhatsApp() { window.open(`https://wa.me/573105632387?text=Interés en: ` + carrito.map(i => `${i.c}x ${i.n}`).join(', '), '_blank'); }
 
     function toggleAdmin() { if(modoAdminActivo) { localStorage.clear(); location.reload(); } else document.getElementById('modalLogin').classList.remove('oculto'); }
     async function procesarLogin() {
