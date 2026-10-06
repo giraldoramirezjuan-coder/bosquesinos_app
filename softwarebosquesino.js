@@ -60,13 +60,13 @@ const arbolMatrizSchema = new mongoose.Schema({
 
 const ArbolMatriz = mongoose.model('ArbolMatriz', arbolMatrizSchema);
 
+// REEMPLAZA EL MODELO LOTE ACTUAL POR ESTE:
 const loteSchema = new mongoose.Schema({
     codigoLote: { type: String, required: true, unique: true }, 
     especieId: { type: mongoose.Schema.Types.ObjectId, ref: 'Especie', required: true },
+    arbolMatrizId: { type: mongoose.Schema.Types.ObjectId, ref: 'ArbolMatriz', required: true }, // Vínculo directo de trazabilidad
     registradoPor: { type: String, required: true },
     origen: {
-        arbolMadreInfo: { type: String, default: '' },
-        finca: { type: String, required: true }, 
         fechaRecoleccion: { type: Date, required: true },
         responsableRecoleccion: { type: String, required: true } 
     },
@@ -82,6 +82,36 @@ const loteSchema = new mongoose.Schema({
     }]
 });
 const Lote = mongoose.model('Lote', loteSchema);
+
+// REEMPLAZA LA RUTA POST /api/lotes POR ESTA:
+app.post('/api/lotes', verificarAcceso, async (req, res) => {
+    try {
+        const { especieId, arbolMatrizId, origen, cantidadInicial } = req.body;
+        const codigoLote = `BQ-${new Date().getMonth()+1}${new Date().getFullYear().toString().slice(-2)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+    
+        const nuevoLote = new Lote({
+            codigoLote,
+            especieId,
+            arbolMatrizId,
+            registradoPor: req.usuarioActual,
+            origen,
+            cantidadInicial,
+            cantidadActual: cantidadInicial,
+            estadoActual: 'Semillero',
+            historial: [{
+                estadoAlcanzado: 'Recolección',
+                cantidadSuperviviente: cantidadInicial,
+                observaciones: 'Ingreso al vivero tras cosecha',
+                responsable: req.usuarioActual
+            }]
+        });
+    
+        await nuevoLote.save();
+        res.status(201).json({ mensaje: `Lote ${codigoLote} registrado correctamente en semillero.` });
+    } catch (error) {
+        res.status(400).json({ error: 'Faltan datos requeridos o error al registrar el lote' });
+    }
+});
 
 // --- 3. AUTO-CREACIÓN DE USUARIO BASE ---
 async function crearUsuarioAdmin() {

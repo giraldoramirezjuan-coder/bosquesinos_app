@@ -28,12 +28,23 @@
             </summary>
             <div style="padding: 0 15px 15px 15px;">
                 <p style="font-size: 12px; color: #555;">(Crea la ficha general de la planta en el sistema. Esto es independiente de las semillas recolectadas).</p>
-                <form id="formEspecie" autocomplete="off">
-                    <input type="text" id="esp-nombre" placeholder="Nombre común (Ej. Guayacán)" autocomplete="off" required>
-                    <input type="text" id="esp-cientifico" placeholder="Nombre científico (Opcional)" autocomplete="off">
-                    <input type="url" id="esp-imagen" placeholder="URL de la fotografía" autocomplete="off">
-                    <textarea id="esp-caracteristicas" placeholder="Características biológicas..."></textarea>
-                    <button type="submit" class="btn-principal" style="background: #40916c;">Guardar Ficha Botánica</button>
+                <form id="formLote" autocomplete="off">
+                    <label style="font-size: 12px; color:#555;">1. Especie recolectada:</label>
+                    <select id="lote-especie" required onchange="filtrarArbolesMatriz()">
+                        <option value="">-- Selecciona una Especie --</option>
+                    </select>
+                    
+                    <label style="font-size: 12px; color:#555; margin-top: 8px; display: block;">2. Árbol Madre de origen (Registrado en Custodia):</label>
+                    <select id="lote-arbolMatriz" required>
+                        <option value="">-- Primero selecciona una especie --</option>
+                    </select>
+
+                    <label style="font-size: 12px; color:#555; margin-top: 8px; display: block;">3. Datos de la colecta:</label>
+                    <input type="number" id="lote-cantidad" placeholder="Cantidad de semillas recolectadas" min="1" required>
+                    <input type="text" id="lote-responsable" placeholder="Responsable de la trepada / recolección" autocomplete="off" required>
+                    <input type="date" id="lote-fecha" required>
+                    
+                    <button type="submit" class="btn-principal" style="background: #e07a5f; margin-top: 10px;">Generar Lote en Semillero</button>
                 </form>
             </div>
         </details>
@@ -45,12 +56,12 @@
             </summary>
             <div style="padding: 0 15px 15px 15px;">
                 <p style="font-size: 12px; color: #555;">(Registra la cantidad de semillas, su árbol madre de origen y la finca desde donde se extrajeron para iniciar la germinación).</p>
-                <form id="formLote" autocomplete="off">
+                rm id="formLote" autocomplete="off">
                     <select id="lote-especie" required>
                         <option value="">-- Selecciona una Especie --</option>
                     </select>
                     <input type="number" id="lote-cantidad" placeholder="Cantidad de semillas recolectadas" required>
-                    <input type="text" id="lote-finca" placeholder="Finca de recolección" autocomplete="off" required>
+                    <i<fonput type="text" id="lote-finca" placeholder="Finca de recolección" autocomplete="off" required>
                     <input type="text" id="lote-arbol" placeholder="Datos del Árbol Madre (Opcional)" autocomplete="off">
                     <input type="text" id="lote-responsable" placeholder="Responsable de la recolección" autocomplete="off" required>
                     <input type="date" id="lote-fecha" required>
@@ -78,6 +89,10 @@
                     <input type="text" id="arbol-custodio" placeholder="Campesino o Asociado Custodio" autocomplete="off" required>
                     <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero</button>
                 </form>
+                <hr style="border: 0.5px solid #d8eadd; margin: 15px 0;">
+                <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalMonitoreo()">
+                    👀 Ver mis Árboles y Reportar Estado
+                </button>
             </div>
         </details>
 
@@ -196,6 +211,19 @@
         </div>
     </div>
 
+    <!-- MODAL: MONITOREO FENOLÓGICO (VISTA MÓVIL) -->
+    <div id="modalMonitoreoArboles" class="modal oculto" style="z-index: 10005 !important;">
+        <div class="modal-contenido" style="max-width: 450px; padding: 20px;">
+            <span class="cerrar-modal" onclick="cerrarModalMonitoreo()">&times;</span>
+            <h3 style="color: #1b4332; margin-top: 0; font-size: 18px;">🌲 Mis Árboles Custodiados</h3>
+            <p style="font-size: 13px; color: #52796f; margin-bottom: 15px; line-height: 1.3;">Toca el estado actual del árbol. Sin escribir, con un solo toque.</p>
+
+            <div id="listaArbolesMonitoreo" style="max-height: 65vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
+                <!-- Las tarjetas de árboles aparecerán aquí automáticamente -->
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: AVANZAR LOTE -->
     <div id="modalAvanzarLote" class="modal oculto" style="z-index: 10000 !important;">
         <div class="modal-contenido" style="max-width: 400px; text-align: center;">
@@ -278,8 +306,29 @@
     
     window.especiesGlobal = [];
     window.lotesGlobal = [];
+    window.arbolesMatrizGlobal = [];
     let especieActualId = null;
     let especieSeleccionadaMicrositio = null;
+
+    function filtrarArbolesMatriz() {
+        const especieId = document.getElementById('lote-especie').value;
+        const selectArbol = document.getElementById('lote-arbolMatriz');
+        selectArbol.innerHTML = '<option value="">-- Selecciona el Árbol Madre --</option>';
+        
+        if (!especieId) return;
+
+        const arbolesFiltrados = window.arbolesMatrizGlobal.filter(a => 
+            a.especieId === especieId || (a.especieId && a.especieId._id === especieId)
+        );
+
+        if (arbolesFiltrados.length === 0) {
+            selectArbol.innerHTML = '<option value="">⚠️ No hay árboles registrados para esta especie</option>';
+        } else {
+            arbolesFiltrados.forEach(arbol => {
+                selectArbol.innerHTML += `<option value="${arbol._id}">${arbol.codigoArbol} (Vereda: ${arbol.veredaSector})</option>`;
+            });
+        }
+    }
 
     function obtenerCabecerasSeguras() {
        const token = localStorage.getItem('tokenAdmin'); 
@@ -310,6 +359,13 @@ fetch(`${hostUrl}/api/lotes`, { // Aplica para /api/especies y /api/registrar-as
             
             lista.innerHTML = ''; 
             selectEspecie.innerHTML = '<option value="">-- Selecciona una Especie --</option>';
+            
+            if (modoAdminActivo) {
+                const resArboles = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
+                if (resArboles.ok) {
+                    window.arbolesMatrizGlobal = await resArboles.json();
+                }
+            }
 
             if (window.especiesGlobal.length === 0) {
                 lista.innerHTML = '<p style="text-align:center; width:100%; color:#555;">No hay especies registradas aún.</p>';
@@ -446,34 +502,32 @@ fetch(`${hostUrl}/api/lotes`, { // Aplica para /api/especies y /api/registrar-as
         }
     }
 
-    document.getElementById('formEditarEspecie').addEventListener('submit', async (e) => {
+    document.getElementById('formLote').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const nuevaCaract = document.getElementById('edit-caracteristicas-esp').value;
-        const nuevoSaberAutor = document.getElementById('edit-saber-autor').value;
-        const nuevoSaberDesc = document.getElementById('edit-saber-desc').value;
+        const datos = {
+            especieId: document.getElementById('lote-especie').value,
+            arbolMatrizId: document.getElementById('lote-arbolMatriz').value,
+            cantidadInicial: parseInt(document.getElementById('lote-cantidad').value),
+            origen: {
+                responsableRecoleccion: document.getElementById('lote-responsable').value,
+                fechaRecoleccion: document.getElementById('lote-fecha').value
+            }
+        };
 
-        const datos = { caracteristicas: nuevaCaract };
-        
-        if (nuevoSaberAutor.trim() !== '' && nuevoSaberDesc.trim() !== '') {
-            datos.nuevoSaber = {
-                autor: nuevoSaberAutor,
-                descripcion: nuevoSaberDesc
-            };
-        }
-
-        const res = await fetch(`${hostUrl}/api/especies/${especieActualId}`, {
-            method: 'PUT',
-            headers: obtenerCabecerasSeguras(),
+        const res = await fetch(`${hostUrl}/api/lotes`, {
+            method: 'POST',
+            headers: obtenerCabecerasSeguras(), 
             body: JSON.stringify(datos)
         });
-
+        
         if (res.ok) {
-            await cargarCatalogo(); 
-            abrirMicrositio(especieActualId); 
-        } else {
+            document.getElementById('formLote').reset();
             const data = await res.json();
-            alert('Error al guardar: ' + data.error);
+            alert(data.mensaje);
+            cargarCatalogo(); 
+        } else {
+            const data = await res.json(); 
+            alert('Error: ' + data.error);
         }
     });
 
@@ -760,6 +814,86 @@ fetch(`${hostUrl}/api/lotes`, { // Aplica para /api/especies y /api/registrar-as
 
     // --- ARRANQUE ---
     cargarCatalogo();
+    // --- MÓDULO B: MONITOREO FENOLÓGICO EN CAMPO ---
+
+    async function abrirModalMonitoreo() {
+        const contenedor = document.getElementById('listaArbolesMonitoreo');
+        contenedor.innerHTML = '<p style="text-align:center; color:#555;">Buscando tus árboles en el territorio...</p>';
+        document.getElementById('modalMonitoreoArboles').classList.remove('oculto');
+
+        try {
+            const res = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
+            if (!res.ok) throw new Error('Error al cargar');
+            window.arbolesMatrizGlobal = await res.json();
+
+            contenedor.innerHTML = '';
+            if (window.arbolesMatrizGlobal.length === 0) {
+                contenedor.innerHTML = '<p style="font-size:13px; color:#666;">No tienes árboles registrados bajo tu custodia aún.</p>';
+                return;
+            }
+
+            window.arbolesMatrizGlobal.forEach(arbol => {
+                const especieNombre = arbol.especieId ? arbol.especieId.nombreComun : 'Especie';
+                
+                // Buscar el último reporte
+                let ultimoEstado = 'Recién registrado';
+                if (arbol.monitoreos && arbol.monitoreos.length > 0) {
+                    ultimoEstado = arbol.monitoreos[arbol.monitoreos.length - 1].estadoFenologico;
+                }
+
+                // Generar etiqueta visual según el estado
+                let etiquetaEstado = `<div style="background:#d8eadd; color:#1b4332; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold; display:inline-block; margin-bottom:5px;">Actual: ${ultimoEstado}</div>`;
+                
+                if (ultimoEstado === 'Semilla madura') {
+                    etiquetaEstado = `<div style="background:#cf222e; color:white; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold; display:inline-block; margin-bottom:5px; box-shadow: 0 0 8px rgba(207, 34, 46, 0.4);">🚨 ¡LISTO PARA COSECHA (TREPAR)!</div>`;
+                }
+
+                // Tarjeta diseñada para dedos (Móvil)
+                contenedor.innerHTML += `
+                    <div style="background:#ffffff; border:1px solid #d0d7de; border-radius:10px; padding:15px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+                        ${etiquetaEstado}
+                        <h4 style="margin: 0 0 4px 0; color:#1f2328; font-size: 15px;">${arbol.codigoArbol} - ${especieNombre}</h4>
+                        <p style="margin: 0 0 12px 0; font-size: 12px; color:#57606a;">📍 Vereda: ${arbol.veredaSector}</p>
+
+                        <p style="font-size: 11px; color: #555; margin: 0 0 6px 0; font-weight:bold;">Toca para actualizar estado:</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <button onclick="registrarFenologia('${arbol._id}', 'Hojas / Vegetativo')" style="padding:10px 5px; font-size:12px; background:#f6f8fa; border:1px solid #d0d7de; border-radius:8px; cursor:pointer;">🍃 Hojas</button>
+                            <button onclick="registrarFenologia('${arbol._id}', 'Floración')" style="padding:10px 5px; font-size:12px; background:#fff8c5; border:1px solid #d4a72c; border-radius:8px; cursor:pointer;">🌼 Floración</button>
+                            <button onclick="registrarFenologia('${arbol._id}', 'Fruto verde')" style="padding:10px 5px; font-size:12px; background:#e6f2ff; border:1px solid #0969da; border-radius:8px; cursor:pointer;">🍏 Fruto verde</button>
+                            <button onclick="registrarFenologia('${arbol._id}', 'Semilla madura')" style="padding:10px 5px; font-size:12px; background:#ffebe9; border:1px solid #cf222e; border-radius:8px; cursor:pointer; font-weight:bold; color:#cf222e;">🌰 Madura</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+        } catch (err) {
+            contenedor.innerHTML = '<p style="color:red; font-size:13px;">Error de conexión.</p>';
+        }
+    }
+
+    function cerrarModalMonitoreo() {
+        document.getElementById('modalMonitoreoArboles').classList.add('oculto');
+    }
+
+    async function registrarFenologia(arbolId, estado) {
+        if(!confirm(`¿Reportar que el árbol está en etapa de: ${estado}?`)) return;
+
+        try {
+            const res = await fetch(`${hostUrl}/api/arboles-matriz/${arbolId}/monitoreo`, {
+                method: 'POST',
+                headers: obtenerCabecerasSeguras(),
+                body: JSON.stringify({ estadoFenologico: estado, observaciones: 'Reporte rápido desde campo' })
+            });
+
+            if (res.ok) {
+                abrirModalMonitoreo();
+            } else {
+                alert('Error al registrar estado.');
+            }
+        } catch (err) {
+            alert('Sin señal o error de conexión.');
+        }
+    }
     window.onload = () => {
         if (localStorage.getItem('tokenAdmin')) {
             modoAdminActivo = true;
