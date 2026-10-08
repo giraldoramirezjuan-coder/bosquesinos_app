@@ -1,4 +1,68 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-brand-forest: #063F1F;
+  --color-brand-forest-900: #06351F;
+  --color-brand-forest-700: #063F1F;
+  --color-brand-forest-500: #3C775C;
+  --color-brand-sage-100: #DCE8E0;
+  --color-brand-cream: #F5F1E8;
+  --color-surface-white: #FFFFFF;
+  --color-text-primary: #183126;
+  --color-text-muted: #63736B;
+  --color-border-subtle: #D9E1DC;
+  --color-accent-sun: #D8A93B;
+
+  --font-display: Poppins, Inter, system-ui, sans-serif;
+  --font-body: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --text-h1: 56px;
+  --text-h2: 40px;
+  --text-h3: 28px;
+  --text-body-lg: 20px;
+  --text-body: 16px;
+  --text-body-sm: 14px;
+  --text-caption: 12px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 80px;
+  --space-10: 120px;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 10px 30px rgba(6,53,31,.08);
+  --shadow-float: 0 18px 45px rgba(6,53,31,.14);
+}
+
+.btn-primary {
+  background: var(--color-brand-forest);
+  color: var(--color-surface-white);
+  border: 0;
+  border-radius: var(--radius-pill);
+  padding: var(--space-4) var(--space-5);
+  font: 600 var(--text-body) / 1 var(--font-body);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-brand-forest);
+  border: 1px solid var(--color-brand-forest);
+  border-radius: var(--radius-pill);
+  padding: var(--space-4) var(--space-5);
+  font: 600 var(--text-body) / 1 var(--font-body);
+}
+
 
 body { 
     font-family: 'Poppins', sans-serif; 
