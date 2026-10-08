@@ -237,10 +237,31 @@ app.post('/api/lotes/retirar', verificarAcceso, async (req, res) => {
         const lote = await Lote.findById(req.body.loteId);
         const cant = Number(req.body.cantidadRetirar);
         lote.cantidadActual -= cant;
+        
+        // LA MAGIA: Si la pérdida vacía el inventario, eliminamos el registro de raíz
+        if (lote.cantidadActual <= 0) {
+            await Lote.findByIdAndDelete(req.body.loteId);
+            return res.json({ mensaje: 'Registro eliminado porque la cantidad llegó a 0' });
+        }
+
         lote.historial.push({ estadoAlcanzado: lote.estadoActual, cantidadSuperviviente: lote.cantidadActual, observaciones: `Retiro: ${req.body.motivo}`, responsable: req.usuarioActual });
         await lote.save();
         res.json({ mensaje: `Se retiraron ${cant} unidades.` });
     } catch (error) { res.status(500).json({ error: 'Error al retirar' }); }
+});
+
+// --- NUEVO: ELIMINAR UN REGISTRO (LOTE) DEFINITIVAMENTE CON LA X ---
+app.delete('/api/lotes/:id', verificarAcceso, async (req, res) => {
+    try {
+        const registroEliminado = await Lote.findByIdAndDelete(req.params.id);
+        if (!registroEliminado) {
+            return res.status(404).json({ error: 'Registro no encontrado' });
+        }
+        res.json({ mensaje: 'Registro eliminado correctamente' });
+    } catch (error) {
+        console.error('Error al eliminar registro:', error);
+        res.status(500).json({ error: 'Error al eliminar' });
+    }
 });
 
 // PUT: Actualizar Vitrina Pública (Fase 3)
@@ -259,4 +280,4 @@ app.put('/api/especies/:id', verificarAcceso, async (req, res) => {
 
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => { console.log(`Servidor activo en puerto ${PORT}`); });
+app.listen(PORT, '0.0.0.0', () => { console.log(`Servidor activo en puerto ${PORT}`); });   
