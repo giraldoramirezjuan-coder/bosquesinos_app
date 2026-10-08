@@ -212,10 +212,10 @@ button.btn-principal:hover { background: #1b4332; }
 
 /* Botones de acción en tarjetas */
 .btn-retirar {
-    background: #e07a5f; color: white; border: none; padding: 8px 12px; 
+    background:#a1b00b; color: white; border: none; padding: 8px 12px; 
     font-size: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
 }
-.btn-retirar:hover { background: #cb6246; }
+.btn-retirar:hover { background: #a1b00b; }
 
 .btn-editar {
     background: #40916c; color: white; border: none; padding: 8px 12px; 
