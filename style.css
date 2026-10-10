@@ -427,3 +427,38 @@ button.btn-principal:hover { background: #1b4332; }
     background-color: #ffebe9;
     border-color: rgba(255, 129, 130, 0.4);
 }
+/* =========================================
+   SUPERPOSICIÓN DE TOKENS (BOTONES GLOBALES) 
+   ========================================= */
+button.btn-principal, .btn-classic-primary, .carrito-flotante {
+    background-color: var(--color-brand-forest) !important;
+    color: var(--color-surface-white) !important;
+    border: none !important;
+    border-radius: var(--radius-pill) !important;
+    font-family: var(--font-body) !important;
+    font-weight: 600 !important;
+}
+button.btn-principal:hover, .btn-classic-primary:hover, .carrito-flotante:hover {
+    background-color: var(--color-brand-forest-900) !important;
+}
+.btn-classic-secondary, .btn-add-carrito {
+    background-color: transparent !important;
+    color: var(--color-brand-forest) !important;
+    border: 1px solid var(--color-brand-forest) !important;
+    border-radius: var(--radius-pill) !important;
+    font-family: var(--font-body) !important;
+    font-weight: 600 !important;
+}
+.btn-classic-secondary:hover, .btn-add-carrito:hover {
+    background-color: var(--color-brand-sage-100) !important;
+}
+.btn-classic-danger, .btn-quitar {
+    background-color: #fff0f0 !important;
+    color: #cf222e !important;
+    border: 1px solid rgba(207, 34, 46, 0.4) !important;
+    border-radius: var(--radius-pill) !important;
+}
+.btn-classic-danger:hover, .btn-quitar:hover {
+    background-color: #cf222e !important;
+    color: #ffffff !important;
+}
