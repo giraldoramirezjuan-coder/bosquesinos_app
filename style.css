@@ -552,3 +552,28 @@ button.btn-principal:hover { background: #1b4332; }
     background-color: #cf222e !important;
     color: #ffffff !important;
 }
+
+/* =========================================
+   CORRECCIÓN DE MODALES (MICROSITIOS AL CENTRO)
+   ========================================= */
+.modal:not(.oculto) {
+    position: fixed !important; /* Lo ancla a la pantalla, no al documento */
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important; /* Ocupa el 100% del ancho visual */
+    height: 100vh !important; /* Ocupa el 100% del alto visual */
+    background-color: rgba(6, 63, 31, 0.85) !important; /* Fondo verde oscuro semitransparente */
+    z-index: 99999 !important; /* Obliga a tapar la barra de navegación que tiene 1000 */
+    display: flex !important;
+    align-items: center !important; /* Lo centra verticalmente */
+    justify-content: center !important; /* Lo centra horizontalmente */
+    overflow-y: auto !important; /* Permite scroll interno si la tarjeta es muy larga */
+}
+
+/* Ajuste para que la cajita blanca no se pegue a los bordes en celulares */
+.modal-contenido {
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    margin: auto !important;
+    position: relative !important;
+}
