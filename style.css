@@ -1,6 +1,47 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
+/* =========================================
+   RESETEO DE MÁRGENES (Elimina los bordes blancos)
+   ========================================= */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* =========================================
+   ANIMACIONES: FLORECIMIENTO Y BOTONES
+   ========================================= */
+@keyframes florecimiento {
+    0% { 
+        opacity: 0; 
+        transform: scale(0.97) translateY(15px); 
+        filter: blur(5px);
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+        filter: blur(0);
+    }
+}
+
+.vista-activa {
+    animation: florecimiento 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+}
+
+.btn-dinamico {
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+}
+
+.btn-dinamico:hover {
+    transform: translateY(-4px) scale(1.03) !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
+    filter: brightness(1.1);
+}
+
 :root {
   --color-brand-forest: #063F1F;
   --color-brand-forest-900: #06351F;
@@ -428,9 +469,14 @@ button.btn-principal:hover { background: #1b4332; }
     border-color: rgba(255, 129, 130, 0.4);
 }
 /* =========================================
-   SUPERPOSICIÓN DE TOKENS (BOTONES GLOBALES) 
+   SUPERPOSICIÓN DE TOKENS (PALETA DISTRIBUIDA)
    ========================================= */
-button.btn-principal, .btn-classic-primary, .carrito-flotante {
+
+/* 1. Tarjetas, Árbol Madre y Login (Verde Bosque Oscuro) */
+.btn-classic-primary,
+#formArbolMatriz button.btn-principal,
+#modalLogin button.btn-principal,
+#modalBosquesino button.btn-principal {
     background-color: var(--color-brand-forest) !important;
     color: var(--color-surface-white) !important;
     border: none !important;
@@ -438,27 +484,71 @@ button.btn-principal, .btn-classic-primary, .carrito-flotante {
     font-family: var(--font-body) !important;
     font-weight: 600 !important;
 }
-button.btn-principal:hover, .btn-classic-primary:hover, .carrito-flotante:hover {
+.btn-classic-primary:hover,
+#formArbolMatriz button.btn-principal:hover {
     background-color: var(--color-brand-forest-900) !important;
 }
-.btn-classic-secondary, .btn-add-carrito {
-    background-color: transparent !important;
-    color: var(--color-brand-forest) !important;
-    border: 1px solid var(--color-brand-forest) !important;
+
+/* 2. Semilleros, Cosechas y Carrito Flotante (Acento Sol / Dorado) */
+#formLote button.btn-principal,
+.carrito-flotante,
+#modalDetalleEspecie button[onclick="apadrinarArbol()"] {
+    background-color: var(--color-accent-sun) !important;
+    color: var(--color-text-primary) !important; /* Texto verde oscuro para que lea bien sobre el dorado */
+    border: none !important;
+    border-radius: var(--radius-pill) !important;
+    font-family: var(--font-body) !important;
+    font-weight: 700 !important;
+}
+#formLote button.btn-principal:hover,
+.carrito-flotante:hover {
+    background-color: #c99b2e !important; /* Un dorado ligeramente más oscuro al pasar el mouse */
+    transform: scale(1.03);
+}
+
+/* 3. Vitrina Pública y Adquisiciones (Verde Medio Vibrante) */
+#formEspecie button.btn-principal,
+#modalDetalleEspecie button[onclick="adquirirEjemplar()"] {
+    background-color: var(--color-brand-forest-500) !important;
+    color: var(--color-surface-white) !important;
+    border: none !important;
     border-radius: var(--radius-pill) !important;
     font-family: var(--font-body) !important;
     font-weight: 600 !important;
 }
-.btn-classic-secondary:hover, .btn-add-carrito:hover {
-    background-color: var(--color-brand-sage-100) !important;
+#formEspecie button.btn-principal:hover,
+#modalDetalleEspecie button[onclick="adquirirEjemplar()"]:hover {
+    background-color: var(--color-brand-forest) !important;
 }
-.btn-classic-danger, .btn-quitar {
+
+/* 4. Botones Secundarios (Blancos con borde Verde Salvia) */
+.btn-classic-secondary, 
+.btn-add-carrito {
+    background-color: var(--color-surface-white) !important;
+    color: var(--color-brand-forest) !important;
+    border: 2px solid var(--color-brand-sage-100) !important;
+    border-radius: var(--radius-pill) !important;
+    font-family: var(--font-body) !important;
+    font-weight: 600 !important;
+}
+.btn-classic-secondary:hover, 
+.btn-add-carrito:hover {
+    background-color: var(--color-brand-sage-100) !important;
+    border-color: var(--color-brand-forest-500) !important;
+}
+
+/* 5. Botones de Pérdida o Eliminar (Se mantienen Rojos por seguridad) */
+.btn-classic-danger, 
+.btn-quitar {
     background-color: #fff0f0 !important;
     color: #cf222e !important;
     border: 1px solid rgba(207, 34, 46, 0.4) !important;
     border-radius: var(--radius-pill) !important;
+    font-family: var(--font-body) !important;
+    font-weight: 600 !important;
 }
-.btn-classic-danger:hover, .btn-quitar:hover {
+.btn-classic-danger:hover, 
+.btn-quitar:hover {
     background-color: #cf222e !important;
     color: #ffffff !important;
 }

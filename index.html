@@ -40,35 +40,54 @@
 </head>
 <body>
 
-    <header class="hero-section">
-        <div class="hero-overlay">
-            <img src="blanco bosquesinos.png" alt="Logo Bosquesinos" class="hero-logo" onerror="this.style.display='none'">
-            <h2 class="hero-subtitle">Conservación en manos campesinas</h2>
-            <p class="hero-text">Custodiando la flora nativa en el corazón de San Luis, Antioquia. Uniendo el cuidado del agua y la tierra a través de la memoria de nuestra comunidad.</p>
-        </div>
-    </header>
-    <!-- LIMPIEZA DE FLOTANTES (Fuerza a que todo baje) -->
-    <div style="clear: both; width: 100%; display: block;"></div>
+    <!-- === BARRA DE NAVEGACIÓN SUPERIOR (Solo aparece cuando sales del inicio) === -->
+<!-- === BARRA DE NAVEGACIÓN SUPERIOR (SIEMPRE VISIBLE) === -->
 
-    <!-- FRANJA DEL PROCESO VIVO (Minimalista) -->
-    <div style="width: 100%; background: #f8fbf9; border-bottom: 2px solid #eef4f0; padding: 25px 0;">
-        <div style="max-width: 900px; margin: 0 auto; text-align: center; padding: 0 15px;">
-            <h2 style="color: #1b4332; font-size: 16px; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 1px;">Nuestro proceso vivo</h2>
-            
-            <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px;">
-                <div style="padding: 8px 15px; background: white; border-radius: 20px; border: 1px solid #d8eadd; font-size: 14px;">
-                    🤎 <span style="color: #2d6a4f; font-weight: bold; margin-left: 5px;">Árbol Madre</span>
-                </div>
-                <div style="color: #a3b18a; font-weight: bold;">➞</div>
-                <div style="padding: 8px 15px; background: white; border-radius: 20px; border: 1px solid #d8eadd; font-size: 14px;">
-                    🌱 <span style="color: #2d6a4f; font-weight: bold; margin-left: 5px;">Semillero</span>
-                </div>
-                <div style="color: #a3b18a; font-weight: bold;">➞</div>
-                <div style="padding: 8px 15px; background: white; border-radius: 20px; border: 1px solid #d8eadd; font-size: 14px;">
-                    🪴 <span style="color: #2d6a4f; font-weight: bold; margin-left: 5px;">Vivero</span>
-                </div>
-            </div>
+<!-- === BARRA DE NAVEGACIÓN SUPERIOR (Solo visible en Catálogo y Gente) === -->
+<nav id="menu-principal" class="oculto" style="background: var(--color-surface-white); padding: 15px 5%; box-shadow: var(--shadow-card); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+    
+    <!-- LADO IZQUIERDO: LOGO -->
+   <div style="display: flex; align-items: center; cursor: pointer;" onclick="cambiarVista('vista-inicio')">
+        <img src="bosquesinos.png" alt="Logo Bosquesinos" style="height: 55px; object-fit: contain;">
+    </div>
+
+    <!-- LADO DERECHO: BOTONES HORIZONTALES Y DISCRETOS -->
+    <div style="display: flex; flex-direction: row; gap: 15px; align-items: center; justify-content: flex-end;">
+        <button class="btn-classic-secondary" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
+            📖 Cuaderno y Catálogo
+        </button>
+        <button class="btn-classic-secondary" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-gente')">
+            🤝 Alianza Bosquesina
+        </button>
+    </div>
+</nav>
+
+<!-- === CAJA 1: HOME (Aterrizaje con Video Dron) === -->
+<section id="vista-inicio" class="vista-activa" style="position: relative; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000;">
+    <!-- Placeholder del Video (Mientras consigues la toma del dron) -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(6, 63, 31, 0.6), rgba(0, 0, 0, 0.8)), url('https://i.imgur.com/jbebAua.jpeg') center/cover; opacity: 0.8;"></div>
+    
+    <div style="position: relative; z-index: 10; text-align: center; padding: 20px; max-width: 800px;">
+        <img src="blanco bosquesinos.png" alt="Logo Bosquesinos" style="max-width: 300px; margin-bottom: 20px;">
+        <h1 style="color: white; font-size: 40px; margin-bottom: 15px;">Conservación en manos campesinas</h1>
+        <p style="color: var(--color-brand-sage-100); font-size: 18px; margin-bottom: 30px;">Custodiando la flora nativa en el corazón de San Luis, Antioquia.</p>
+        
+        <div style="display: flex; flex-direction: row; gap: 20px; justify-content: center; align-items: center; margin-top: 30px; flex-wrap: wrap;">
+            <button class="btn-primary btn-dinamico" style="width: max-content; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-brand-forest); border: 2px solid var(--color-brand-forest); white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
+                📖 Explorar Cuaderno y Catálogo
+            </button>
+            <button class="btn-primary btn-dinamico" style="width: max-content; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-accent-sun); color: var(--color-text-primary); border: 2px solid var(--color-accent-sun); white-space: nowrap;" onclick="cambiarVista('vista-gente')">
+                🤝 Conocer las personas bosquesinas
+            </button>
         </div>
+    </div>
+</section>
+
+<!-- === CAJA 2: CUADERNO BOSQUESINO Y CATÁLOGO === -->
+<section id="vista-catalogo" class="oculto" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h2 style="color: var(--color-brand-forest); font-size: 32px;">Cuaderno Bosquesino</h2>
+        <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">Conoce las historias de nuestras especies nativas. Cada plántula guarda una memoria campesina y el esfuerzo de recuperación de nuestros bosques.</p>
     </div>
 
     <!-- PANEL DE CONTROL 4.0 -->
@@ -678,6 +697,7 @@
         await cargarCatalogo(); 
         abrirGestionInventario(especieInventarioActiva); // Te deja donde estabas
     });
+   
     // --- CARRITO Y LOGIN ---
     let carrito = [];
     function apadrinarArbol() { window.open(`https://wa.me/573226575786?text=Quiero apadrinar ${especieSeleccionadaMicrositio}`, '_blank'); }
@@ -692,6 +712,42 @@
     }
     
     window.onload = () => { if(localStorage.getItem('tokenAdmin')) { modoAdminActivo = true; document.getElementById('panelAdmin').classList.remove('oculto'); document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión'; if(localStorage.getItem('rolUsuario') === 'Admin') document.getElementById('seccionCrearBosquesino').classList.remove('oculto'); cargarCatalogo(); } else cargarCatalogo(); };
+    
+function cambiarVista(idVistaDestino) {
+    // 1. Ocultamos todas las cajas y reiniciamos animación
+    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin'];
+    vistas.forEach(vista => {
+        const elemento = document.getElementById(vista);
+        if(elemento) {
+            elemento.classList.add('oculto');
+            elemento.classList.remove('vista-activa');
+        }
+    });
+
+    // 2. Mostramos la caja elegida con efecto de florecimiento
+    const vistaDestino = document.getElementById(idVistaDestino);
+    if(vistaDestino) {
+        vistaDestino.classList.remove('oculto');
+        void vistaDestino.offsetWidth; // Truco para reiniciar la animación
+        vistaDestino.classList.add('vista-activa');
+    }
+    
+    // 3. Controlamos la barra de navegación superior (Oculta en inicio)
+    const nav = document.getElementById('menu-principal');
+    if (idVistaDestino === 'vista-inicio') {
+        nav.classList.add('oculto'); // Desaparece en el HOME
+    } else {
+        nav.classList.remove('oculto'); // Aparece en el resto de páginas
+    }
+    
+    // 4. Subimos la pantalla arriba del todo suavemente
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function enviarInteresWhatsApp() {
+    // Redirige al WhatsApp de Bosquesinos con un mensaje predeterminado
+    window.open(`https://wa.me/573226575786?text=Hola Bosquesinos, estoy interesado en colaborar con la asociación. Me gustaría hablar sobre...`, '_blank');
+}
     </script>
 </body>
 </html>
