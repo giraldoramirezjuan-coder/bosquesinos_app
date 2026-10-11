@@ -53,12 +53,20 @@
 
     <!-- LADO DERECHO: BOTONES HORIZONTALES Y DISCRETOS -->
     <div style="display: flex; flex-direction: row; gap: 15px; align-items: center; justify-content: flex-end;">
+        
         <button class="btn-classic-secondary" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
             📖 Cuaderno y Catálogo
         </button>
+        
         <button class="btn-classic-secondary" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-gente')">
             🤝 Alianza Bosquesina
         </button>
+
+        <!-- ESTE BOTÓN ES SECRETO: Solo se verá si el usuario inició sesión (Mero ícono en la esquina) -->
+        <button id="btn-nav-admin" class="btn-classic-secondary oculto" style="margin: 0; padding: 6px 10px; font-size: 18px; border-radius: 50%; border-color: var(--color-accent-sun); color: var(--color-accent-sun); display: flex; align-items: center; justify-content: center;" onclick="cambiarVista('panelAdmin')" title="Panel de Control">
+            ⚙️
+        </button>
+
     </div>
 </nav>
 
@@ -91,7 +99,20 @@
     </div>
 
     <!-- PANEL DE CONTROL 4.0 -->
-    <div id="panelAdmin" class="tarjeta-admin oculto" style="max-width: 800px; margin-bottom: 40px;">
+   <section id="vista-catalogo" class="oculto" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h2 style="color: var(--color-brand-forest); font-size: 32px;">Cuaderno Bosquesino</h2>
+        <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">Conoce las historias de nuestras especies nativas. Cada plántula guarda una memoria campesina y el esfuerzo de recuperación de nuestros bosques.</p>
+    </div>
+    
+    <!-- Aquí quedan las tarjetas mágicas de las plantas (sin el panel) -->
+    <ul id="listaPlantulas"></ul>
+</section>
+
+<!-- === CAJA 4: PANEL DE CONTROL PRIVADO (Para Bosquesinos) === -->
+<section id="panelAdmin" class="oculto" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
+    
+    <div class="tarjeta-admin" style="max-width: 800px; margin: 0 auto;">
         <h3 style="color: #2a4d31; margin-top: 0; text-align: center;">Panel de Control Bosquesino</h3>
         
         <!-- PASO 1: ÁRBOL MADRE -->
@@ -711,7 +732,30 @@
         if(res.ok) { const d = await res.json(); localStorage.setItem('tokenAdmin', d.token); localStorage.setItem('rolUsuario', d.rol); localStorage.setItem('emailUsuario', d.email); location.reload(); } else alert('Error credenciales');
     }
     
-    window.onload = () => { if(localStorage.getItem('tokenAdmin')) { modoAdminActivo = true; document.getElementById('panelAdmin').classList.remove('oculto'); document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión'; if(localStorage.getItem('rolUsuario') === 'Admin') document.getElementById('seccionCrearBosquesino').classList.remove('oculto'); cargarCatalogo(); } else cargarCatalogo(); };
+    window.onload = () => { 
+        if(localStorage.getItem('tokenAdmin')) { 
+            modoAdminActivo = true; 
+            
+            // 1. Mostrar el botón secreto en el menú
+            document.getElementById('btn-nav-admin').classList.remove('oculto'); 
+            
+            // 2. Cambiar el texto del pie de página a Cerrar Sesión
+            document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión'; 
+            
+            if(localStorage.getItem('rolUsuario') === 'Admin') {
+                document.getElementById('seccionCrearBosquesino').classList.remove('oculto'); 
+            }
+            
+            cargarCatalogo(); 
+            
+            // 3. LA MAGIA: Saltar automáticamente al Panel de Control en vez del Home
+            cambiarVista('panelAdmin'); 
+            
+        } else { 
+            cargarCatalogo(); 
+            // Si no está logueado, se queda tranquilamente en el video de Inicio
+        } 
+    };
     
 function cambiarVista(idVistaDestino) {
     // 1. Ocultamos todas las cajas y reiniciamos animación
