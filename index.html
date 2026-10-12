@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Ajustes responsivos para celulares */
         @media (max-width: 768px) {
             #panelAdmin { width: 95% !important; margin: 10px auto 40px auto !important; padding: 10px !important; }
             details summary { font-size: 15px !important; padding: 18px 12px !important; }
@@ -227,10 +226,42 @@
     </div>
 </div>
 
-<!-- === FOOTER === -->
-<footer class="footer-discreto" style="position: relative; padding: 30px 20px; text-align: center; background-color: #1b4332; color: #a3b18a;">
-    <p style="margin: 0; font-size: 13px;">Cultivando vida y protegiendo nuestros ríos desde San Luis, Antioquia.</p>
-    <span id="btnModoAdmin" onclick="toggleAdmin()" style="position: absolute; bottom: 15px; right: 20px; font-size: 11px; color: #74c69d; cursor: pointer; font-weight: bold;">🔒 Ingreso Bosquesinos</span>
+<section id="vista-legal" class="oculto" style="padding: 60px 20px; max-width: 900px; margin: 0 auto; min-height: 80vh; color: var(--color-text-primary);">
+    <div style="background: var(--color-surface-white); padding: 50px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); text-align: left;">
+        
+        <h2 style="color: var(--color-brand-forest); font-size: 32px; border-bottom: 2px solid var(--color-brand-sage-100); padding-bottom: 15px; margin-top: 0;">Políticas y Términos Legales</h2>
+        
+        <p style="font-size: 14px; color: #666; margin-bottom: 40px;">Este documento establece las normativas de uso, colaboración y protección de la información de la Asociación Bosquesinos.</p>
+
+        <h3 style="color: #2a4d31; font-size: 20px;">Política de Tratamiento de Datos (Ley 1581)</h3>
+        <p style="font-size: 15px; line-height: 1.6; color: #444;"><strong>1. Recolección de Datos:</strong> La Asociación Bosquesinos recolecta información básica (nombre, correo electrónico) y datos geoespaciales (coordenadas de árboles semilleros) con el único fin de gestionar la red comunitaria de conservación en San Luis, Antioquia.</p>
+        <p style="font-size: 15px; line-height: 1.6; color: #444;"><strong>2. Uso de la Información:</strong> Los datos de los custodios campesinos y las coordenadas de las fincas son estrictamente confidenciales. No compartiremos, venderemos ni alquilaremos esta información a terceros comerciales bajo ninguna circunstancia.</p>
+        <p style="font-size: 15px; line-height: 1.6; color: #444;"><strong>3. Derechos:</strong> Como titular de los datos, tienes derecho a conocer, actualizar y solicitar la eliminación de tu información de nuestra base de datos en cualquier momento.</p>
+
+        <h3 style="color: #2a4d31; font-size: 20px; margin-top: 40px;">Términos y Condiciones</h3>
+        <p style="font-size: 15px; line-height: 1.6; color: #444;"><strong>1. Naturaleza del Proyecto:</strong> Bosquesinos es una iniciativa comunitaria enfocada en la preservación de la flora nativa. El uso de esta plataforma implica el respeto profundo por los saberes campesinos y el territorio natural.</p>
+        <p style="font-size: 15px; line-height: 1.6; color: #444;"><strong>2. Apadrinamiento y Adquisición:</strong> Los aportes realizados para apadrinar o adquirir plántulas se consideran contribuciones directas para el sostenimiento del vivero comunitario y la labor de las familias campesinas involucradas. Las plántulas deben ser plantadas siguiendo las recomendaciones ecológicas de la asociación.</p>
+        <p style="font-size: 15px; line-height: 1.6; color: #444;"><strong>3. Saberes Tradicionales:</strong> Los aportes al "Muro de Saberes" serán moderados por el equipo de Bosquesinos. Al enviar un saber, autorizas su publicación para fines educativos y de memoria cultural, manteniendo siempre el reconocimiento a tu autoría.</p>
+
+    </div>
+</section>
+
+<footer class="footer-discreto" style="position: relative; padding: 40px 20px 20px 20px; text-align: center; background-color: #06351f; color: #a3b18a;">
+    <p style="margin: 0; font-size: 14px; font-weight: 500; color: #dce8e0;">Cultivando vida y protegiendo nuestros ríos desde San Luis, Antioquia.</p>
+    
+    <!-- ENLACE A LA PÁGINA LEGAL -->
+    <div style="margin-top: 15px; display: flex; justify-content: center; font-size: 13px;">
+        <span style="cursor: pointer; text-decoration: underline; opacity: 0.8; transition: 0.3s;" onclick="cambiarVista('vista-legal')">
+            Políticas de Privacidad y Términos Legales
+        </span>
+    </div>
+
+    <div style="margin-top: 30px; border-top: 1px solid rgba(220, 232, 224, 0.1); padding-top: 15px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin-left: auto; margin-right: auto;">
+        <span style="font-size: 11px; opacity: 0.6;">© 2026 Asociación Bosquesinos.</span>
+        <span id="btnModoAdmin" onclick="toggleAdmin()" style="font-size: 11px; color: #74c69d; cursor: pointer; font-weight: bold; padding: 5px 10px; border: 1px solid #74c69d; border-radius: 4px;">
+            🔒 Ingreso Equipo
+        </span>
+    </div>
 </footer>
 
 <!-- === JAVASCRIPT === -->
@@ -480,7 +511,7 @@ window.onload = () => {
 };
 
 function cambiarVista(idVistaDestino) {
-    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin'];
+    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin', 'vista-legal'];
     vistas.forEach(vista => {
         const elemento = document.getElementById(vista);
         if(elemento) { elemento.classList.add('oculto'); elemento.classList.remove('vista-activa'); }
