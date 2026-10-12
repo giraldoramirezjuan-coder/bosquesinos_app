@@ -33,12 +33,25 @@ mongoose.connect(uri)
   })
   .catch(err => console.error('Error conectando a la base de datos:', err));
 
-// --- 2. MODELOS DE DATOS (NUEVO ORDEN BIOLÓGICO) ---
+// --- 2. MODELOS DE DATOS ---
 
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    rol: { type: String, default: 'Operario' }
+    rol: { 
+        type: String, 
+        enum: ['Fundador', 'Custodio', 'Vigía'], // Limitamos a estos 3 roles
+        default: 'Vigía' // Todo el que se registre nuevo será Vigía por defecto
+    },
+    // Nuevos campos para postulación y recuperación
+    postulacionCustodio: {
+        estado: { type: String, enum: ['Ninguna', 'Pendiente', 'Aprobada', 'Rechazada'], default: 'Ninguna' },
+        vereda: { type: String, default: '' },
+        tamañoPredio: { type: String, default: '' },
+        tipoBosque: { type: String, default: '' }
+    },
+    resetPasswordToken: { type: String },
+    resetPasswordExpire: { type: Date }
 });
 const User = mongoose.model('User', userSchema);
 
@@ -98,13 +111,14 @@ const especieSchema = new mongoose.Schema({
 });
 const Especie = mongoose.model('Especie', especieSchema);
 
-// --- AUTO-CREACIÓN ADMIN ---
+// --- AUTO-CREACIÓN FUNDADOR ---
 async function crearUsuarioAdmin() {
   try {
     const usuarioExiste = await User.findOne({ email: 'bosquesinos' });
     if (!usuarioExiste) {
       const passwordEncriptada = await bcrypt.hash('bosquesinas', 10);
-      await new User({ email: 'bosquesinos', password: passwordEncriptada, rol: 'Admin' }).save();
+      // Ahora se llama Fundador en lugar de Admin
+      await new User({ email: 'bosquesinos', password: passwordEncriptada, rol: 'Fundador' }).save();
     }
   } catch (error) { console.log('Error inicial:', error); }
 }
@@ -143,13 +157,143 @@ app.post('/api/login', async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error en el servidor' }); }
 });
 
+// POST: Registro Público (Todos entran como Vigías)
+app.post('/api/registro-publico', async (req, res) => {
+    try {
+        if (await User.findOne({ email: String(req.body.email).trim() })) {
+            return res.status(400).json({ error: 'El correo ya está registrado.' });
+        }
+        const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
+        
+        // Se crea como Vigía automáticamente
+        const nuevoUsuario = new User({ 
+            email: String(req.body.email).trim(), 
+            password: passwordEncriptada, 
+            rol: 'Vigía' 
+        });
+        await nuevoUsuario.save();
+        res.status(201).json({ mensaje: 'Cuenta creada con éxito. Ya puedes iniciar sesión.' });
+    } catch (error) { res.status(500).json({ error: 'Error al registrar la cuenta.' }); }
+});
+
+// POST: Recuperación de contraseña (Enviar código)
+// NOTA: Requieres instalar 'nodemailer': npm install nodemailer
+const nodemailer = require('nodemailer');
+app.post('/api/olvide-password', async (req, res) => {
+    try {
+        const usuario = await User.findOne({ email: req.body.email });
+        if (!usuario) return res.status(404).json({ error: 'No hay un usuario con ese correo.' });
+
+        // Generar token de 6 dígitos
+        const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Hashear el token antes de guardarlo por seguridad
+        usuario.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        usuario.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // Expira en 15 minutos
+        await usuario.save();
+
+        // Configuración de Nodemailer (Deberías usar variables de entorno para esto)
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail', // o el que uses
+            auth: {
+                user: process.env.EMAIL_USER, // Tu correo
+                pass: process.env.EMAIL_PASS  // Tu contraseña de aplicación
+            }
+        });
+
+        const mensaje = `Has solicitado restablecer tu contraseña. \n\nTu código de recuperación es: ${resetToken}\n\nEste código es válido por 15 minutos.`;
+
+        await transporter.sendMail({
+            from: '"Bosquesinos San Luis" <tu-correo@gmail.com>',
+            to: usuario.email,
+            subject: 'Recuperación de Contraseña - Bosquesinos',
+            text: mensaje
+        });
+
+        res.json({ mensaje: 'Código enviado a tu correo electrónico.' });
+    } catch (error) { 
+        console.error(error);
+        res.status(500).json({ error: 'Error enviando el correo.' }); 
+    }
+});
+
+// POST: Restablecer Contraseña
+app.post('/api/reset-password', async (req, res) => {
+    try {
+        // Encriptar el token recibido para compararlo con la base de datos
+        const resetPasswordToken = crypto.createHash('sha256').update(req.body.token).digest('hex');
+
+        const usuario = await User.findOne({
+            resetPasswordToken,
+            resetPasswordExpire: { $gt: Date.now() } // Verifica que no haya expirado
+        });
+
+        if (!usuario) return res.status(400).json({ error: 'Código inválido o ha expirado.' });
+
+        // Actualizar contraseña
+        usuario.password = await bcrypt.hash(req.body.nuevaPassword, 10);
+        usuario.resetPasswordToken = undefined;
+        usuario.resetPasswordExpire = undefined;
+        await usuario.save();
+
+        res.json({ mensaje: 'Contraseña actualizada con éxito.' });
+    } catch (error) { res.status(500).json({ error: 'Error al actualizar contraseña.' }); }
+});
+
 // =======================================================
 //   RUTAS PROTEGIDAS (ASOCIACIÓN)
 // =======================================================
 
+// POST: Vigía solicita ser Custodio
+app.post('/api/postulacion-custodio', verificarAcceso, async (req, res) => {
+    try {
+        if (req.rol !== 'Vigía') return res.status(400).json({ error: 'Solo los Vigías pueden postularse.' });
+        
+        const usuario = await User.findOne({ email: req.usuarioActual });
+        usuario.postulacionCustodio = {
+            estado: 'Pendiente',
+            vereda: req.body.vereda,
+            tamañoPredio: req.body.tamañoPredio,
+            tipoBosque: req.body.tipoBosque
+        };
+        await usuario.save();
+        res.json({ mensaje: 'Postulación enviada correctamente. Un Fundador la revisará.' });
+    } catch (error) { res.status(500).json({ error: 'Error al enviar postulación.' }); }
+});
+
+// GET: Fundador ve las postulaciones pendientes
+app.get('/api/postulaciones', verificarAcceso, async (req, res) => {
+    try {
+        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Acceso denegado.' });
+        const postulaciones = await User.find({ 'postulacionCustodio.estado': 'Pendiente' }, '-password');
+        res.json(postulaciones);
+    } catch (error) { res.status(500).json({ error: 'Error al obtener postulaciones.' }); }
+});
+
+// PUT: Fundador aprueba o rechaza a un Custodio
+app.put('/api/postulaciones/:id', verificarAcceso, async (req, res) => {
+    try {
+        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Acceso denegado.' });
+        
+        const usuario = await User.findById(req.params.id);
+        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado.' });
+
+        const { accion } = req.body; // 'Aprobar' o 'Rechazar'
+        
+        if (accion === 'Aprobar') {
+            usuario.rol = 'Custodio';
+            usuario.postulacionCustodio.estado = 'Aprobada';
+        } else {
+            usuario.postulacionCustodio.estado = 'Rechazada';
+        }
+        await usuario.save();
+        res.json({ mensaje: `Postulación ${accion.toLowerCase()}a con éxito.` });
+    } catch (error) { res.status(500).json({ error: 'Error al procesar postulación.' }); }
+});
+
 app.post('/api/registrar-asociado', verificarAcceso, async (req, res) => {
     try {
-        if (req.rol !== 'Admin') return res.status(403).json({ error: 'Solo Admin puede crear cuentas.' });
+        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo Fundador puede crear cuentas.' });
         if (await User.findOne({ email: String(req.body.email).trim() })) return res.status(400).json({ error: 'Usuario ya registrado' });
         const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
         await new User({ email: String(req.body.email).trim(), password: passwordEncriptada, rol: 'Operario' }).save();
