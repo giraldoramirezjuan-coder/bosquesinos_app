@@ -1,21 +1,17 @@
 {
-  "name": "pictures",
-  "version": "1.0.0",
-  "description": "",
+  "name": "bosquesinos-backend",
+  "version": "1.0.1",
+  "description": "Backend para la plataforma Bosquesinos",
   "main": "softwarebosquesino.js",
   "scripts": {
-    "start": "node softwarebosquesino.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node softwarebosquesino.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.9.5"
+    "mongoose": "^9.9.5",
+    "nodemailer": "^6.9.13"
   }
 }
