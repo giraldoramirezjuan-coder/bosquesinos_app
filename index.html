@@ -15,6 +15,14 @@
             #panelAdmin > details:nth-child(5) > div > div { flex-direction: column; }
             #panelAdmin > details:nth-child(5) > div > div > div { width: 100%; margin-bottom: 8px; }
         }
+        .btn-suave {
+            transition: all 0.3s ease !important;
+        }
+        .btn-suave:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(6, 63, 31, 0.15) !important;
+            filter: brightness(1.05);
+        }
     </style>
 </head>
 <body>
@@ -27,9 +35,24 @@
     </div>
     <!-- LADO DERECHO: BOTONES -->
     <div style="display: flex; flex-direction: row; gap: 15px; align-items: center; justify-content: flex-end;">
-        <button class="btn-classic-secondary" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">📖 Cuaderno y Catálogo</button>
-        <button class="btn-classic-secondary" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-gente')">🤝 Alianza Bosquesina</button>
-        <button id="btn-nav-admin" class="btn-classic-secondary oculto" style="margin: 0; padding: 6px 10px; font-size: 18px; border-radius: 50%; border-color: var(--color-accent-sun); color: var(--color-accent-sun); display: flex; align-items: center; justify-content: center;" onclick="cambiarVista('panelAdmin')" title="Panel de Control">⚙️</button>
+        
+        <button class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
+            📖 Cuaderno y Catálogo
+        </button>
+        
+        <button class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-gente')">
+            🤝 Alianza Bosquesina
+        </button>
+
+        <!-- BOTÓN PÚBLICO: Iniciar Sesión (Se oculta si ya ingresó) -->
+        <button id="btn-nav-login" class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; border-color: var(--color-brand-forest); color: var(--color-brand-forest); font-weight: bold;" onclick="document.getElementById('modalLoginClasico').classList.remove('oculto')">
+            👤 Iniciar Sesión
+        </button>
+
+        <!-- BOTÓN SECRETO: Panel Interno (Mero ícono en la esquina) -->
+        <button id="btn-nav-admin" class="btn-classic-secondary btn-suave oculto" style="margin: 0; padding: 6px 10px; font-size: 18px; border-radius: 50%; border-color: var(--color-accent-sun); color: var(--color-accent-sun); display: flex; align-items: center; justify-content: center;" onclick="cambiarVista('panelAdmin')" title="Panel de Control">
+            ⚙️
+        </button>
     </div>
 </nav>
 
@@ -67,7 +90,7 @@
                 <input type="text" placeholder="Tu Nombre o Institución" required>
                 <input type="email" placeholder="Tu Correo Electrónico" required>
                 <textarea placeholder="¿Cómo te gustaría colaborar con Bosquesinos? (Ej: Dictar charla, voluntariado...)" style="min-height: 120px;" required></textarea>
-                <button type="button" class="btn-primary" style="width: 100%; background: var(--color-accent-sun); color: var(--color-text-primary);" onclick="enviarInteresWhatsApp()">Enviar propuesta</button>
+                <button type="button" class="btn-primary btn-suave" style="width: 100%; background: var(--color-accent-sun); color: var(--color-text-primary);" onclick="enviarInteresWhatsApp()">Enviar propuesta</button>
             </form>
         </div>
     </div>
@@ -139,11 +162,6 @@
 
         <hr style="border: 0.5px solid #d8eadd; margin: 15px 0;">
         <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalMonitoreo()">👀 Seguimiento de Arboles Semilleros</button>
-
-        <div id="seccionCrearBosquesino" class="oculto" style="text-align: center; margin-top: 15px;">
-            <hr style="border: 0.5px solid #d8eadd; margin: 15px 0;">
-            <button class="btn-principal" style="background: #386641; width: auto; padding: 10px 20px;" onclick="document.getElementById('modalBosquesino').classList.remove('oculto')">➕ Agregar Nuevo Bosquesino</button>
-        </div>
     </div>
 </section>
 
@@ -167,7 +185,7 @@
     </div>
 </div>
 
-<!-- MODAL MICROSITIO -->
+<!-- MODAL MICROSITIO ESPECIE -->
 <div id="modalDetalleEspecie" class="modal oculto">
     <div class="modal-contenido" style="max-width: 550px; text-align: center;">
         <span class="cerrar-modal" onclick="document.getElementById('modalDetalleEspecie').classList.add('oculto')">&times;</span>
@@ -199,12 +217,10 @@
     </div>
 </div>
 
-<!-- MODALES DE GESTIÓN Y LOGIN -->
+<!-- MODALES DE GESTIÓN DE LOTES -->
 <div id="modalGestionLotes" class="modal oculto"><div class="modal-contenido" style="max-width: 600px;"><span class="cerrar-modal" onclick="document.getElementById('modalGestionLotes').classList.add('oculto')">&times;</span><h3 id="nombreEspecieLotes"></h3><div id="contenedorLotesActivos"></div></div></div>
 <div id="modalAvanzarLote" class="modal oculto"><div class="modal-contenido" style="max-width: 400px; text-align: center;"><span class="cerrar-modal" onclick="document.getElementById('modalAvanzarLote').classList.add('oculto')">&times;</span><form id="formAvanzar"><input type="hidden" id="avanzar-loteId"><select id="avanzar-estado"><option value="Semillero">Semillero</option><option value="Vivero">Vivero</option><option value="Lista para transplante">Transplante</option><option value="Sembrada">Sembrada</option></select><input type="number" id="avanzar-cantidad"><input type="text" id="avanzar-obs" placeholder="Obs"><button type="submit" class="btn-principal">Avanzar</button></form></div></div>
 <div id="modalRetiroLote" class="modal oculto"><div class="modal-contenido" style="max-width: 400px;"><span class="cerrar-modal" onclick="document.getElementById('modalRetiroLote').classList.add('oculto')">&times;</span><form id="formRetirarLote"><input type="hidden" id="retirar-loteId"><input type="number" id="retirar-loteCantidad"><input type="text" id="retirar-loteMotivo"><button type="submit" class="btn-classic-danger">Retirar</button></form></div></div>
-<div id="modalLogin" class="modal oculto"><div class="modal-contenido" style="max-width: 400px; text-align: center;"><span class="cerrar-modal" onclick="document.getElementById('modalLogin').classList.add('oculto')">&times;</span><input type="text" id="login-email" placeholder="Usuario"><input type="password" id="login-password" placeholder="Contraseña"><button class="btn-principal" onclick="procesarLogin()">Ingresar</button></div></div>
-<div id="modalBosquesino" class="modal oculto"><div class="modal-contenido" style="max-width: 400px; text-align: center;"><span class="cerrar-modal" onclick="document.getElementById('modalBosquesino').classList.add('oculto')">&times;</span><form id="formRegistrarAsociado"><input type="text" id="nuevo-email" placeholder="Usuario"><input type="password" id="nueva-password" placeholder="Contraseña"><button type="submit" class="btn-principal">Crear</button></form></div></div>
 <div id="btnCarrito" class="carrito-flotante oculto" onclick="document.getElementById('modalCarrito').classList.remove('oculto')">🌱 Mi lista <span id="contadorCarrito">0</span></div>
 <div id="modalCarrito" class="modal oculto"><div class="modal-contenido" style="max-width: 450px;"><span class="cerrar-modal" onclick="document.getElementById('modalCarrito').classList.add('oculto')">&times;</span><ul id="listaCarrito" class="lista-carrito"></ul><button class="btn-classic-primary" onclick="enviarWhatsApp()">Enviar WhatsApp</button></div></div>
 
@@ -226,6 +242,72 @@
     </div>
 </div>
 
+<!-- === MICROSITIOS DE CUENTAS (Estilo Clásico) === -->
+
+<!-- 1. LOGIN -->
+<div id="modalLoginClasico" class="modal oculto" style="z-index: 10010 !important;">
+    <div class="modal-contenido" style="max-width: 400px; padding: 40px 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;">
+        <span class="cerrar-modal" onclick="document.getElementById('modalLoginClasico').classList.add('oculto')">&times;</span>
+        <h2 style="color: var(--color-brand-forest); margin-top: 0; font-family: serif; font-size: 26px;">Bienvenido a Bosquesinos</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Ingresa a tu cuenta para continuar</p>
+        
+        <form autocomplete="off" onsubmit="event.preventDefault(); procesarLoginClasico();">
+            <input type="email" id="login-email-clasico" placeholder="Correo electrónico o Usuario" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
+            <input type="password" id="login-password-clasico" placeholder="Contraseña" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
+            
+            <div style="text-align: right; margin-bottom: 20px;">
+                <span style="font-size: 12px; color: var(--color-brand-forest); cursor: pointer; text-decoration: underline;" onclick="cambiarMicrositio('modalLoginClasico', 'modalOlvidePassword')">¿Olvidaste tu contraseña?</span>
+            </div>
+
+            <button type="submit" class="btn-principal btn-suave" style="width: 100%; padding: 12px; font-size: 15px; background: var(--color-brand-forest); border: none; border-radius: 6px;">Ingresar al sistema</button>
+        </form>
+        
+        <div style="margin-top: 25px; border-top: 1px solid #dce8e0; padding-top: 20px;">
+            <p style="font-size: 13px; color: #666; margin: 0 0 10px 0;">¿Aún no eres parte de la red?</p>
+            <button type="button" class="btn-classic-secondary btn-suave" style="width: 100%; padding: 10px; font-size: 14px; border: 1px solid var(--color-brand-forest); color: var(--color-brand-forest); border-radius: 6px; background: transparent;" onclick="cambiarMicrositio('modalLoginClasico', 'modalRegistroPublico')">Registrar nueva cuenta</button>
+        </div>
+    </div>
+</div>
+
+<!-- 2. REGISTRO PÚBLICO -->
+<div id="modalRegistroPublico" class="modal oculto" style="z-index: 10010 !important;">
+    <div class="modal-contenido" style="max-width: 400px; padding: 40px 30px; border-radius: 12px; text-align: center;">
+        <span class="cerrar-modal" onclick="document.getElementById('modalRegistroPublico').classList.add('oculto')">&times;</span>
+        <h2 style="color: var(--color-brand-forest); margin-top: 0; font-family: serif; font-size: 26px;">Únete a la Red</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Crea tu cuenta como Vigía Bosquesino.</p>
+        
+        <form autocomplete="off" onsubmit="event.preventDefault(); procesarRegistroPublico();">
+            <input type="email" id="reg-email" placeholder="Tu Correo Electrónico" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
+            <input type="password" id="reg-password" placeholder="Crea una Contraseña" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
+            
+            <button type="submit" class="btn-principal btn-suave" style="width: 100%; padding: 12px; font-size: 15px; background: var(--color-brand-forest); border: none; border-radius: 6px;">Crear Cuenta</button>
+        </form>
+        
+        <div style="margin-top: 20px;">
+            <span style="font-size: 13px; color: var(--color-brand-forest); cursor: pointer; text-decoration: underline;" onclick="cambiarMicrositio('modalRegistroPublico', 'modalLoginClasico')">Ya tengo cuenta. Iniciar sesión.</span>
+        </div>
+    </div>
+</div>
+
+<!-- 3. RECUPERAR CONTRASEÑA -->
+<div id="modalOlvidePassword" class="modal oculto" style="z-index: 10010 !important;">
+    <div class="modal-contenido" style="max-width: 400px; padding: 40px 30px; border-radius: 12px; text-align: center;">
+        <span class="cerrar-modal" onclick="document.getElementById('modalOlvidePassword').classList.add('oculto')">&times;</span>
+        <h2 style="color: var(--color-brand-forest); margin-top: 0; font-family: serif; font-size: 22px;">Recuperar Acceso</h2>
+        <p style="color: #666; font-size: 13px; margin-bottom: 20px;">Te enviaremos un código a tu correo para restablecer tu contraseña.</p>
+        
+        <form autocomplete="off" onsubmit="event.preventDefault(); solicitarRecuperacion();">
+            <input type="email" id="rec-email" placeholder="Tu Correo Electrónico" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
+            <button type="submit" class="btn-principal btn-suave" style="width: 100%; padding: 12px; font-size: 15px; background: var(--color-accent-sun); color: var(--color-text-primary); border: none; border-radius: 6px;">Enviar Código</button>
+        </form>
+        
+        <div style="margin-top: 20px;">
+            <span style="font-size: 13px; color: var(--color-brand-forest); cursor: pointer; text-decoration: underline;" onclick="cambiarMicrositio('modalOlvidePassword', 'modalLoginClasico')">Volver al inicio de sesión</span>
+        </div>
+    </div>
+</div>
+
+<!-- CAJA 5: LEGAL -->
 <section id="vista-legal" class="oculto" style="padding: 60px 20px; max-width: 900px; margin: 0 auto; min-height: 80vh; color: var(--color-text-primary);">
     <div style="background: var(--color-surface-white); padding: 50px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); text-align: left;">
         
@@ -337,7 +419,7 @@ function abrirGestionInventario(especieId) {
     if (!especie) return;
     const nombreComun = especie.nombreComun;
     document.getElementById('nombreEspecieLotes').innerText = `Gestión de: ${nombreComun}`;
-    const misLotes = window.lotesGlobal.filter(l => ((l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun) || (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id))) && (localStorage.getItem('rolUsuario') === 'Admin' || l.registradoPor === localStorage.getItem('emailUsuario')));
+    const misLotes = window.lotesGlobal.filter(l => ((l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun) || (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id))) && (localStorage.getItem('rolUsuario') === 'Admin' || localStorage.getItem('rolUsuario') === 'Fundador' || l.registradoPor === localStorage.getItem('emailUsuario')));
     const cont = document.getElementById('contenedorLotesActivos'); 
     if (misLotes.length === 0) {
         cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No hay registros de esta especie.</p>';
@@ -491,18 +573,75 @@ function adquirirEjemplar() { let i = carrito.find(x => x.n === especieSeleccion
 function actUI() { document.getElementById('listaCarrito').innerHTML = carrito.map(i => `<li>${i.n} - ${i.c} uds</li>`).join(''); document.getElementById('btnCarrito').className = carrito.length ? 'carrito-flotante' : 'oculto'; }
 function enviarWhatsApp() { window.open(`https://wa.me/573105632387?text=Interés en: ` + carrito.map(i => `${i.c}x ${i.n}`).join(', '), '_blank'); }
 
-function toggleAdmin() { if(modoAdminActivo) { localStorage.clear(); location.reload(); } else document.getElementById('modalLogin').classList.remove('oculto'); }
-async function procesarLogin() {
-    const res = await fetch(`${hostUrl}/api/login`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email: document.getElementById('login-email').value, password: document.getElementById('login-password').value }) });
-    if(res.ok) { const d = await res.json(); localStorage.setItem('tokenAdmin', d.token); localStorage.setItem('rolUsuario', d.rol); localStorage.setItem('emailUsuario', d.email); location.reload(); } else alert('Error credenciales');
+// --- FUNCIONES DE LOS MICROSITIOS ---
+function cambiarMicrositio(idActual, idDestino) {
+    document.getElementById(idActual).classList.add('oculto');
+    document.getElementById(idDestino).classList.remove('oculto');
+}
+
+async function procesarLoginClasico() {
+    const res = await fetch(`${hostUrl}/api/login`, { 
+        method: 'POST', headers: {'Content-Type':'application/json'}, 
+        body: JSON.stringify({ email: document.getElementById('login-email-clasico').value, password: document.getElementById('login-password-clasico').value }) 
+    });
+    if(res.ok) { 
+        const d = await res.json(); 
+        localStorage.setItem('tokenAdmin', d.token); localStorage.setItem('rolUsuario', d.rol); localStorage.setItem('emailUsuario', d.email); 
+        location.reload(); 
+    } else { 
+        alert('Credenciales incorrectas'); 
+    }
+}
+
+async function procesarRegistroPublico() {
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
+    const res = await fetch(`${hostUrl}/api/registro-publico`, { 
+        method: 'POST', headers: {'Content-Type':'application/json'}, 
+        body: JSON.stringify({ email, password }) 
+    });
+    const data = await res.json();
+    if(res.ok) {
+        alert(data.mensaje);
+        cambiarMicrositio('modalRegistroPublico', 'modalLoginClasico');
+    } else {
+        alert(data.error);
+    }
+}
+
+async function solicitarRecuperacion() {
+    const email = document.getElementById('rec-email').value;
+    alert("Procesando..."); // Aquí conectarás luego la ruta del backend
+    const res = await fetch(`${hostUrl}/api/olvide-password`, { 
+        method: 'POST', headers: {'Content-Type':'application/json'}, 
+        body: JSON.stringify({ email }) 
+    });
+    const data = await res.json();
+    alert(data.mensaje || data.error);
+}
+
+function toggleAdmin() { 
+    if(modoAdminActivo) { 
+        localStorage.clear(); 
+        location.reload(); 
+    } else {
+        document.getElementById('modalLoginClasico').classList.remove('oculto'); 
+    }
 }
 
 window.onload = () => { 
     if(localStorage.getItem('tokenAdmin')) { 
         modoAdminActivo = true; 
+        
         document.getElementById('btn-nav-admin').classList.remove('oculto'); 
+        const btnLogin = document.getElementById('btn-nav-login');
+        if(btnLogin) btnLogin.classList.add('oculto'); // Ocultar login si ya entró
+
         document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión'; 
-        if(localStorage.getItem('rolUsuario') === 'Admin') { document.getElementById('seccionCrearBosquesino').classList.remove('oculto'); }
+        
+        if(localStorage.getItem('rolUsuario') === 'Fundador' || localStorage.getItem('rolUsuario') === 'Admin') { 
+            document.getElementById('seccionCrearBosquesino').classList.remove('oculto'); 
+        }
         cargarCatalogo(); 
         cambiarVista('panelAdmin'); 
     } else { 
