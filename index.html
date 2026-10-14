@@ -23,6 +23,16 @@
             box-shadow: 0 6px 15px rgba(6, 63, 31, 0.15) !important;
             filter: brightness(1.05);
         }
+        .badge-rol {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: #e9f5ed;
+            color: #1b4332;
+            font-weight: bold;
+            border: 1px solid #74c69d;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -34,7 +44,7 @@
         <img src="bosquesinos.png" alt="Logo Bosquesinos" style="height: 55px; object-fit: contain;">
     </div>
     <!-- LADO DERECHO: BOTONES -->
-    <div style="display: flex; flex-direction: row; gap: 15px; align-items: center; justify-content: flex-end;">
+    <div style="display: flex; flex-direction: row; gap: 12px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
         
         <button class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
             📖 Cuaderno y Catálogo
@@ -44,12 +54,20 @@
             🤝 Alianza Bosquesina
         </button>
 
+        <!-- BOTÓN EXCLUSIVO PARA VIGÍAS: Postular a Custodio -->
+        <button id="btn-nav-postular" class="btn-classic-secondary btn-suave oculto" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; background: #e9f5ed; border-color: #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalPostulacion()">
+            🌱 Postular a Custodio
+        </button>
+
+        <!-- INSIGNIA DE SESIÓN ACTIVA -->
+        <span id="badge-usuario-activo" class="badge-rol oculto"></span>
+
         <!-- BOTÓN PÚBLICO: Iniciar Sesión (Se oculta si ya ingresó) -->
         <button id="btn-nav-login" class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; border-color: var(--color-brand-forest); color: var(--color-brand-forest); font-weight: bold;" onclick="document.getElementById('modalLoginClasico').classList.remove('oculto')">
             👤 Iniciar Sesión
         </button>
 
-        <!-- BOTÓN SECRETO: Panel Interno (Mero ícono en la esquina) -->
+        <!-- BOTÓN SECRETO: Panel Interno (Solo visible para Fundador y Custodio) -->
         <button id="btn-nav-admin" class="btn-classic-secondary btn-suave oculto" style="margin: 0; padding: 6px 10px; font-size: 18px; border-radius: 50%; border-color: var(--color-accent-sun); color: var(--color-accent-sun); display: flex; align-items: center; justify-content: center;" onclick="cambiarVista('panelAdmin')" title="Panel de Control">
             ⚙️
         </button>
@@ -84,8 +102,16 @@
     <div style="max-width: 700px; margin: 0 auto; text-align: center;">
         <h2 style="color: var(--color-brand-forest); font-size: 36px;">Alianza Bosquesina</h2>
         <p style="color: var(--color-text-primary); font-size: 18px; margin-bottom: 30px;">Buscamos aliados, educadores, voluntarios y personas apasionadas por el territorio. Si quieres dictar una charla, colaborar en el vivero o apoyar nuestra asociación, este es tu lugar.</p>
+        
+        <!-- Tarjeta rápida para Vigías que quieran postularse desde Alianza -->
+        <div id="bannerPostulacionAlianza" class="oculto" style="background: #e9f5ed; border: 2px solid #2d6a4f; padding: 20px; border-radius: 12px; margin-bottom: 25px; text-align: center;">
+            <h3 style="color: #1b4332; margin: 0 0 8px 0;">🌳 ¿Tienes bosque o predio en San Luis y eres Vigía?</h3>
+            <p style="font-size: 14px; color: #354f52; margin: 0 0 15px 0;">Postúlate para convertirte en <b>Custodio Bosquesino</b> y proteger árboles semilleros en tu vereda.</p>
+            <button type="button" class="btn-principal btn-suave" style="background: #1b4332; max-width: 280px; margin: 0 auto;" onclick="abrirModalPostulacion()">🌱 Postularme a Custodio</button>
+        </div>
+
         <div style="background: var(--color-surface-white); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-float); text-align: left;">
-            <h3 style="color: var(--color-brand-forest); margin-top: 0;">Formulario de Interés</h3>
+            <h3 style="color: var(--color-brand-forest); margin-top: 0;">Formulario de Interés General</h3>
             <form id="formContactoColaborador">
                 <input type="text" placeholder="Tu Nombre o Institución" required>
                 <input type="email" placeholder="Tu Correo Electrónico" required>
@@ -96,16 +122,16 @@
     </div>
 </section>
 
-<!-- === CAJA 4: PANEL DE CONTROL PRIVADO === -->
+<!-- === CAJA 4: PANEL DE CONTROL PRIVADO (EXCLUSIVO FUNDADOR Y CUSTODIO) === -->
 <section id="panelAdmin" class="oculto" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
     <div class="tarjeta-admin" style="max-width: 800px; margin: 0 auto;">
         <h3 style="color: #2a4d31; margin-top: 0; text-align: center;">Panel de Control Bosquesino</h3>
         
         <!-- PASO 1 -->
         <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
-            <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌳 1. Registrar Nuevo Arbol Semillero</summary>
+            <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌳 1. Registrar Nuevo Árbol Semillero</summary>
             <div style="padding: 0 15px 15px 15px;">
-                <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ <strong>Seguridad:</strong> Coordenadas GPS encriptadas.</p>
+                <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ <strong>Seguridad:</strong> Coordenadas GPS encriptadas con AES-256.</p>
                 <form id="formArbolMatriz" autocomplete="off">
                     <input type="text" id="arbol-especie" placeholder="Nombre Común (Ej: Guayacán Amarillo)" required>
                     <input type="text" id="arbol-cientifico" placeholder="Nombre Científico (Opcional)">
@@ -160,12 +186,59 @@
             </div>
         </details>
 
+        <!-- PASO 5: EXCLUSIVO FUNDADOR (Gestión de Custodios y Postulaciones) -->
+        <details id="seccionCrearBosquesino" class="oculto" style="background: #fffdf5; margin-bottom: 12px; border-radius: 8px; border: 1px solid #f4d35e;">
+            <summary style="padding: 14px; font-weight: 600; color: #8a5a00; cursor: pointer;">👑 5. Gestión de Custodios y Postulaciones (Solo Fundador)</summary>
+            <div style="padding: 0 15px 15px 15px;">
+                <h4 style="color: #1b4332; margin: 10px 0 8px 0; font-size: 14px;">📩 Solicitudes Pendientes de Vigías:</h4>
+                <div id="listaPostulacionesPendientes" style="margin-bottom: 18px; font-size: 13px; color: #555;">
+                    Cargando solicitudes...
+                </div>
+
+                <hr style="border: 0.5px solid #e9edc9; margin: 15px 0;">
+                <h4 style="color: #1b4332; margin: 0 0 8px 0; font-size: 14px;">➕ Crear Cuenta Directa de Custodio:</h4>
+                <form id="formRegistrarAsociado" autocomplete="off">
+                    <input type="email" id="asociado-email" placeholder="Correo electrónico del nuevo Custodio" required>
+                    <input type="password" id="asociado-password" placeholder="Contraseña asignada" required>
+                    <button type="submit" class="btn-principal" style="background: #2d6a4f;">Registrar Custodio Directamente</button>
+                </form>
+            </div>
+        </details>
+
         <hr style="border: 0.5px solid #d8eadd; margin: 15px 0;">
-        <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalMonitoreo()">👀 Seguimiento de Arboles Semilleros</button>
+        <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalMonitoreo()">👀 Seguimiento de Árboles Semilleros</button>
     </div>
 </section>
 
-<!-- === MODALES Y VENTANAS EMERGENTES (RESTURADOS) === -->
+<!-- === MODALES Y VENTANAS EMERGENTES === -->
+
+<!-- MODAL POSTULACIÓN A CUSTODIO (PARA VIGÍAS) -->
+<div id="modalPostulacionCustodio" class="modal oculto" style="z-index: 10012 !important;">
+    <div class="modal-contenido" style="max-width: 460px; padding: 30px; border-radius: 12px; text-align: left;">
+        <span class="cerrar-modal" onclick="document.getElementById('modalPostulacionCustodio').classList.add('oculto')">&times;</span>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <span style="font-size: 36px;">🌳</span>
+            <h2 style="color: #1b4332; margin: 5px 0; font-family: serif; font-size: 24px;">Postulación a Custodio</h2>
+            <p style="color: #52796f; font-size: 13px; margin: 0;">Pasa de Vigía a guardián activo de árboles semilleros y lotes en tu vereda.</p>
+        </div>
+
+        <!-- Estado actual de la postulación -->
+        <div id="cajaEstadoPostulacion" style="padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; display: none;"></div>
+
+        <form id="formPostularCustodio" autocomplete="off">
+            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">📍 Vereda o Corregimiento (San Luis):</label>
+            <input type="text" id="post-vereda" placeholder="Ej: Vereda El Prodigio, La Cristalina, Manizales..." required style="width: 100%; padding: 10px; margin-top: 4px; margin-bottom: 12px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box;">
+
+            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">📐 Tamaño aproximado del predio o área a custodiar:</label>
+            <input type="text" id="post-tamano" placeholder="Ej: 3 hectáreas / Solar campesino / Reserva familiar" required style="width: 100%; padding: 10px; margin-top: 4px; margin-bottom: 12px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box;">
+
+            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">🌿 Tipo de bosque y especies que identificas:</label>
+            <textarea id="post-bosque" placeholder="Cuéntanos si hay bosque nativo, nacimientos de agua o árboles madre (ej. abarco, guayacán, cedro...)" required style="width: 100%; min-height: 85px; padding: 10px; margin-top: 4px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box;"></textarea>
+
+            <button type="submit" id="btnEnviarPostulacion" class="btn-principal btn-suave" style="width: 100%; padding: 12px; background: #1b4332; border: none; border-radius: 6px; font-size: 15px;">Enviar Postulación a Bosquesinos</button>
+        </form>
+    </div>
+</div>
 
 <!-- MODAL MONITOREO -->
 <div id="modalMonitoreoArboles" class="modal oculto" style="z-index: 10005 !important;">
@@ -252,7 +325,7 @@
         <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Ingresa a tu cuenta para continuar</p>
         
         <form autocomplete="off" onsubmit="event.preventDefault(); procesarLoginClasico();">
-            <input type="email" id="login-email-clasico" placeholder="Correo electrónico o Usuario" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
+            <input type="text" id="login-email-clasico" placeholder="Correo electrónico o Usuario" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
             <input type="password" id="login-password-clasico" placeholder="Contraseña" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
             
             <div style="text-align: right; margin-bottom: 20px;">
@@ -264,7 +337,7 @@
         
         <div style="margin-top: 25px; border-top: 1px solid #dce8e0; padding-top: 20px;">
             <p style="font-size: 13px; color: #666; margin: 0 0 10px 0;">¿Aún no eres parte de la red?</p>
-            <button type="button" class="btn-classic-secondary btn-suave" style="width: 100%; padding: 10px; font-size: 14px; border: 1px solid var(--color-brand-forest); color: var(--color-brand-forest); border-radius: 6px; background: transparent;" onclick="cambiarMicrositio('modalLoginClasico', 'modalRegistroPublico')">Registrar nueva cuenta</button>
+            <button type="button" class="btn-classic-secondary btn-suave" style="width: 100%; padding: 10px; font-size: 14px; border: 1px solid var(--color-brand-forest); color: var(--color-brand-forest); border-radius: 6px; background: transparent;" onclick="cambiarMicrositio('modalLoginClasico', 'modalRegistroPublico')">Registrar nueva cuenta (Vigía)</button>
         </div>
     </div>
 </div>
@@ -274,7 +347,7 @@
     <div class="modal-contenido" style="max-width: 400px; padding: 40px 30px; border-radius: 12px; text-align: center;">
         <span class="cerrar-modal" onclick="document.getElementById('modalRegistroPublico').classList.add('oculto')">&times;</span>
         <h2 style="color: var(--color-brand-forest); margin-top: 0; font-family: serif; font-size: 26px;">Únete a la Red</h2>
-        <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Crea tu cuenta como Vigía Bosquesino.</p>
+        <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Crea tu cuenta como Vigía Bosquesino y postúlate luego como Custodio.</p>
         
         <form autocomplete="off" onsubmit="event.preventDefault(); procesarRegistroPublico();">
             <input type="email" id="reg-email" placeholder="Tu Correo Electrónico" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
@@ -310,9 +383,7 @@
 <!-- CAJA 5: LEGAL -->
 <section id="vista-legal" class="oculto" style="padding: 60px 20px; max-width: 900px; margin: 0 auto; min-height: 80vh; color: var(--color-text-primary);">
     <div style="background: var(--color-surface-white); padding: 50px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); text-align: left;">
-        
         <h2 style="color: var(--color-brand-forest); font-size: 32px; border-bottom: 2px solid var(--color-brand-sage-100); padding-bottom: 15px; margin-top: 0;">Políticas y Términos Legales</h2>
-        
         <p style="font-size: 14px; color: #666; margin-bottom: 40px;">Este documento establece las normativas de uso, colaboración y protección de la información de la Asociación Bosquesinos.</p>
 
         <h3 style="color: #2a4d31; font-size: 20px;">Política de Tratamiento de Datos (Ley 1581)</h3>
@@ -324,14 +395,12 @@
         <p style="font-size: 15px; line-height: 1.6; color: #444;"><strong>1. Naturaleza del Proyecto:</strong> Bosquesinos es una iniciativa comunitaria enfocada en la preservación de la flora nativa. El uso de esta plataforma implica el respeto profundo por los saberes campesinos y el territorio natural.</p>
         <p style="font-size: 15px; line-height: 1.6; color: #444;"><strong>2. Apadrinamiento y Adquisición:</strong> Los aportes realizados para apadrinar o adquirir plántulas se consideran contribuciones directas para el sostenimiento del vivero comunitario y la labor de las familias campesinas involucradas. Las plántulas deben ser plantadas siguiendo las recomendaciones ecológicas de la asociación.</p>
         <p style="font-size: 15px; line-height: 1.6; color: #444;"><strong>3. Saberes Tradicionales:</strong> Los aportes al "Muro de Saberes" serán moderados por el equipo de Bosquesinos. Al enviar un saber, autorizas su publicación para fines educativos y de memoria cultural, manteniendo siempre el reconocimiento a tu autoría.</p>
-
     </div>
 </section>
 
 <footer class="footer-discreto" style="position: relative; padding: 40px 20px 20px 20px; text-align: center; background-color: #06351f; color: #a3b18a;">
     <p style="margin: 0; font-size: 14px; font-weight: 500; color: #dce8e0;">Cultivando vida y protegiendo nuestros ríos desde San Luis, Antioquia.</p>
     
-    <!-- ENLACE A LA PÁGINA LEGAL -->
     <div style="margin-top: 15px; display: flex; justify-content: center; font-size: 13px;">
         <span style="cursor: pointer; text-decoration: underline; opacity: 0.8; transition: 0.3s;" onclick="cambiarVista('vista-legal')">
             Políticas de Privacidad y Términos Legales
@@ -349,7 +418,8 @@
 <!-- === JAVASCRIPT === -->
 <script>
 const hostUrl = 'https://bosquesinos-sanluis.onrender.com'; 
-let modoAdminActivo = false;
+let sesionIniciada = false;
+let esGestor = false; // Solo true para Fundador o Custodio (Oculta inventario y panel a los Vigías)
 window.especiesGlobal = []; window.lotesGlobal = []; window.arbolesMatrizGlobal = [];
 let especieActualId = null; let especieSeleccionadaMicrositio = null;
 
@@ -371,7 +441,8 @@ async function cargarCatalogo() {
         window.especiesGlobal = await resEspecies.json(); 
         window.lotesGlobal = await resLotes.json();
         
-        if (modoAdminActivo) {
+        // Solo carga árboles matriz si el usuario es Fundador o Custodio (esGestor)
+        if (esGestor) {
             const resArboles = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
             if (resArboles.ok) { window.arbolesMatrizGlobal = await resArboles.json(); }
             selLoteArbol.innerHTML = '<option value="">-- Selecciona el Árbol Madre --</option>';
@@ -389,15 +460,17 @@ async function cargarCatalogo() {
                 let activas = 0;
                 misLotes.forEach(l => { if (l.estadoActual !== 'Sembrada' && l.estadoActual !== 'Semillero' && l.estadoActual !== 'Germinación') { activas += l.cantidadActual; } });
                 let img = especie.imagenUrl ? `<img src="${especie.imagenUrl}" class="img-arbol">` : `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
-                const btnGest = modoAdminActivo ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionInventario('${especie._id}')">⚙ Gestionar Inventario</button>` : '';
+                
+                // OCULTO PARA VIGÍAS Y VISITANTES: Solo Fundador y Custodio ven 'Gestionar Inventario'
+                const btnGest = esGestor ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionInventario('${especie._id}')">⚙ Gestionar Inventario</button>` : '';
 
                 lista.innerHTML += `
                     <li class="item-planta">
                         ${img}
                         <div class="info-arbol">
                             <h3 style="margin-bottom:2px;">${especie.nombreComun}</h3> 
-                            <i style="color:#52796f; font-size:13px;">${especie.nombreCientifico}</i>
-                            <p style="margin-top:8px;">${especie.caracteristicas.substring(0, 75)}...</p>
+                            <i style="color:#52796f; font-size:13px;">${especie.nombreCientifico || ''}</i>
+                            <p style="margin-top:8px;">${(especie.caracteristicas || 'Especie nativa custodiada en San Luis.').substring(0, 75)}...</p>
                             <div class="estadisticas" style="margin-top: 10px; margin-bottom: 10px;"><span>Plántulas Disponibles</span><strong style="font-size: 16px;">${activas} uds.</strong></div>
                             <div class="acciones-tarjeta">
                                 <button class="btn-classic-primary" style="width: 100%;" onclick="abrirMicrositio('${especie._id}')">Conocer especie</button>
@@ -414,15 +487,17 @@ async function cargarCatalogo() {
 let especieInventarioActiva = null;
 
 function abrirGestionInventario(especieId) {
+    if (!esGestor) return; // Doble candado contra Vigías
     especieInventarioActiva = especieId;
     const especie = window.especiesGlobal.find(e => e._id === especieId);
     if (!especie) return;
     const nombreComun = especie.nombreComun;
     document.getElementById('nombreEspecieLotes').innerText = `Gestión de: ${nombreComun}`;
-    const misLotes = window.lotesGlobal.filter(l => ((l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun) || (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id))) && (localStorage.getItem('rolUsuario') === 'Admin' || localStorage.getItem('rolUsuario') === 'Fundador' || l.registradoPor === localStorage.getItem('emailUsuario')));
+    const rolActual = localStorage.getItem('rolUsuario');
+    const misLotes = window.lotesGlobal.filter(l => ((l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun) || (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id))) && (rolActual === 'Fundador' || rolActual === 'Admin' || l.registradoPor === localStorage.getItem('emailUsuario')));
     const cont = document.getElementById('contenedorLotesActivos'); 
     if (misLotes.length === 0) {
-        cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No hay registros de esta especie.</p>';
+        cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No hay registros de esta especie bajo tu gestión.</p>';
         document.getElementById('modalGestionLotes').classList.remove('oculto');
         return;
     }
@@ -455,7 +530,7 @@ async function eliminarRegistroDefinitivo(idRegistro) {
 }
 
 function actualizarDashboard() {
-    if (!modoAdminActivo) return;
+    if (!esGestor) return;
     let totalPlantas = 0; let registrosActivos = 0; let arbolesCosecha = 0;
     window.lotesGlobal.forEach(l => { if (l.estadoActual !== 'Sembrada' && l.estadoActual !== 'Semillero' && l.estadoActual !== 'Germinación') { totalPlantas += l.cantidadActual; registrosActivos++; } });
     window.arbolesMatrizGlobal.forEach(a => { let est = a.monitoreos.length ? a.monitoreos[a.monitoreos.length-1].estadoFenologico : ''; if (est === 'Semilla madura') arbolesCosecha++; });
@@ -484,19 +559,155 @@ document.getElementById('formEspecie').addEventListener('submit', async (e) => {
     if (res.ok) { document.getElementById('formEspecie').reset(); alert('Vitrina actualizada.'); cargarCatalogo(); }
 });
 
+// --- POSTULACIÓN DE VIGÍA A CUSTODIO ---
+async function abrirModalPostulacion() {
+    document.getElementById('modalPostulacionCustodio').classList.remove('oculto');
+    const cajaEstado = document.getElementById('cajaEstadoPostulacion');
+    const form = document.getElementById('formPostularCustodio');
+    cajaEstado.style.display = 'block';
+    cajaEstado.style.background = '#f8fbf9';
+    cajaEstado.innerText = 'Consultando estado de tu perfil...';
+
+    try {
+        const res = await fetch(`${hostUrl}/api/mi-perfil`, { headers: obtenerCabecerasSeguras() });
+        if (!res.ok) throw new Error('Error al leer perfil');
+        const usuario = await res.json();
+        const post = usuario.postulacionCustodio || { estado: 'Ninguna' };
+
+        if (post.estado === 'Pendiente') {
+            cajaEstado.style.background = '#fff3cd';
+            cajaEstado.style.color = '#856404';
+            cajaEstado.style.border = '1px solid #ffeeba';
+            cajaEstado.innerHTML = `⏳ <b>Solicitud en revisión:</b> Ya enviaste tu postulación para la vereda <b>${post.vereda}</b> (${post.tamañoPredio}). El equipo Fundador la revisará pronto.`;
+            document.getElementById('post-vereda').value = post.vereda || '';
+            document.getElementById('post-tamano').value = post.tamañoPredio || '';
+            document.getElementById('post-bosque').value = post.tipoBosque || '';
+            document.getElementById('btnEnviarPostulacion').innerText = 'Actualizar datos de mi postulación';
+        } else if (post.estado === 'Aprobada' || usuario.rol === 'Custodio') {
+            cajaEstado.style.background = '#d4edda';
+            cajaEstado.style.color = '#155724';
+            cajaEstado.style.border = '1px solid #c3e6cb';
+            cajaEstado.innerHTML = `🎉 <b>¡Felicidades! Tu solicitud fue aprobada.</b> Cierra sesión y vuelve a ingresar para activar tu Panel de Control de Custodio.`;
+            form.classList.add('oculto');
+        } else if (post.estado === 'Rechazada') {
+            cajaEstado.style.background = '#f8d7da';
+            cajaEstado.style.color = '#721c24';
+            cajaEstado.style.border = '1px solid #f5c6cb';
+            cajaEstado.innerHTML = `⚠️ Tu solicitud anterior no pudo ser aprobada en este momento. Puedes actualizar la información de tu predio y enviarla nuevamente.`;
+        } else {
+            cajaEstado.style.display = 'none';
+        }
+    } catch (error) {
+        cajaEstado.style.display = 'none';
+    }
+}
+
+document.getElementById('formPostularCustodio')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const datos = {
+        vereda: document.getElementById('post-vereda').value,
+        tamañoPredio: document.getElementById('post-tamano').value,
+        tipoBosque: document.getElementById('post-bosque').value
+    };
+    try {
+        const res = await fetch(`${hostUrl}/api/postular-custodio`, {
+            method: 'POST',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify(datos)
+        });
+        const data = await res.json();
+        if (res.ok) {
+            alert(data.mensaje || '¡Postulación enviada con éxito!');
+            abrirModalPostulacion();
+        } else {
+            alert(data.error || 'No se pudo enviar la postulación.');
+        }
+    } catch (error) {
+        alert('Error de conexión al enviar la postulación.');
+    }
+});
+
+// --- GESTIÓN EXCLUSIVA DEL FUNDADOR ---
+async function cargarPostulacionesPendientes() {
+    const cont = document.getElementById('listaPostulacionesPendientes');
+    if (!cont) return;
+    try {
+        const res = await fetch(`${hostUrl}/api/postulaciones-pendientes`, { headers: obtenerCabecerasSeguras() });
+        if (!res.ok) { cont.innerHTML = '<p style="color:#888;">Sin acceso o ruta pendiente de despliegue en servidor.</p>'; return; }
+        const pendientes = await res.json();
+        if (pendientes.length === 0) {
+            cont.innerHTML = '<p style="color:#52796f; background:#f1f7f3; padding:10px; border-radius:6px;">✅ No hay solicitudes pendientes en este momento.</p>';
+            return;
+        }
+        cont.innerHTML = '';
+        pendientes.forEach(u => {
+            const p = u.postulacionCustodio || {};
+            cont.innerHTML += `
+                <div style="border: 1px solid #dce8e0; background: #ffffff; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: left;">
+                    <strong style="color: #1b4332;">👤 ${u.email}</strong>
+                    <p style="margin: 4px 0; font-size: 12px;">📍 <b>Vereda:</b> ${p.vereda || '-'} | 📐 <b>Predio:</b> ${p.tamañoPredio || '-'}</p>
+                    <p style="margin: 4px 0 10px 0; font-size: 12px; color: #354f52;">🌿 <b>Bosque:</b> ${p.tipoBosque || '-'}</p>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn-principal" style="background: #2d6a4f; padding: 6px 12px; font-size: 12px; flex: 1;" onclick="resolverPostulacion('${u._id}', 'Aprobada')">✔ Aprobar como Custodio</button>
+                        <button type="button" class="btn-classic-danger" style="padding: 6px 12px; font-size: 12px; flex: 1;" onclick="resolverPostulacion('${u._id}', 'Rechazada')">✖ Rechazar</button>
+                    </div>
+                </div>`;
+        });
+    } catch (error) {
+        cont.innerHTML = '<p style="color:#888;">No se pudieron cargar las solicitudes.</p>';
+    }
+}
+
+async function resolverPostulacion(userId, decision) {
+    if (!confirm(`¿Seguro que deseas marcar esta postulación como ${decision}?`)) return;
+    try {
+        const res = await fetch(`${hostUrl}/api/resolver-postulacion/${userId}`, {
+            method: 'PUT',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify({ decision })
+        });
+        const data = await res.json();
+        alert(data.mensaje || data.error);
+        cargarPostulacionesPendientes();
+    } catch (error) {
+        alert('Error al procesar la decisión.');
+    }
+}
+
+document.getElementById('formRegistrarAsociado')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const res = await fetch(`${hostUrl}/api/registrar-asociado`, {
+        method: 'POST',
+        headers: obtenerCabecerasSeguras(),
+        body: JSON.stringify({
+            email: document.getElementById('asociado-email').value,
+            password: document.getElementById('asociado-password').value
+        })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        document.getElementById('formRegistrarAsociado').reset();
+        alert(data.mensaje);
+    } else {
+        alert(data.error || 'Error al registrar Custodio');
+    }
+});
+
 async function abrirModalMonitoreo() {
+    if (!esGestor) return;
     const cont = document.getElementById('listaArbolesMonitoreo');
     document.getElementById('modalMonitoreoArboles').classList.remove('oculto');
     cont.innerHTML = 'Cargando tus árboles...';
     const res = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
     window.arbolesMatrizGlobal = await res.json();
-    const misArboles = window.arbolesMatrizGlobal.filter(a => a.registradoPor === localStorage.getItem('emailUsuario'));
+    const rol = localStorage.getItem('rolUsuario');
+    const misArboles = rol === 'Fundador' ? window.arbolesMatrizGlobal : window.arbolesMatrizGlobal.filter(a => a.registradoPor === localStorage.getItem('emailUsuario'));
     cont.innerHTML = '';
     if (misArboles.length === 0) { cont.innerHTML = '<p style="font-size:13px; color:#666;">No tienes árboles bajo tu custodia.</p>'; return; }
     misArboles.forEach(a => {
         let est = a.monitoreos.length ? a.monitoreos[a.monitoreos.length-1].estadoFenologico : 'Recién registrado';
         let etiq = est === 'Semilla madura' ? `<div style="background:#cf222e;color:white;padding:4px;border-radius:4px;font-size:11px;">🚨 ¡COSECHAR!</div>` : `<div style="background:#d8eadd;padding:4px;border-radius:4px;font-size:11px;">Actual: ${est}</div>`;
-        cont.innerHTML += `<div style="border:1px solid #d0d7de; padding:15px; border-radius:8px; margin-bottom:10px; position: relative;"><div style="position: absolute; top: 15px; right: 15px;"><button style="background: none; border: none; font-size: 16px; cursor: pointer;" onclick="editarArbol('${a._id}')">✏</button></div>${etiq}<h4 style="margin-top: 10px; width: 85%;">${a.codigoArbol} - ${a.nombreComun}</h4><p>📍 ${a.veredaSector}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"><button onclick="registrarFenologia('${a._id}', 'Hojas')">🍃 Hojas</button><button onclick="registrarFenologia('${a._id}', 'Floración')">🌼 Flor</button><button onclick="registrarFenologia('${a._id}', 'Fruto verde')">🍏 Verde</button><button onclick="registrarFenologia('${a._id}', 'Semilla madura')" style="color:red; font-weight:bold;">🌰 Madura</button></div></div>`;
+        cont.innerHTML += `<div style="border:1px solid #d0d7de; padding:15px; border-radius:8px; margin-bottom:10px; position: relative;"><div style="position: absolute; top: 15px; right: 15px;"><button style="background: none; border: none; font-size: 16px; cursor: pointer;" onclick="editarArbol('${a._id}')">✏</button></div>${etiq}<h4 style="margin-top: 10px; width: 85%;">${a.codigoArbol} - ${a.nombreComun}</h4><p>📍 ${a.veredaSector} (Custodio: ${a.custodio})</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"><button onclick="registrarFenologia('${a._id}', 'Hojas')">🍃 Hojas</button><button onclick="registrarFenologia('${a._id}', 'Floración')">🌼 Flor</button><button onclick="registrarFenologia('${a._id}', 'Fruto verde')">🍏 Verde</button><button onclick="registrarFenologia('${a._id}', 'Semilla madura')" style="color:red; font-weight:bold;">🌰 Madura</button></div></div>`;
     });
     actualizarDashboard();
 }
@@ -543,11 +754,12 @@ function abrirMicrositio(id) {
     document.getElementById('detalle-imagen').src = especie.imagenUrl; document.getElementById('detalle-imagen').style.display = especie.imagenUrl ? 'block' : 'none';
     const contSaberes = document.getElementById('contenedor-saberes'); contSaberes.innerHTML = '';
     if(especie.saberes.length) especie.saberes.forEach(s => contSaberes.innerHTML += `<p>"${s.descripcion}" - <b>${s.autor}</b></p>`); else contSaberes.innerHTML = 'Sin saberes registrados.';
-    document.getElementById('contenedorBotonAportarSaber').className = modoAdminActivo ? '' : 'oculto';
+    // Solo Fundador y Custodio pueden aportar directamente al muro sin moderación previa
+    document.getElementById('contenedorBotonAportarSaber').className = esGestor ? '' : 'oculto';
     cancelarSaber(); document.getElementById('modalDetalleEspecie').classList.remove('oculto');
 }
 function activarAporteSaber() { document.getElementById('vistaLecturaEspecie').classList.add('oculto'); document.getElementById('formAportarSaber').classList.remove('oculto'); document.getElementById('contenedorBotonAportarSaber').classList.add('oculto'); }
-function cancelarSaber() { document.getElementById('vistaLecturaEspecie').classList.remove('oculto'); document.getElementById('formAportarSaber').classList.add('oculto'); if(modoAdminActivo) document.getElementById('contenedorBotonAportarSaber').classList.remove('oculto'); }
+function cancelarSaber() { document.getElementById('vistaLecturaEspecie').classList.remove('oculto'); document.getElementById('formAportarSaber').classList.add('oculto'); if(esGestor) document.getElementById('contenedorBotonAportarSaber').classList.remove('oculto'); }
 document.getElementById('formAportarSaber').addEventListener('submit', async (e) => {
     e.preventDefault();
     const res = await fetch(`${hostUrl}/api/especies/${especieActualId}`, { method: 'PUT', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ nuevoSaber: { autor: document.getElementById('saber-autor').value, descripcion: document.getElementById('saber-desc').value } }) });
@@ -586,7 +798,9 @@ async function procesarLoginClasico() {
     });
     if(res.ok) { 
         const d = await res.json(); 
-        localStorage.setItem('tokenAdmin', d.token); localStorage.setItem('rolUsuario', d.rol); localStorage.setItem('emailUsuario', d.email); 
+        localStorage.setItem('tokenAdmin', d.token); 
+        localStorage.setItem('rolUsuario', d.rol); 
+        localStorage.setItem('emailUsuario', d.email); 
         location.reload(); 
     } else { 
         alert('Credenciales incorrectas'); 
@@ -611,7 +825,7 @@ async function procesarRegistroPublico() {
 
 async function solicitarRecuperacion() {
     const email = document.getElementById('rec-email').value;
-    alert("Procesando..."); // Aquí conectarás luego la ruta del backend
+    alert("Procesando...");
     const res = await fetch(`${hostUrl}/api/olvide-password`, { 
         method: 'POST', headers: {'Content-Type':'application/json'}, 
         body: JSON.stringify({ email }) 
@@ -621,7 +835,7 @@ async function solicitarRecuperacion() {
 }
 
 function toggleAdmin() { 
-    if(modoAdminActivo) { 
+    if(sesionIniciada) { 
         localStorage.clear(); 
         location.reload(); 
     } else {
@@ -630,35 +844,71 @@ function toggleAdmin() {
 }
 
 window.onload = () => { 
-    if(localStorage.getItem('tokenAdmin')) { 
-        modoAdminActivo = true; 
-        
-        document.getElementById('btn-nav-admin').classList.remove('oculto'); 
-        const btnLogin = document.getElementById('btn-nav-login');
-        if(btnLogin) btnLogin.classList.add('oculto'); // Ocultar login si ya entró
+    const token = localStorage.getItem('tokenAdmin');
+    const rol = localStorage.getItem('rolUsuario');
+    const email = localStorage.getItem('emailUsuario');
 
-        document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión'; 
-        
-        if(localStorage.getItem('rolUsuario') === 'Fundador' || localStorage.getItem('rolUsuario') === 'Admin') { 
-            document.getElementById('seccionCrearBosquesino').classList.remove('oculto'); 
+    if (token) { 
+        sesionIniciada = true;
+        esGestor = (rol === 'Fundador' || rol === 'Custodio' || rol === 'Admin');
+
+        const btnLogin = document.getElementById('btn-nav-login');
+        if (btnLogin) btnLogin.classList.add('oculto');
+        document.getElementById('btnModoAdmin').innerText = '🚪 Cerrar Sesión';
+
+        const badge = document.getElementById('badge-usuario-activo');
+        if (badge) {
+            badge.innerText = `🌿 ${rol}: ${email}`;
+            badge.classList.remove('oculto');
         }
-        cargarCatalogo(); 
-        cambiarVista('panelAdmin'); 
+
+        if (esGestor) {
+            // Fundador y Custodio ven el engranaje y entran al Panel de Control
+            document.getElementById('btn-nav-admin').classList.remove('oculto');
+            if (rol === 'Fundador' || rol === 'Admin') {
+                const secFundador = document.getElementById('seccionCrearBosquesino');
+                if (secFundador) secFundador.classList.remove('oculto');
+                cargarPostulacionesPendientes();
+            }
+            cargarCatalogo();
+            cambiarVista('panelAdmin');
+        } else {
+            // Si es VIGÍA: No ve el Panel de Control ni 'Gestionar Inventario', pero sí puede postularse a Custodio
+            document.getElementById('btn-nav-admin').classList.add('oculto');
+            document.getElementById('btn-nav-postular').classList.remove('oculto');
+            document.getElementById('bannerPostulacionAlianza').classList.remove('oculto');
+            cargarCatalogo();
+            cambiarVista('vista-catalogo');
+        }
     } else { 
         cargarCatalogo(); 
     } 
 };
 
 function cambiarVista(idVistaDestino) {
+    if (idVistaDestino === 'panelAdmin' && !esGestor) {
+        idVistaDestino = 'vista-catalogo';
+    }
     const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin', 'vista-legal'];
     vistas.forEach(vista => {
         const elemento = document.getElementById(vista);
-        if(elemento) { elemento.classList.add('oculto'); elemento.classList.remove('vista-activa'); }
+        if (elemento) { 
+            elemento.classList.add('oculto'); 
+            elemento.classList.remove('vista-activa'); 
+        }
     });
     const vistaDestino = document.getElementById(idVistaDestino);
-    if(vistaDestino) { vistaDestino.classList.remove('oculto'); void vistaDestino.offsetWidth; vistaDestino.classList.add('vista-activa'); }
+    if (vistaDestino) { 
+        vistaDestino.classList.remove('oculto'); 
+        void vistaDestino.offsetWidth; 
+        vistaDestino.classList.add('vista-activa'); 
+    }
     const nav = document.getElementById('menu-principal');
-    if (idVistaDestino === 'vista-inicio') { nav.classList.add('oculto'); } else { nav.classList.remove('oculto'); }
+    if (idVistaDestino === 'vista-inicio') { 
+        nav.classList.add('oculto'); 
+    } else { 
+        nav.classList.remove('oculto'); 
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

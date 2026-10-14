@@ -383,7 +383,55 @@ app.put('/api/especies/:id', verificarAcceso, soloGestores, async (req, res) => 
     } catch (error) { res.status(500).json({ error: 'Error al actualizar vitrina' }); }
 });
 
-// GET: Consultar el perfil y estado de postulación del usuario actual
+app.post('/api/postular-custodio', verificarAcceso, async (req, res) => {
+    try {
+        const { vereda, tamañoPredio, tipoBosque } = req.body;
+        const usuario = await User.findOne({ email: req.usuarioActual });
+        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+        usuario.postulacionCustodio = {
+            estado: 'Pendiente',
+            vereda: String(vereda).trim(),
+            tamañoPredio: String(tamañoPredio).trim(),
+            tipoBosque: String(tipoBosque).trim()
+        };
+        await usuario.save();
+        res.json({ mensaje: '¡Postulación enviada! El equipo Fundador revisará tu solicitud.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al procesar la postulación' });
+    }
+});
+
+// GET: Fundador consulta todas las postulaciones pendientes
+app.get('/api/postulaciones-pendientes', verificarAcceso, async (req, res) => {
+    try {
+        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo el Fundador puede ver postulaciones' });
+        const pendientes = await User.find({ 'postulacionCustodio.estado': 'Pendiente' }, '-password');
+        res.json(pendientes);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener postulaciones' });
+    }
+});
+
+// PUT: Fundador aprueba o rechaza a un Vigía como Custodio
+app.put('/api/resolver-postulacion/:id', verificarAcceso, async (req, res) => {
+    try {
+        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'No autorizado' });
+        const { decision } = req.body; // 'Aprobada' o 'Rechazada'
+        const usuario = await User.findById(req.params.id);
+        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+        usuario.postulacionCustodio.estado = decision;
+        if (decision === 'Aprobada') {
+            usuario.rol = 'Custodio'; // Asciende automáticamente de rango
+        }
+        await usuario.save();
+        res.json({ mensaje: `Postulación ${decision.toLowerCase()} con éxito.` });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al resolver postulación' });
+    }
+});
+
 app.get('/api/mi-perfil', verificarAcceso, async (req, res) => {
     try {
         const usuario = await User.findOne({ email: req.usuarioActual }, '-password');
