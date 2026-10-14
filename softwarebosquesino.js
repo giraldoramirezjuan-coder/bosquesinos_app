@@ -3,7 +3,15 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken'); 
 const bcrypt = require('bcrypt');
-const crypto = require('crypto'); // Nueva librería para encriptar coordenadas
+const crypto = require('crypto');
+
+// Carga segura de nodemailer (evita que Render falle si no está en package.json)
+let nodemailer = null;
+try {
+    nodemailer = require('nodemailer');
+} catch (e) {
+    console.log('Aviso: nodemailer no instalado, recuperación por correo desactivada temporalmente.');
+}
 
 const app = express();
 app.use(cors());         
@@ -34,16 +42,14 @@ mongoose.connect(uri)
   .catch(err => console.error('Error conectando a la base de datos:', err));
 
 // --- 2. MODELOS DE DATOS ---
-
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     rol: { 
         type: String, 
-        enum: ['Fundador', 'Custodio', 'Vigía'], // Limitamos a estos 3 roles
-        default: 'Vigía' // Todo el que se registre nuevo será Vigía por defecto
+        enum: ['Fundador', 'Custodio', 'Vigía'],
+        default: 'Vigía'
     },
-    // Nuevos campos para postulación y recuperación
     postulacionCustodio: {
         estado: { type: String, enum: ['Ninguna', 'Pendiente', 'Aprobada', 'Rechazada'], default: 'Ninguna' },
         vereda: { type: String, default: '' },
@@ -64,7 +70,7 @@ const arbolMatrizSchema = new mongoose.Schema({
     veredaSector: { type: String, required: true },
     custodio: { type: String, required: true },
     registradoPor: { type: String, required: true },
-    coordenadasGPSEncriptadas: { type: String, default: '' }, // Bóveda segura
+    coordenadasGPSEncriptadas: { type: String, default: '' },
     fechaSeleccion: { type: Date, default: Date.now },
     monitoreos: [{
         fechaObservacion: { type: Date, default: Date.now },
@@ -117,7 +123,6 @@ async function crearUsuarioAdmin() {
     const usuarioExiste = await User.findOne({ email: 'bosquesinos' });
     if (!usuarioExiste) {
       const passwordEncriptada = await bcrypt.hash('bosquesinas', 10);
-      // Ahora se llama Fundador en lugar de Admin
       await new User({ email: 'bosquesinos', password: passwordEncriptada, rol: 'Fundador' }).save();
     }
   } catch (error) { console.log('Error inicial:', error); }
@@ -165,15 +170,12 @@ app.post('/api/login', async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error en el servidor' }); }
 });
 
-// POST: Registro Público (Todos entran como Vigías)
 app.post('/api/registro-publico', async (req, res) => {
     try {
         if (await User.findOne({ email: String(req.body.email).trim() })) {
             return res.status(400).json({ error: 'El correo ya está registrado.' });
         }
         const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
-        
-        // Se crea como Vigía automáticamente
         const nuevoUsuario = new User({ 
             email: String(req.body.email).trim(), 
             password: passwordEncriptada, 
@@ -184,38 +186,27 @@ app.post('/api/registro-publico', async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al registrar la cuenta.' }); }
 });
 
-// POST: Recuperación de contraseña (Enviar código)
-// NOTA: Requieres instalar 'nodemailer': npm install nodemailer
-const nodemailer = require('nodemailer');
 app.post('/api/olvide-password', async (req, res) => {
     try {
+        if (!nodemailer) return res.status(503).json({ error: 'Servicio de correo en mantenimiento.' });
         const usuario = await User.findOne({ email: req.body.email });
         if (!usuario) return res.status(404).json({ error: 'No hay un usuario con ese correo.' });
 
-        // Generar token de 6 dígitos
         const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        // Hashear el token antes de guardarlo por seguridad
         usuario.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-        usuario.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // Expira en 15 minutos
+        usuario.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
         await usuario.save();
 
-        // Configuración de Nodemailer (Deberías usar variables de entorno para esto)
         const transporter = nodemailer.createTransport({
-            service: 'Gmail', // o el que uses
-            auth: {
-                user: process.env.EMAIL_USER, // Tu correo
-                pass: process.env.EMAIL_PASS  // Tu contraseña de aplicación
-            }
+            service: 'Gmail',
+            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
         });
-
-        const mensaje = `Has solicitado restablecer tu contraseña. \n\nTu código de recuperación es: ${resetToken}\n\nEste código es válido por 15 minutos.`;
 
         await transporter.sendMail({
             from: '"Bosquesinos San Luis" <tu-correo@gmail.com>',
             to: usuario.email,
             subject: 'Recuperación de Contraseña - Bosquesinos',
-            text: mensaje
+            text: `Has solicitado restablecer tu contraseña.\n\nTu código de recuperación es: ${resetToken}\n\nEste código es válido por 15 minutos.`
         });
 
         res.json({ mensaje: 'Código enviado a tu correo electrónico.' });
@@ -225,20 +216,15 @@ app.post('/api/olvide-password', async (req, res) => {
     }
 });
 
-// POST: Restablecer Contraseña
 app.post('/api/reset-password', async (req, res) => {
     try {
-        // Encriptar el token recibido para compararlo con la base de datos
         const resetPasswordToken = crypto.createHash('sha256').update(req.body.token).digest('hex');
-
         const usuario = await User.findOne({
             resetPasswordToken,
-            resetPasswordExpire: { $gt: Date.now() } // Verifica que no haya expirado
+            resetPasswordExpire: { \$gt: Date.now() }
         });
-
         if (!usuario) return res.status(400).json({ error: 'Código inválido o ha expirado.' });
 
-        // Actualizar contraseña
         usuario.password = await bcrypt.hash(req.body.nuevaPassword, 10);
         usuario.resetPasswordToken = undefined;
         usuario.resetPasswordExpire = undefined;
@@ -251,20 +237,16 @@ app.post('/api/reset-password', async (req, res) => {
 // =======================================================
 //   RUTAS PROTEGIDAS (ASOCIACIÓN)
 // =======================================================
-
-// POST: Vigía solicita ser Custodio
 app.post('/api/registrar-asociado', verificarAcceso, async (req, res) => {
     try {
         if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo Fundador puede crear cuentas.' });
         if (await User.findOne({ email: String(req.body.email).trim() })) return res.status(400).json({ error: 'Usuario ya registrado' });
         const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
-        // Corregido a 'Custodio' para que coincida con el enum del modelo User
         await new User({ email: String(req.body.email).trim(), password: passwordEncriptada, rol: 'Custodio' }).save();
         res.status(201).json({ mensaje: 'Custodio registrado con éxito.' });
     } catch (error) { res.status(400).json({ error: 'Error al registrar' }); }
 });
 
-// GET: Árboles (Fundador ve todos, Custodio ve los suyos, Vigía bloqueado)
 app.get('/api/arboles-matriz', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const filtro = req.rol === 'Fundador' ? {} : { registradoPor: req.usuarioActual };
@@ -272,7 +254,6 @@ app.get('/api/arboles-matriz', verificarAcceso, soloGestores, async (req, res) =
     } catch (error) { res.status(500).json({ error: 'Error al obtener árboles' }); }
 });
 
-// POST: Registrar Árbol (Fase 1)
 app.post('/api/arboles-matriz', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const { codigoArbol, nombreComun, nombreCientifico, finca, veredaSector, custodio, coordenadasGPS } = req.body;
@@ -294,7 +275,15 @@ app.post('/api/arboles-matriz', verificarAcceso, soloGestores, async (req, res) 
     } catch (error) { res.status(400).json({ error: 'Error o código repetido' }); }
 });
 
-// POST: Monitoreo Fenológico
+// PUT: Editar datos de un Árbol Semillero
+app.put('/api/arboles-matriz/:id', verificarAcceso, soloGestores, async (req, res) => {
+    try {
+        const arbolActualizado = await ArbolMatriz.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!arbolActualizado) return res.status(404).json({ error: 'Árbol no encontrado' });
+        res.json({ mensaje: 'Árbol actualizado', arbol: arbolActualizado });
+    } catch (error) { res.status(500).json({ error: 'Error al actualizar árbol' }); }
+});
+
 app.post('/api/arboles-matriz/:id/monitoreo', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const arbol = await ArbolMatriz.findById(req.params.id);
@@ -310,7 +299,6 @@ app.post('/api/arboles-matriz/:id/monitoreo', verificarAcceso, soloGestores, asy
     } catch (error) { res.status(500).json({ error: 'Error al reportar' }); }
 });
 
-// POST: Registrar Lote (Fase 2)
 app.post('/api/lotes', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const { arbolMatrizId, origen, cantidadInicial } = req.body;
@@ -325,7 +313,6 @@ app.post('/api/lotes', verificarAcceso, soloGestores, async (req, res) => {
     } catch (error) { res.status(400).json({ error: 'Error al crear lote' }); }
 });
 
-// POST: Avanzar y Retirar Lotes
 app.post('/api/lotes/avanzar', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const lote = await Lote.findById(req.body.loteId);
@@ -355,21 +342,14 @@ app.post('/api/lotes/retirar', verificarAcceso, soloGestores, async (req, res) =
     } catch (error) { res.status(500).json({ error: 'Error al retirar' }); }
 });
 
-// DELETE: Eliminar un lote definitivamente (Solo Fundador o Custodio)
 app.delete('/api/lotes/:id', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const registroEliminado = await Lote.findByIdAndDelete(req.params.id);
-        if (!registroEliminado) {
-            return res.status(404).json({ error: 'Registro no encontrado' });
-        }
+        if (!registroEliminado) return res.status(404).json({ error: 'Registro no encontrado' });
         res.json({ mensaje: 'Registro eliminado correctamente' });
-    } catch (error) {
-        console.error('Error al eliminar registro:', error);
-        res.status(500).json({ error: 'Error al eliminar' });
-    }
+    } catch (error) { res.status(500).json({ error: 'Error al eliminar' }); }
 });
 
-// PUT: Actualizar Vitrina Pública (Fase 3)
 app.put('/api/especies/:id', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const especie = await Especie.findById(req.params.id);
@@ -383,6 +363,14 @@ app.put('/api/especies/:id', verificarAcceso, soloGestores, async (req, res) => 
     } catch (error) { res.status(500).json({ error: 'Error al actualizar vitrina' }); }
 });
 
+// --- RUTAS DE PERFIL Y POSTULACIÓN A CUSTODIO ---
+app.get('/api/mi-perfil', verificarAcceso, async (req, res) => {
+    try {
+        const usuario = await User.findOne({ email: req.usuarioActual }, '-password');
+        res.json(usuario);
+    } catch (error) { res.status(500).json({ error: 'Error al obtener perfil' }); }
+});
+
 app.post('/api/postular-custodio', verificarAcceso, async (req, res) => {
     try {
         const { vereda, tamañoPredio, tipoBosque } = req.body;
@@ -391,52 +379,35 @@ app.post('/api/postular-custodio', verificarAcceso, async (req, res) => {
 
         usuario.postulacionCustodio = {
             estado: 'Pendiente',
-            vereda: String(vereda).trim(),
-            tamañoPredio: String(tamañoPredio).trim(),
-            tipoBosque: String(tipoBosque).trim()
+            vereda: String(vereda || '').trim(),
+            tamañoPredio: String(tamañoPredio || '').trim(),
+            tipoBosque: String(tipoBosque || '').trim()
         };
         await usuario.save();
         res.json({ mensaje: '¡Postulación enviada! El equipo Fundador revisará tu solicitud.' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al procesar la postulación' });
-    }
+    } catch (error) { res.status(500).json({ error: 'Error al procesar la postulación' }); }
 });
 
-// GET: Fundador consulta todas las postulaciones pendientes
 app.get('/api/postulaciones-pendientes', verificarAcceso, async (req, res) => {
     try {
         if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo el Fundador puede ver postulaciones' });
         const pendientes = await User.find({ 'postulacionCustodio.estado': 'Pendiente' }, '-password');
         res.json(pendientes);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al obtener postulaciones' });
-    }
+    } catch (error) { res.status(500).json({ error: 'Error al obtener postulaciones' }); }
 });
 
-// PUT: Fundador aprueba o rechaza a un Vigía como Custodio
 app.put('/api/resolver-postulacion/:id', verificarAcceso, async (req, res) => {
     try {
         if (req.rol !== 'Fundador') return res.status(403).json({ error: 'No autorizado' });
-        const { decision } = req.body; // 'Aprobada' o 'Rechazada'
+        const { decision } = req.body;
         const usuario = await User.findById(req.params.id);
         if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
 
         usuario.postulacionCustodio.estado = decision;
-        if (decision === 'Aprobada') {
-            usuario.rol = 'Custodio'; // Asciende automáticamente de rango
-        }
+        if (decision === 'Aprobada') usuario.rol = 'Custodio';
         await usuario.save();
         res.json({ mensaje: `Postulación ${decision.toLowerCase()} con éxito.` });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al resolver postulación' });
-    }
-});
-
-app.get('/api/mi-perfil', verificarAcceso, async (req, res) => {
-    try {
-        const usuario = await User.findOne({ email: req.usuarioActual }, '-password');
-        res.json(usuario);
-    } catch (error) { res.status(500).json({ error: 'Error al obtener perfil' }); }
+    } catch (error) { res.status(500).json({ error: 'Error al resolver postulación' }); }
 });
 
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
