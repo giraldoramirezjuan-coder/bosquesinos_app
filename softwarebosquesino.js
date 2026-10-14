@@ -135,6 +135,14 @@ function verificarAcceso(req, res, next) {
     } catch (error) { return res.status(401).json({ error: 'Token inválido' }); }
 }
 
+function soloGestores(req, res, next) {
+    if (req.rol === 'Fundador' || req.rol === 'Custodio') {
+        next();
+    } else {
+        return res.status(403).json({ error: 'Acceso denegado: Se requiere rango de Custodio o Fundador.' });
+    }
+}
+
 // =======================================================
 //   RUTAS PÚBLICAS
 // =======================================================
@@ -245,72 +253,27 @@ app.post('/api/reset-password', async (req, res) => {
 // =======================================================
 
 // POST: Vigía solicita ser Custodio
-app.post('/api/postulacion-custodio', verificarAcceso, async (req, res) => {
-    try {
-        if (req.rol !== 'Vigía') return res.status(400).json({ error: 'Solo los Vigías pueden postularse.' });
-        
-        const usuario = await User.findOne({ email: req.usuarioActual });
-        usuario.postulacionCustodio = {
-            estado: 'Pendiente',
-            vereda: req.body.vereda,
-            tamañoPredio: req.body.tamañoPredio,
-            tipoBosque: req.body.tipoBosque
-        };
-        await usuario.save();
-        res.json({ mensaje: 'Postulación enviada correctamente. Un Fundador la revisará.' });
-    } catch (error) { res.status(500).json({ error: 'Error al enviar postulación.' }); }
-});
-
-// GET: Fundador ve las postulaciones pendientes
-app.get('/api/postulaciones', verificarAcceso, async (req, res) => {
-    try {
-        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Acceso denegado.' });
-        const postulaciones = await User.find({ 'postulacionCustodio.estado': 'Pendiente' }, '-password');
-        res.json(postulaciones);
-    } catch (error) { res.status(500).json({ error: 'Error al obtener postulaciones.' }); }
-});
-
-// PUT: Fundador aprueba o rechaza a un Custodio
-app.put('/api/postulaciones/:id', verificarAcceso, async (req, res) => {
-    try {
-        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Acceso denegado.' });
-        
-        const usuario = await User.findById(req.params.id);
-        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado.' });
-
-        const { accion } = req.body; // 'Aprobar' o 'Rechazar'
-        
-        if (accion === 'Aprobar') {
-            usuario.rol = 'Custodio';
-            usuario.postulacionCustodio.estado = 'Aprobada';
-        } else {
-            usuario.postulacionCustodio.estado = 'Rechazada';
-        }
-        await usuario.save();
-        res.json({ mensaje: `Postulación ${accion.toLowerCase()}a con éxito.` });
-    } catch (error) { res.status(500).json({ error: 'Error al procesar postulación.' }); }
-});
-
 app.post('/api/registrar-asociado', verificarAcceso, async (req, res) => {
     try {
         if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo Fundador puede crear cuentas.' });
         if (await User.findOne({ email: String(req.body.email).trim() })) return res.status(400).json({ error: 'Usuario ya registrado' });
         const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
-        await new User({ email: String(req.body.email).trim(), password: passwordEncriptada, rol: 'Operario' }).save();
-        res.status(201).json({ mensaje: 'Asociado registrado con éxito.' });
+        // Corregido a 'Custodio' para que coincida con el enum del modelo User
+        await new User({ email: String(req.body.email).trim(), password: passwordEncriptada, rol: 'Custodio' }).save();
+        res.status(201).json({ mensaje: 'Custodio registrado con éxito.' });
     } catch (error) { res.status(400).json({ error: 'Error al registrar' }); }
 });
 
-// GET: Árboles (Admin ve todos, Operario ve los suyos)
-app.get('/api/arboles-matriz', verificarAcceso, async (req, res) => {
+// GET: Árboles (Fundador ve todos, Custodio ve los suyos, Vigía bloqueado)
+app.get('/api/arboles-matriz', verificarAcceso, soloGestores, async (req, res) => {
     try {
-        const filtro = req.rol === 'Admin' ? {} : { registradoPor: req.usuarioActual };
+        const filtro = req.rol === 'Fundador' ? {} : { registradoPor: req.usuarioActual };
         res.json(await ArbolMatriz.find(filtro));
     } catch (error) { res.status(500).json({ error: 'Error al obtener árboles' }); }
 });
 
 // POST: Registrar Árbol (Fase 1)
-app.post('/api/arboles-matriz', verificarAcceso, async (req, res) => {
+app.post('/api/arboles-matriz', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const { codigoArbol, nombreComun, nombreCientifico, finca, veredaSector, custodio, coordenadasGPS } = req.body;
         const nuevoArbol = new ArbolMatriz({
@@ -323,7 +286,6 @@ app.post('/api/arboles-matriz', verificarAcceso, async (req, res) => {
         });
         await nuevoArbol.save();
 
-        // Autocrear la cáscara en la Vitrina Pública si la especie no existe
         if (!(await Especie.findOne({ nombreComun: nuevoArbol.nombreComun }))) {
             await new Especie({ nombreComun: nuevoArbol.nombreComun, nombreCientifico: nuevoArbol.nombreCientifico }).save();
         }
@@ -333,7 +295,7 @@ app.post('/api/arboles-matriz', verificarAcceso, async (req, res) => {
 });
 
 // POST: Monitoreo Fenológico
-app.post('/api/arboles-matriz/:id/monitoreo', verificarAcceso, async (req, res) => {
+app.post('/api/arboles-matriz/:id/monitoreo', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const arbol = await ArbolMatriz.findById(req.params.id);
         if (!arbol) return res.status(404).json({ error: 'Árbol no encontrado' });
@@ -349,7 +311,7 @@ app.post('/api/arboles-matriz/:id/monitoreo', verificarAcceso, async (req, res) 
 });
 
 // POST: Registrar Lote (Fase 2)
-app.post('/api/lotes', verificarAcceso, async (req, res) => {
+app.post('/api/lotes', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const { arbolMatrizId, origen, cantidadInicial } = req.body;
         const codigoLote = `BQ-${new Date().getMonth()+1}${new Date().getFullYear().toString().slice(-2)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
@@ -364,7 +326,7 @@ app.post('/api/lotes', verificarAcceso, async (req, res) => {
 });
 
 // POST: Avanzar y Retirar Lotes
-app.post('/api/lotes/avanzar', verificarAcceso, async (req, res) => {
+app.post('/api/lotes/avanzar', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const lote = await Lote.findById(req.body.loteId);
         const cant = Number(req.body.cantidadSuperviviente);
@@ -376,13 +338,12 @@ app.post('/api/lotes/avanzar', verificarAcceso, async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al avanzar' }); }
 });
 
-app.post('/api/lotes/retirar', verificarAcceso, async (req, res) => {
+app.post('/api/lotes/retirar', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const lote = await Lote.findById(req.body.loteId);
         const cant = Number(req.body.cantidadRetirar);
         lote.cantidadActual -= cant;
         
-        // LA MAGIA: Si la pérdida vacía el inventario, eliminamos el registro de raíz
         if (lote.cantidadActual <= 0) {
             await Lote.findByIdAndDelete(req.body.loteId);
             return res.json({ mensaje: 'Registro eliminado porque la cantidad llegó a 0' });
@@ -394,8 +355,8 @@ app.post('/api/lotes/retirar', verificarAcceso, async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al retirar' }); }
 });
 
-// --- NUEVO: ELIMINAR UN REGISTRO (LOTE) DEFINITIVAMENTE CON LA X ---
-app.delete('/api/lotes/:id', verificarAcceso, async (req, res) => {
+// DELETE: Eliminar un lote definitivamente (Solo Fundador o Custodio)
+app.delete('/api/lotes/:id', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const registroEliminado = await Lote.findByIdAndDelete(req.params.id);
         if (!registroEliminado) {
@@ -409,7 +370,7 @@ app.delete('/api/lotes/:id', verificarAcceso, async (req, res) => {
 });
 
 // PUT: Actualizar Vitrina Pública (Fase 3)
-app.put('/api/especies/:id', verificarAcceso, async (req, res) => {
+app.put('/api/especies/:id', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const especie = await Especie.findById(req.params.id);
         if (req.body.caracteristicas) especie.caracteristicas = req.body.caracteristicas;
@@ -422,6 +383,14 @@ app.put('/api/especies/:id', verificarAcceso, async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al actualizar vitrina' }); }
 });
 
+// GET: Consultar el perfil y estado de postulación del usuario actual
+app.get('/api/mi-perfil', verificarAcceso, async (req, res) => {
+    try {
+        const usuario = await User.findOne({ email: req.usuarioActual }, '-password');
+        res.json(usuario);
+    } catch (error) { res.status(500).json({ error: 'Error al obtener perfil' }); }
+});
+
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => { console.log(`Servidor activo en puerto ${PORT}`); });   
+app.listen(PORT, '0.0.0.0', () => { console.log(`Servidor activo en puerto ${PORT}`); });
