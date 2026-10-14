@@ -49,6 +49,10 @@
         <button class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
             📖 Cuaderno y Catálogo
         </button>
+
+        <button class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-territorio')">
+            🌿 Del Monte a la Plaza
+        </button>
         
         <button class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-gente')">
             🤝 Alianza Bosquesina
@@ -81,9 +85,17 @@
         <img src="blanco bosquesinos.png" alt="Logo Bosquesinos" style="max-width: 300px; margin-bottom: 20px;">
         <h1 style="color: white; font-size: 40px; margin-bottom: 15px;">Conservación en manos campesinas</h1>
         <p style="color: var(--color-brand-sage-100); font-size: 18px; margin-bottom: 30px;">Custodiando la flora nativa en el corazón de San Luis, Antioquia.</p>
+        
         <div style="display: flex; flex-direction: row; gap: 20px; justify-content: center; align-items: center; margin-top: 30px; flex-wrap: wrap;">
-            <button class="btn-primary btn-dinamico" style="width: max-content; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-brand-forest); border: 2px solid var(--color-brand-forest); white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">📖 Explorar Cuaderno y Catálogo</button>
-            <button class="btn-primary btn-dinamico" style="width: max-content; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-accent-sun); color: var(--color-text-primary); border: 2px solid var(--color-accent-sun); white-space: nowrap;" onclick="cambiarVista('vista-gente')">🤝 Alianza Bosquesina</button>
+            <!-- Botón 1: Verde Bosque -->
+            <button class="btn-primary btn-dinamico" style="width: max-content; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-brand-forest); color: #ffffff; border: 2px solid var(--color-brand-forest); white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
+                📖 Explorar Cuaderno y Catálogo
+            </button>
+            
+            <!-- Botón 2: Gemelo en tamaño y forma, color Sol/Tierra -->
+            <button class="btn-primary btn-dinamico" style="width: max-content; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-accent-sun); color: var(--color-text-primary); border: 2px solid var(--color-accent-sun); font-weight: bold; white-space: nowrap;" onclick="cambiarVista('vista-territorio')">
+                🌿 Del Monte a la Plaza
+            </button>       
         </div>
     </div>
 </section>
@@ -95,6 +107,114 @@
         <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">Conoce las historias de nuestras especies nativas. Cada plántula guarda una memoria campesina y el esfuerzo de recuperación de nuestros bosques.</p>
     </div>
     <ul id="listaPlantulas"></ul>
+</section>
+
+<!-- === NUEVA CAJA: DEL MONTE A LA PLAZA Y BITÁCORA VISUAL === -->
+<section id="vista-territorio" class="oculto" style="padding: 50px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
+    
+    <!-- ENCABEZADO Y SELECTOR DE MÓDULOS -->
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h2 style="color: var(--color-brand-forest); font-size: 34px; margin-bottom: 10px;">Territorio Vivo Bosquesino</h2>
+        <p style="color: var(--color-text-muted); max-width: 750px; margin: 0 auto 25px auto; font-size: 16px;">
+            El recorrido real de nuestra conservación: desde las lomas donde custodiamos y sembramos bajo la lluvia, hasta el encuentro con la comunidad en el parque de San Luis.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <button id="tab-plaza" class="btn-principal btn-suave" style="width: max-content; padding: 12px 24px; background: #1b4332; border-radius: 30px;" onclick="alternarSubvistaTerritorio('plaza')">
+                🧺 1. Del Monte a la Plaza (Mercados)
+            </button>
+            <button id="tab-bitacora" class="btn-classic-secondary btn-suave" style="width: max-content; padding: 12px 24px; border-radius: 30px; border: 2px solid #1b4332; color: #1b4332; font-weight: bold;" onclick="alternarSubvistaTerritorio('bitacora')">
+                🥾 2. Bitácora Visual (Salidas al Bosque)
+            </button>
+        </div>
+    </div>
+
+    <!-- SUBMÓDULO 1: DEL MONTE A LA PLAZA (MERCADOS CAMPESINOS) -->
+    <div id="subvista-plaza">
+        <div style="background: #f1f7f3; border-left: 5px solid #2d6a4f; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h3 style="color: #1b4332; margin-top: 0;">🧺 Mercados Campesinos San Luis</h3>
+            <p style="color: #354f52; font-size: 14.5px; margin-bottom: 0;">
+                Cada vez que bajamos al parque principal, llevamos plántulas nativas criadas en nuestro vivero comunitario, semillas y saberes campesinos para conectar el campo con el pueblo.
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+            <!-- Tarjeta Jornada Octubre -->
+            <div style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #dce8e0;">
+                <img src="https://drive.google.com/thumbnail?id=1pyvWR8LHDVtZfV6M_5dclePlyVLfDvHC&sz=w1000" alt="Mercado Campesino" style="width: 100%; height: 220px; object-fit: cover;">
+                <div style="padding: 20px;">
+                    <span style="background: #e9f5ed; color: #2d6a4f; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px;">📍 Parque Principal San Luis • Octubre 2026</span>
+                    <h4 style="color: #1b4332; margin: 12px 0 8px 0; font-size: 18px;">Jornada de Octubre: Vivero en la Plaza</h4>
+                    <p style="color: #555; font-size: 13.5px; line-height: 1.5;">
+                        Exhibición de especies nativas listas para adopción y diálogo directo con las familias sanluisanas sobre el cuidado de nuestras cuencas.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tarjeta Jornada Septiembre 1 -->
+            <div style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #dce8e0;">
+                <img src="https://drive.google.com/thumbnail?id=1x_val35a-NsFuVwPPdxVR7ZEKnUIC4Kf&sz=w1000" alt="Comunidad Bosquesina" style="width: 100%; height: 220px; object-fit: cover;">
+                <div style="padding: 20px;">
+                    <span style="background: #e9f5ed; color: #2d6a4f; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px;">📍 San Luis, Antioquia • Septiembre 2026</span>
+                    <h4 style="color: #1b4332; margin: 12px 0 8px 0; font-size: 18px;">Encuentro de Saberes y Semillas</h4>
+                    <p style="color: #555; font-size: 13.5px; line-height: 1.5;">
+                        Reconocimiento de árboles maderables y frutales nativos junto a los productores y custodios de las veredas.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tarjeta Jornada Septiembre 2 -->
+            <div style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #dce8e0;">
+                <img src="https://drive.google.com/thumbnail?id=1rHzkyriuCkhqdqhYI0idqqZQNvgGKAZe&sz=w1000" alt="Muestra Campesina" style="width: 100%; height: 220px; object-fit: cover;">
+                <div style="padding: 20px;">
+                    <span style="background: #e9f5ed; color: #2d6a4f; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px;">🌱 Economía Regenerativa • Septiembre 2026</span>
+                    <h4 style="color: #1b4332; margin: 12px 0 8px 0; font-size: 18px;">Alianza Campo y Pueblo</h4>
+                    <p style="color: #555; font-size: 13.5px; line-height: 1.5;">
+                        Cada ejemplar entregado en la plaza respalda directamente el trabajo de recolección y viverismo en las fincas custodias.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBMÓDULO 2: BITÁCORA VISUAL (SALIDAS AL BOSQUE) -->
+    <div id="subvista-bitacora" class="oculto">
+        <div style="background: #fffaf8; border-left: 5px solid #e07a5f; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <h3 style="color: #c15539; margin-top: 0;">🥾 Bitácora de Expediciones y Siembra</h3>
+            <p style="color: #555; font-size: 14.5px; margin-bottom: 0;">
+                Detrás de cada plántula en bolsa hay kilómetros de loma, monitoreo fenológico, ascenso a árboles madre y jornadas de reforestación comunitaria.
+            </p>
+        </div>
+
+        <!-- Línea de tiempo de expediciones -->
+        <div style="display: flex; flex-direction: column; gap: 20px; max-width: 850px; margin: 0 auto;">
+            
+            <!-- Entrada 1: La jornada de ayer bajo la lluvia -->
+            <div style="background: #fff; border: 1px solid #dce8e0; border-left: 6px solid #1b4332; border-radius: 10px; padding: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                    <span style="background: #1b4332; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 15px;">🌧️ JORNADA DE SIEMBRA</span>
+                    <span style="color: #52796f; font-size: 12px; font-weight: bold;">Octubre 2026 • Montañas de San Luis</span>
+                </div>
+                <h4 style="color: #1b4332; font-size: 19px; margin: 5px 0 10px 0;">Hombro a hombro con la montaña: 1 km de ascenso en canasta</h4>
+                <p style="color: #444; font-size: 14px; line-height: 1.6; margin: 0;">
+                    Jornada intensiva de plantación en lomas de alta pendiente. Pese al barro liso y la fuerte brisa de temporada de lluvias, el equipo transportó los árboles en canasta durante un kilómetro de ascenso para devolverle cobertura nativa a la montaña.
+                </p>
+            </div>
+
+            <!-- Entrada 2: Monitoreo y recolección -->
+            <div style="background: #fff; border: 1px solid #dce8e0; border-left: 6px solid #e07a5f; border-radius: 10px; padding: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                    <span style="background: #e07a5f; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 15px;">🌲 SALIDA AL BOSQUE</span>
+                    <span style="color: #52796f; font-size: 12px; font-weight: bold;">Septiembre 2026 • Bosques Nativos</span>
+                </div>
+                <h4 style="color: #1b4332; font-size: 19px; margin: 5px 0 10px 0;">Identificación de Árboles Semilleros y Fenología</h4>
+                <p style="color: #444; font-size: 14px; line-height: 1.6; margin: 0;">
+                    Recorrido de custodia forestal para verificar el estado de floración y maduración de frutos en árboles madre, registrando coordenadas protegidas para asegurar la trazabilidad genética de nuestras próximas cosechas.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
 </section>
 
 <!-- === CAJA 3: GENTE BOSQUESINA === -->
@@ -889,7 +1009,7 @@ function cambiarVista(idVistaDestino) {
     if (idVistaDestino === 'panelAdmin' && !esGestor) {
         idVistaDestino = 'vista-catalogo';
     }
-    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin', 'vista-legal'];
+    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin', 'vista-legal','vista-territorio'];
     vistas.forEach(vista => {
         const elemento = document.getElementById(vista);
         if (elemento) { 
@@ -910,6 +1030,29 @@ function cambiarVista(idVistaDestino) {
         nav.classList.remove('oculto'); 
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function alternarSubvistaTerritorio(subvista) {
+    const divPlaza = document.getElementById('subvista-plaza');
+    const divBitacora = document.getElementById('subvista-bitacora');
+    const tabPlaza = document.getElementById('tab-plaza');
+    const tabBitacora = document.getElementById('tab-bitacora');
+
+    if (subvista === 'plaza') {
+        divPlaza.classList.remove('oculto');
+        divBitacora.classList.add('oculto');
+        tabPlaza.style.background = '#1b4332';
+        tabPlaza.style.color = '#ffffff';
+        tabBitacora.style.background = 'transparent';
+        tabBitacora.style.color = '#1b4332';
+    } else {
+        divPlaza.classList.add('oculto');
+        divBitacora.classList.remove('oculto');
+        tabBitacora.style.background = '#1b4332';
+        tabBitacora.style.color = '#ffffff';
+        tabPlaza.style.background = 'transparent';
+        tabPlaza.style.color = '#1b4332';
+    }
 }
 
 function enviarInteresWhatsApp() {
