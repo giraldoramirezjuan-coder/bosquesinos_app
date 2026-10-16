@@ -336,7 +336,7 @@ app.post('/api/reset-password', async (req, res) => {
         const resetPasswordToken = crypto.createHash('sha256').update(req.body.token).digest('hex');
         const usuario = await User.findOne({
             resetPasswordToken,
-            resetPasswordExpire: { \$gt: Date.now() }
+            resetPasswordExpire: { $gt: Date.now() }
         });
         if (!usuario) return res.status(400).json({ error: 'Código inválido o ha expirado.' });
 
