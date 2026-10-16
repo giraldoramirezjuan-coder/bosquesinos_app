@@ -117,6 +117,24 @@ const especieSchema = new mongoose.Schema({
 });
 const Especie = mongoose.model('Especie', especieSchema);
 
+// FASE 4: Territorio Vivo (Crónicas de "Del Campo a la Mesa" y "Salidas al Bosque")
+const cronicaSchema = new mongoose.Schema({
+    titulo: { type: String, required: true },
+    categoria: { 
+        type: String, 
+        enum: ['campo-mesa', 'salidas-bosque'], 
+        required: true 
+    },
+    etiquetaLugarFecha: { type: String, required: true }, // Ej: "Parque Principal San Luis • Septiembre 2026"
+    resumen: { type: String, required: true },
+    contenido: { type: String, required: true }, // Texto con etiquetas estilo foro ([img], [cita], etc.)
+    imagenPortada: { type: String, default: '' },
+    autor: { type: String, required: true },
+    estado: { type: String, enum: ['Publicado', 'Pendiente'], default: 'Publicado' },
+    fechaCreacion: { type: Date, default: Date.now }
+});
+const Cronica = mongoose.model('Cronica', cronicaSchema);
+
 // --- AUTO-CREACIÓN FUNDADOR ---
 async function crearUsuarioAdmin() {
   try {
@@ -126,6 +144,61 @@ async function crearUsuarioAdmin() {
       await new User({ email: 'bosquesinos', password: passwordEncriptada, rol: 'Fundador' }).save();
     }
   } catch (error) { console.log('Error inicial:', error); }
+}
+
+async function crearCronicasIniciales() {
+    try {
+        const cuenta = await Cronica.countDocuments();
+        if (cuenta === 0) {
+            await Cronica.insertMany([
+                {
+                    titulo: 'Septiembre en el Parque: Plántulas, semillas y saberes de nuestra tierra',
+                    categoria: 'campo-mesa',
+                    etiquetaLugarFecha: '📍 Parque Principal San Luis • Septiembre 2026',
+                    resumen: 'Bajamos de las veredas al parque principal con el vivero comunitario, cosechas frescas y la historia viva detrás de cada semilla.',
+                    imagenPortada: 'URL_FOTO_1_PARQUE', // Puedes cambiarla luego desde el editor
+                    autor: 'Equipo Bosquesinos',
+                    estado: 'Publicado',
+                    contenido: `Cada vez que bajamos de la montaña al parque principal, traemos mucho más que matas en bolsa: traemos el trabajo de las familias custodias y la memoria de nuestros bosques. En esta jornada de septiembre armamos mesa en el parque para conversar sin afán con la gente del pueblo.
+
+[titulo]El vivero comunitario en la plaza[/titulo]
+Llegamos temprano a acomodar los arbolitos nativos listos para adopción. Muchas familias se acercaron a preguntar cómo sembrarlos en sus solares y fincas para cuidar los nacimientos de agua.
+
+[img]URL_FOTO_1_PARQUE[/img]
+
+[titulo]Conversando sobre semillas y árboles madre[/titulo]
+A mitad de la mañana se armó el mostrario alrededor de la mesa. Entre vecinos y productores estuvieron reconociendo las semillas de nuestros árboles maderables y frutales, recordando cuáles sirven para darle sombra al agua y cuáles alimentan a los animales del bosque.
+
+[img]URL_FOTO_2_PARQUE[/img]
+
+[cita]Cada arbolito que alguien se lleva en la plaza respalda directamente las caminadas de recolección en el monte y la gestion de los viverons en las veredas.[/cita]
+
+[titulo]Cosecha limpia y alimento de verdad[/titulo]
+Se comparten los frutos de la tierra y preparaciones hechas en casa, demostrando que cuidar el monte y producir comida sana van de la mano.
+
+[img]URL_FOTO_3_PARQUE[/img]`
+                },
+                {
+                    titulo: 'Hombro a hombro con la montaña: 1 km de ascenso con los árboles al hombro',
+                    categoria: 'salidas-bosque',
+                    etiquetaLugarFecha: '🌧️ Montañas de San Luis • Octubre 2026',
+                    resumen: 'Subida en canasta por loma empinada y barro liso bajo el aguacero para devolverle el monte a la cordillera.',
+                    imagenPortada: '',
+                    autor: 'Equipo Bosquesinos',
+                    estado: 'Publicado',
+                    contenido: `Detrás de cada plántula que germina en el vivero hay kilómetros de trocha, loma parada y botas embarradas. En esta salida nos fuimos a sembrar en una ladera alta donde la montaña pedía árboles a gritos.
+
+[titulo]Jornada en la montaña de la vereda La Linda[/titulo]
+Aunque el clima nos recibió con aguacero y viento frío, nos repartimos el peso en canastas y arrancamos el ascenso de la montaña por el barro liso. Cuando el terreno se pone pesado es cuando más se mira el trabajo en equipo.
+
+[cita]Sembrar en temporada de lluvias cuesta el doble en la subida, pero es la garantía de que el arbolito agarre raíz firme en su nueva tierra.[/cita]
+
+Al final de la tarde dejamos los árboles bien plantados, sabiendo que en unos años esa loma volverá a ser abrigo para el agua y los animales del cañón.`
+                }
+            ]);
+            console.log('Crónicas iniciales de Territorio Vivo creadas.');
+        }
+    } catch (e) { console.log('Error creando crónicas iniciales:', e); }
 }
 
 // --- MIDDLEWARE DE SEGURIDAD ---
@@ -144,9 +217,51 @@ function soloGestores(req, res, next) {
     if (req.rol === 'Fundador' || req.rol === 'Custodio') {
         next();
     } else {
-        return res.status(403).json({ error: 'Acceso denegado: Se requiere rango de Custodio o Fundador.' });
+        return res.status(403).json({ error: 'Solo Custodios y Fundadores pueden realizar esta acción.' });
     }
 }
+
+app.get('/api/cronicas', async (req, res) => {
+    try {
+        const cronicas = await Cronica.find({ estado: 'Publicado' }).sort({ fechaCreacion: -1 });
+        res.json(cronicas);
+    } catch (error) { res.status(500).json({ error: 'Error al cargar las crónicas' }); }
+});
+
+
+app.post('/api/cronicas', verificarAcceso, async (req, res) => {
+    try {
+        const { titulo, categoria, etiquetaLugarFecha, resumen, contenido, imagenPortada } = req.body;
+        const estadoInicial = (req.rol === 'Fundador' || req.rol === 'Custodio') ? 'Publicado' : 'Pendiente';
+        
+        const nueva = new Cronica({
+            titulo, categoria, etiquetaLugarFecha, resumen, contenido, imagenPortada,
+            autor: req.usuarioActual,
+            estado: estadoInicial
+        });
+        await nueva.save();
+        
+        const msj = estadoInicial === 'Publicado' 
+            ? '¡Crónica publicada en Territorio Vivo!' 
+            : '¡Tu relato fue enviado! Un Fundador lo revisará para publicarlo.';
+        res.status(201).json({ mensaje: msj, cronica: nueva });
+    } catch (error) { res.status(400).json({ error: 'Completa todos los campos del relato.' }); }
+});
+
+app.put('/api/cronicas/:id', verificarAcceso, soloGestores, async (req, res) => {
+    try {
+        const actualizada = await Cronica.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json({ mensaje: 'Crónica actualizada con éxito', cronica: actualizada });
+    } catch (error) { res.status(500).json({ error: 'Error al actualizar la crónica' }); }
+});
+
+app.delete('/api/cronicas/:id', verificarAcceso, async (req, res) => {
+    try {
+        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo un Fundador puede borrar crónicas.' });
+        await Cronica.findByIdAndDelete(req.params.id);
+        res.json({ mensaje: 'Crónica eliminada' });
+    } catch (error) { res.status(500).json({ error: 'Error al eliminar' }); }
+});
 
 // =======================================================
 //   RUTAS PÚBLICAS
