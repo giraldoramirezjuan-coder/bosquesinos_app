@@ -44,22 +44,23 @@
         <img src="bosquesinos.png" alt="Logo Bosquesinos" style="height: 55px; object-fit: contain;">
     </div>
     <!-- LADO DERECHO: BOTONES -->
-    <div style="display: flex; flex-direction: row; gap: 12px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: row; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
         
-        <button class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
+        <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
             📖 Cuaderno y Catálogo
         </button>
 
-        <button class="btn-classic-secondary btn-suave oculto" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-territorio')">
-            🌿 Del Monte a la Plaza
+        <!-- AHORA SÍ VISIBLE EN TODA LA PÁGINA -->
+        <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-territorio')">
+            🌿 Territorio Vivo
         </button>
         
-        <button class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-gente')">
+        <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-gente')">
             🤝 Alianza Bosquesina
         </button>
 
         <!-- BOTÓN EXCLUSIVO PARA VIGÍAS: Postular a Custodio -->
-        <button id="btn-nav-postular" class="btn-classic-secondary btn-suave oculto" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; background: #e9f5ed; border-color: #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalPostulacion()">
+        <button id="btn-nav-postular" class="btn-classic-secondary btn-suave oculto" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; background: #e9f5ed; border-color: #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalPostulacion()">
             🌱 Postular a Custodio
         </button>
 
@@ -67,12 +68,12 @@
         <span id="badge-usuario-activo" class="badge-rol oculto"></span>
 
         <!-- BOTÓN PÚBLICO: Iniciar Sesión (Se oculta si ya ingresó) -->
-        <button id="btn-nav-login" class="btn-classic-secondary btn-suave" style="width: max-content; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; border-color: var(--color-brand-forest); color: var(--color-brand-forest); font-weight: bold;" onclick="document.getElementById('modalLoginClasico').classList.remove('oculto')">
+        <button id="btn-nav-login" class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; border-color: var(--color-brand-forest); color: var(--color-brand-forest); font-weight: bold;" onclick="document.getElementById('modalLoginClasico').classList.remove('oculto')">
             👤 Iniciar Sesión
         </button>
 
-        <!-- BOTÓN SECRETO: Panel Interno (Solo visible para Fundador y Custodio) -->
-        <button id="btn-nav-admin" class="btn-classic-secondary btn-suave oculto" style="margin: 0; padding: 6px 10px; font-size: 18px; border-radius: 50%; border-color: var(--color-accent-sun); color: var(--color-accent-sun); display: flex; align-items: center; justify-content: center;" onclick="cambiarVista('panelAdmin')" title="Panel de Control">
+        <!-- BOTÓN SECRETO: Panel Interno (Tamaño compacto redondo corregido) -->
+        <button id="btn-nav-admin" class="btn-classic-secondary btn-suave oculto" style="width: 40px !important; height: 40px !important; min-width: 40px !important; margin: 0; padding: 0; font-size: 18px; border-radius: 50%; border: 2px solid var(--color-brand-forest); background: #f2f8f4; color: var(--color-brand-forest); display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;" onclick="cambiarVista('panelAdmin')" title="Panel de Control Vivero">
             ⚙️
         </button>
     </div>
@@ -87,14 +88,12 @@
         <p style="color: var(--color-brand-sage-100); font-size: 18px; margin-bottom: 30px;">Custodiando la flora nativa en el corazón de San Luis, Antioquia.</p>
         
         <div style="display: flex; flex-direction: row; gap: 20px; justify-content: center; align-items: center; margin-top: 30px; flex-wrap: wrap;">
-            <!-- Botón 1: Verde Bosque -->
-            <button class="btn-primary btn-dinamico" style="width: max-content; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-brand-forest); color: #ffffff; border: 2px solid var(--color-brand-forest); white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
+            <button class="btn-primary btn-dinamico" style="width: max-content !important; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-brand-forest); color: #ffffff; border: 2px solid var(--color-brand-forest); white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
                 📖 Explorar Cuaderno y Catálogo
             </button>
             
-            <!-- Botón 2: Gemelo en tamaño y forma, color Sol/Tierra -->
-            <button class="btn-primary btn-dinamico" style="width: max-content; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-accent-sun); color: var(--color-text-primary); border: 2px solid var(--color-accent-sun); font-weight: bold; white-space: nowrap;" onclick="cambiarVista('vista-territorio')">
-                🌿 Del Monte a la Plaza
+            <button class="btn-primary btn-dinamico" style="width: max-content !important; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-accent-sun); color: var(--color-text-primary); border: 2px solid var(--color-accent-sun); font-weight: bold; white-space: nowrap;" onclick="cambiarVista('vista-territorio')">
+                🌿 Territorio Vivo
             </button>       
         </div>
     </div>
@@ -109,52 +108,75 @@
     <ul id="listaPlantulas"></ul>
 </section>
 
-<!-- SECCIÓN: TERRITORIO VIVO BOSQUESINO -->
-<section id="vista-territorio" style="max-width: 1050px; margin: 0 auto; padding: 20px;">
+<!-- === CAJA 2.5: TERRITORIO VIVO BOSQUESINO (CON CLASE OCULTO CORREGIDA) === -->
+<section id="vista-territorio" class="oculto" style="max-width: 1050px; margin: 0 auto; padding: 40px 20px; min-height: 80vh;">
   <div style="text-align: center; margin-bottom: 28px;">
     <h1 style="color: #0d4a29; font-size: 2.2rem; margin-bottom: 10px;">Territorio Vivo Bosquesino</h1>
     <p style="color: #4a5d52; max-width: 680px; margin: 0 auto 22px; font-size: 1.05rem;">
       El recorrido real de nuestra gente: desde las trochas donde cuidamos los árboles madre y sembramos bajo el agua, hasta el encuentro en el parque de San Luis.
     </p>
 
-    <!-- BOTONES DE NAVEGACIÓN LIMPIOS Y MONTAÑEROS -->
-    <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+    <!-- BOTONES DE NAVEGACIÓN COMPACTOS Y MONTAÑEROS -->
+    <div style="display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap;">
       <button id="tab-campo-mesa" onclick="cambiarCategoriaTerritorio('campo-mesa')" 
-              style="padding: 12px 24px; border-radius: 30px; border: 2px solid #0d4a29; background: #0d4a29; color: white; font-weight: bold; cursor: pointer; font-size: 1rem;">
+              style="width: max-content !important; padding: 12px 26px; border-radius: 30px; border: 2px solid #0d4a29; background: #0d4a29; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; margin: 0;">
         🌱 Del Campo a la Mesa
       </button>
       <button id="tab-salidas-bosque" onclick="cambiarCategoriaTerritorio('salidas-bosque')" 
-              style="padding: 12px 24px; border-radius: 30px; border: 2px solid #0d4a29; background: white; color: #0d4a29; font-weight: bold; cursor: pointer; font-size: 1rem;">
+              style="width: max-content !important; padding: 12px 26px; border-radius: 30px; border: 2px solid #0d4a29; background: white; color: #0d4a29; font-weight: bold; cursor: pointer; font-size: 1rem; margin: 0;">
         🥾 Salidas al Bosque
       </button>
-      <!-- Botón para abrir el Editor estilo Foro (Visible si inició sesión) -->
-      <button id="btn-abrir-editor-cronica" onclick="toggleEditorCronica()" 
-              style="display: none; padding: 12px 22px; border-radius: 30px; border: none; background: #c86428; color: white; font-weight: bold; cursor: pointer; font-size: 0.95rem;">
+      <button id="btn-abrir-editor-cronica" onclick="accionBotonPublicar()" 
+              style="width: max-content !important; padding: 12px 24px; border-radius: 30px; border: none; background: #c86428; color: white; font-weight: bold; cursor: pointer; font-size: 0.98rem; margin: 0; box-shadow: 0 4px 12px rgba(200,100,40,0.25);">
         ✍️ Contar una Historia / Reporte
       </button>
     </div>
   </div>
 
   <!-- BANNER DESCRIPTIVO DINÁMICO SEGÚN LA PESTAÑA -->
-  <div id="banner-categoria-territorio" style="background: #f2f8f4; border-left: 5px solid #0d4a29; padding: 16px 20px; border-radius: 10px; margin-bottom: 25px;">
-    <h3 id="titulo-banner-territorio" style="margin: 0 0 6px 0; color: #0d4a29;">🌱 Del Campo a la Mesa</h3>
-    <p id="desc-banner-territorio" style="margin: 0; color: #3b4d43;">
-      Cada vez que bajamos de las veredas al parque, traemos arbolitos nativos criados en nuestro vivero comunitario, cosechas limpias y la palabra de quienes cuidan la tierra.
-    </p>
+  <div id="banner-categoria-territorio" style="background: #f2f8f4; border-left: 5px solid #0d4a29; padding: 18px 22px; border-radius: 10px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div style="flex: 1; min-width: 260px;">
+      <h3 id="titulo-banner-territorio" style="margin: 0 0 6px 0; color: #0d4a29;">🌱 Del Campo a la Mesa</h3>
+      <p id="desc-banner-territorio" style="margin: 0; color: #3b4d43;">
+        Cada vez que bajamos de las veredas al parque, traemos arbolitos nativos criados en nuestro vivero comunitario, cosechas limpias y la palabra de quienes cuidan la tierra.
+      </p>
+    </div>
+    <!-- CAJITA PARA ANIMAR A LA COMUNIDAD A ESCRIBIR -->
+    <div style="background: #ffffff; border: 1px dashed #74c69d; padding: 12px 16px; border-radius: 10px; text-align: left; max-width: 320px;">
+      <strong style="color: #0d4a29; font-size: 0.9rem; display: block; margin-bottom: 4px;">🌿 ¿Estuviste en una siembra o en la plaza?</strong>
+      <span style="font-size: 0.82rem; color: #52796f; display: block; margin-bottom: 8px;">Anímate a dejar el recuerdo con tus propias palabras. Tenemos una guía de 3 pregunticas para ayudarte.</span>
+      <button type="button" onclick="accionBotonPublicar()" style="width: max-content !important; background: #e9f5ed; color: #0d4a29; border: 1px solid #0d4a29; padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: bold; cursor: pointer; margin: 0;">
+        ✨ Escribir mi relato guiado
+      </button>
+    </div>
   </div>
 
   <!-- =========================================================
-       EDITOR ESTILO FORO SA-MP CON BARRA DE COMANDOS Y VISTA PREVIA
+       EDITOR ESTILO FORO SA-MP CON MODO GUIADO Y VISTA PREVIA
        ========================================================= -->
   <div id="panel-editor-cronica" style="display: none; background: #ffffff; border: 2px solid #d4e3da; border-radius: 14px; padding: 24px; margin-bottom: 35px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
       <h2 id="titulo-modal-editor" style="margin: 0; color: #0d4a29;">✍️ Armar Crónica Bosquesina</h2>
-      <div>
-        <button type="button" onclick="toggleManualReportero()" style="background: #eef5f0; color: #0d4a29; border: 1px solid #0d4a29; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600;">
-          📖 Manual para publicar bonito
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button type="button" onclick="toggleAsistenteRapidito()" style="width: max-content !important; margin: 0; background: #fff4ec; color: #b85418; border: 1px solid #e0a882; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+          🪄 Armar con 3 preguntas (Fácil)
         </button>
-        <button type="button" onclick="cargarPlantillaBase()" style="background: #fff4ec; color: #b85418; border: 1px solid #e0a882; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-left: 6px;">
-          🪄 Cargar Plantilla Lista
+        <button type="button" onclick="toggleManualReportero()" style="width: max-content !important; margin: 0; background: #eef5f0; color: #0d4a29; border: 1px solid #0d4a29; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+          📖 Consejos para publicar
+        </button>
+      </div>
+    </div>
+
+    <!-- ASISTENTE DE 3 PREGUNTAS PARA QUE LA GENTE SE ANIME A PUBLICAR SIN MIEDO -->
+    <div id="caja-asistente-rapido" style="display: none; background: #fffaf5; border: 2px solid #f3d4be; border-radius: 10px; padding: 16px; margin-bottom: 18px;">
+      <h4 style="margin: 0 0 8px 0; color: #b85418;">🪄 Responde estas 3 preguntas como si se lo contaras a un vecino y nosotros te armamos el formato:</h4>
+      <div style="display: grid; gap: 10px;">
+        <input type="text" id="asist-p1" placeholder="1. ¿A qué vereda o lugar fueron, cómo estaba el clima y quiénes estuvieron?" style="margin: 0 !important; padding: 10px !important;">
+        <input type="text" id="asist-p2" placeholder="2. ¿Qué hicieron en la jornada? (Ej: sembramos abarco, charlamos en el parque...)" style="margin: 0 !important; padding: 10px !important;">
+        <input type="text" id="asist-p3" placeholder="3. ¿Qué enseñanza, frase bonita o anécdota les dejó el día?" style="margin: 0 !important; padding: 10px !important;">
+        <input type="text" id="asist-foto" placeholder="Opcional: Pega aquí el link de una foto de ese día" style="margin: 0 !important; padding: 10px !important;">
+        <button type="button" onclick="generarDesdeAsistente()" style="width: max-content !important; background: #c86428; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 0;">
+          ✨ Pasar mis respuestas al editor
         </button>
       </div>
     </div>
@@ -163,9 +185,9 @@
     <div id="caja-manual-reportero" style="display: none; background: #f9fbf9; border: 1px dashed #7ba68c; border-radius: 10px; padding: 16px; margin-bottom: 18px; font-size: 0.93rem; color: #2c3e35;">
       <h4 style="margin-top: 0; color: #0d4a29;">🌲 ¿Cómo armar un reporte que dé gusto leer?</h4>
       <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-        <li><strong>Habla como en la trocha o en la plaza:</strong> No uses palabras raras ni de oficina. Cuenta cómo estaba el clima, qué vereda visitaron, quiénes ayudaron y qué sembraron o compartieron.</li>
-        <li><strong>Revisa que la fecha sea la real:</strong> Si varias fotos son del mismo día de mercado o de la misma caminada, mételas todas dentro de esta misma historia usando el botón <strong>[📷 Foto]</strong> en lugar de crear fichas sueltas con fechas distintas.</li>
-        <li><strong>Usa los botones de arriba del cuadro:</strong> Selecciona un pedazo de texto o haz clic en <strong>[Subtítulo]</strong> para separar los momentos del día, y usa <strong>[💬 Saber / Frase]</strong> para resaltar algo bonito que haya dicho un campesino o compañero.</li>
+        <li><strong>Habla con naturalidad:</strong> Cuenta cómo estaba el camino, qué vereda visitaron y qué compartieron.</li>
+        <li><strong>Unifica las fotos del mismo día:</strong> Si tienes 2 o 3 fotos de la misma jornada, mételas todas en este mismo relato usando el botón <strong>[📷 Insertar Foto]</strong>.</li>
+        <li><strong>Usa la barra de botones:</strong> Pon <strong>[H Subtítulo]</strong> para separar momentos y <strong>[💬 Resaltar Saber]</strong> para destacar una enseñanza campesina.</li>
       </ul>
     </div>
 
@@ -181,7 +203,7 @@
       </div>
       <div>
         <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Lugar y Mes real (Etiqueta superior)</label>
-        <input type="text" id="cronica-etiqueta" placeholder="Ej: 📍 Parque de San Luis • Septiembre 2026" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
+        <input type="text" id="cronica-etiqueta" oninput="actualizarVistaPrevia()" placeholder="Ej: 📍 Parque de San Luis • Septiembre 2026" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
       </div>
     </div>
 
@@ -196,35 +218,36 @@
         <input type="text" id="cronica-resumen" oninput="actualizarVistaPrevia()" placeholder="Una frase que invite a leer la historia completa..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
       </div>
       <div>
-        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Foto principal de portada (Link / Ruta)</label>
-        <input type="text" id="cronica-portada" oninput="actualizarVistaPrevia()" placeholder="Ej: https://... o nombre de foto" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
+        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Foto principal de portada (Opcional)</label>
+        <input type="text" id="cronica-portada" oninput="actualizarVistaPrevia()" placeholder="Pega el enlace (https://...) de la foto principal" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
       </div>
     </div>
 
     <!-- BARRA DE COMANDOS ESTILO FORO SA-MP -->
     <div style="background: #eef5f0; padding: 8px 10px; border-radius: 8px 8px 0 0; border: 1px solid #c5d9cc; border-bottom: none; display: flex; gap: 8px; flex-wrap: wrap;">
-      <button type="button" onclick="insertarTag('[b]', '[/b]')" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; cursor: pointer; font-weight: bold;">B Negrita</button>
-      <button type="button" onclick="insertarTag('[titulo]', '[/titulo]')" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; cursor: pointer; color: #0d4a29; font-weight: bold;">H Subtítulo de Momento</button>
-      <button type="button" onclick="insertarFotoTag()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; cursor: pointer;">📷 Insertar Foto en el relato</button>
-      <button type="button" onclick="insertarTag('[cita]', '[/cita]')" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; cursor: pointer;">💬 Resaltar Saber / Frase</button>
+      <button type="button" onclick="insertarTag('[b]', '[/b]')" style="width: max-content !important; margin: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; color: #1b4332; cursor: pointer; font-weight: bold;">B Negrita</button>
+      <button type="button" onclick="insertarTag('[titulo]', '[/titulo]')" style="width: max-content !important; margin: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; color: #0d4a29; cursor: pointer; font-weight: bold;">H Subtítulo de Momento</button>
+      <button type="button" onclick="insertarFotoTag()" style="width: max-content !important; margin: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; color: #1b4332; cursor: pointer;">📷 Insertar Foto en el relato</button>
+      <button type="button" onclick="insertarTag('[cita]', '[/cita]')" style="width: max-content !important; margin: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; color: #1b4332; cursor: pointer;">💬 Resaltar Saber / Frase</button>
+      <button type="button" onclick="cargarPlantillaBase()" style="width: max-content !important; margin: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid #e0a882; background: #fff4ec; color: #b85418; cursor: pointer;">📋 Poner Esqueleto Ejemplo</button>
     </div>
 
     <!-- PANEL DIVIDIDO: ESCRIBIR A LA IZQUIERDA, VISTA PREVIA EN VIVO A LA DERECHA -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
       <div>
-        <textarea id="cronica-contenido" rows="12" oninput="actualizarVistaPrevia()" placeholder="Escribe aquí toda la historia con tus propias palabras..." style="width: 100%; padding: 12px; border-radius: 0 0 8px 8px; border: 1px solid #c5d9cc; font-family: inherit; font-size: 0.95rem; line-height: 1.5; resize: vertical;"></textarea>
+        <textarea id="cronica-contenido" rows="12" oninput="actualizarVistaPrevia()" placeholder="Escribe aquí toda la historia con tus propias palabras..." style="width: 100%; padding: 12px; border-radius: 0 0 8px 8px; border: 1px solid #c5d9cc; font-family: inherit; font-size: 0.95rem; line-height: 1.5; resize: vertical; box-sizing: border-box;"></textarea>
       </div>
-      <div style="background: #fcfdfc; border: 1px solid #d4e3da; border-radius: 0 0 8px 8px; padding: 16px; max-height: 340px; overflow-y: auto;">
+      <div style="background: #fcfdfc; border: 1px solid #d4e3da; border-radius: 0 0 8px 8px; padding: 16px; max-height: 360px; overflow-y: auto;">
         <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: #6c8577; margin-bottom: 10px; font-weight: bold;">
-          👁️ Vista Previa en Vivo (Así se verá publicado)
+          👁️ Vista Previa en Vivo (Así quedará publicado)
         </div>
         <div id="vista-previa-vivo"></div>
       </div>
     </div>
 
     <div style="margin-top: 18px; display: flex; justify-content: flex-end; gap: 12px;">
-      <button type="button" onclick="toggleEditorCronica()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #aaa; background: white; cursor: pointer;">Cancelar</button>
-      <button type="button" onclick="guardarCronica()" style="padding: 10px 24px; border-radius: 8px; border: none; background: #0d4a29; color: white; font-weight: bold; cursor: pointer;">
+      <button type="button" onclick="toggleEditorCronica()" style="width: max-content !important; margin: 0; padding: 10px 20px; border-radius: 8px; border: 1px solid #aaa; background: white; color: #333; cursor: pointer;">Cancelar</button>
+      <button type="button" onclick="guardarCronica()" style="width: max-content !important; margin: 0; padding: 10px 24px; border-radius: 8px; border: none; background: #0d4a29; color: white; font-weight: bold; cursor: pointer;">
         🚀 Publicar Crónica
       </button>
     </div>
@@ -578,35 +601,122 @@ const hostUrl = 'https://bosquesinos-sanluis.onrender.com';
 
 let categoriaTerritorioActual = 'campo-mesa';
 let listaCronicasGlobal = [];
+let sesionIniciada = false;
+let esGestor = false;
+window.especiesGlobal = []; 
+window.lotesGlobal = []; 
+window.arbolesMatrizGlobal = [];
+let especieActualId = null; 
+let especieSeleccionadaMicrositio = null;
+let especieInventarioActiva = null;
+let carrito = [];
 
-// 1. TRADUCTOR DE COMANDOS ESTILO FORO SA-MP A HTML BONITO
-function formatearTextoForo(textoCrudo) {
-    if (!textoCrudo) return '';
-    // Escapar HTML básico por seguridad
-    let seguro = textoCrudo
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+const CRONICAS_BASE_LOCAL = [
+    {
+        _id: 'base-septiembre-parque',
+        titulo: 'Septiembre en el Parque: Plántulas, semillas y saberes de nuestra tierra',
+        categoria: 'campo-mesa',
+        etiquetaLugarFecha: '📍 Parque Principal San Luis • Septiembre 2026',
+        resumen: 'Bajamos de las veredas al parque principal con el vivero comunitario, cosechas frescas y la historia viva detrás de cada semilla.',
+        autor: 'Equipo Bosquesinos',
+        contenido: 'Cada vez que bajamos de la montaña al parque principal, traemos mucho más que matas en bolsa: traemos el trabajo de las familias custodias y la memoria de nuestros bosques. En esta jornada de septiembre armamos mesa en el parque para conversar sin afán con la gente del pueblo.\n\n[titulo]El vivero comunitario en la plaza[/titulo]\nLlegamos temprano a acomodar los arbolitos nativos listos para adopción. Muchas familias se acercaron a preguntar cómo sembrarlos en sus solares y fincas para cuidar los nacimientos de agua.\n\n[titulo]Conversando sobre semillas y árboles madre[/titulo]\nA mitad de la mañana se armó el corrillo alrededor de la mesa. Entre vecinos y productores fuimos reconociendo las semillas de nuestros árboles maderables y frutales, recordando cuáles sirven para darle sombra al agua y cuáles alimentan a los pájaros de la cordillera.\n\n[cita]Cada arbolito que alguien se lleva en la plaza respalda directamente las caminadas de recolección en el monte y el cuidado de los viveros en las veredas.[/cita]\n\n[titulo]Cosecha limpia y alimento de verdad[/titulo]\nTambién compartimos los frutos de la tierra y preparaciones hechas en casa, demostrando que cuidar el monte y producir comida sana van de la mano.'
+    },
+    {
+        _id: 'base-octubre-bosque',
+        titulo: 'Hombro a hombro con la montaña: 1 km de ascenso con los árboles en canasta',
+        categoria: 'salidas-bosque',
+        etiquetaLugarFecha: '🌧️ Montañas de San Luis • Octubre 2026',
+        resumen: 'Jornada de siembra en loma de alta pendiente. Pese al barro liso y la brisa de temporada de lluvias, subimos los árboles a pulso para devolverle abrigo a la montaña.',
+        autor: 'Equipo Bosquesinos',
+        contenido: 'Detrás de cada plántula que germina en el vivero hay kilómetros de trocha, loma parada y botas embarradas. En esta salida nos fuimos a sembrar en una ladera alta donde la montaña pedía árboles a gritos.\n\n[titulo]Subiendo la loma en canasta[/titulo]\nAunque el clima nos recibió con aguacero y viento frío, nos repartimos el peso en canastas y arrancamos el ascenso de un kilómetro por el barro liso. Cuando el terreno se pone pesado es cuando más se siente el trabajo en equipo.\n\n[cita]Sembrar en temporada de lluvias cuesta el doble en la subida, pero es la garantía de que el arbolito agarre raíz firme en su nueva tierra.[/cita]\n\nAl final de la tarde dejamos los árboles bien plantados, sabiendo que en unos años esa loma volverá a ser abrigo para el agua y los animales del cañón.'
+    }
+];
 
-    // Convertir etiquetas [b], [titulo], [cita], [img]
-    seguro = seguro
-        .replace(/[b]([\s\S]*?)\[\/b\]/gi, '<strong>\$1</strong>')
-        .replace(/[titulo]([\s\S]*?)\[\/titulo\]/gi, '<h3 style="color:#0d4a29; margin: 22px 0 8px 0; font-size: 1.25rem; border-bottom: 2px solid #e3efe7; padding-bottom: 4px;">\$1</h3>')
-        .replace(/[cita]([\s\S]*?)\[\/cita\]/gi, '<blockquote style="background:#f2f8f4; border-left: 4px solid #0d4a29; margin: 16px 0; padding: 12px 16px; border-radius: 6px; font-style: italic; color: #244232;">“\$1”</blockquote>')
-        .replace(/[img]([\s\S]*?)\[\/img\]/gi, '<div style="margin: 16px 0; text-align: center;"><img src="\$1" alt="Foto de la jornada" style="max-width: 100%; max-height: 440px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 14px rgba(0,0,0,0.08);" onerror="this.style.display=\'none\'"></div>');
-
-    // Convertir saltos de línea en párrafos naturales
-    return seguro.split(/\n\n+/).map(parrafo => {
-        if (parrafo.trim().startsWith('<h3') || parrafo.trim().startsWith('<blockquote') || parrafo.trim().startsWith('<div')) {
-            return parrafo;
-        }
-        return `<p style="line-height: 1.75; color: #36493e; margin-bottom: 14px; font-size: 1.02rem;">${parrafo.replace(/\n/g, '<br>')}</p>`;
-    }).join('');
+function obtenerCabecerasSeguras() {
+    const tk = localStorage.getItem('tokenAdmin') || localStorage.getItem('token') || '';
+    return { 
+        'Content-Type': 'application/json', 
+        'Authorization': 'Bearer ' + tk 
+    };
 }
 
-// 2. FUNCIONES DE LA BARRA DE HERRAMIENTAS Y VISTA PREVIA
+function usuarioPuedeGestionar() {
+    const rol = localStorage.getItem('rolUsuario') || localStorage.getItem('rol') || '';
+    return (rol === 'Fundador' || rol === 'Custodio' || rol === 'Admin');
+}
+
+// 1. TRADUCTOR DE COMANDOS ESTILO FORO SA-MP (SIN REGEX COMPLEJOS)
+function formatearTextoForo(textoCrudo) {
+    if (!textoCrudo) return '';
+    let seguro = String(textoCrudo)
+        .split('&').join('&amp;')
+        .split('<').join('&lt;')
+        .split('>').join('&gt;');
+
+    seguro = seguro
+        .split('[b]').join('<strong>')
+        .split('[/b]').join('</strong>')
+        .split('[titulo]').join('<h3 style="color:#0d4a29; margin: 22px 0 8px 0; font-size: 1.25rem; border-bottom: 2px solid #e3efe7; padding-bottom: 4px;">')
+        .split('[/titulo]').join('</h3>')
+        .split('[cita]').join('<blockquote style="background:#f2f8f4; border-left: 4px solid #0d4a29; margin: 16px 0; padding: 12px 16px; border-radius: 6px; font-style: italic; color: #244232;">“')
+        .split('[/cita]').join('”</blockquote>')
+        .split('[img]').join('<div style="margin: 16px 0; text-align: center;"><img src="')
+        .split('[/img]').join('" alt="Foto de la jornada" style="max-width: 100%; max-height: 440px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 14px rgba(0,0,0,0.08);"></div>');
+
+    const bloques = seguro.split('\n\n');
+    let htmlFinal = '';
+    for (let i = 0; i < bloques.length; i++) {
+        const p = bloques[i].trim();
+        if (!p) continue;
+        if (p.indexOf('<h3') === 0 || p.indexOf('<blockquote') === 0 || p.indexOf('<div') === 0) {
+            htmlFinal += p;
+        } else {
+            htmlFinal += '<p style="line-height: 1.75; color: #36493e; margin-bottom: 14px; font-size: 1.02rem;">' + p.split('\n').join('<br>') + '</p>';
+        }
+    }
+    return htmlFinal;
+}
+
+// 2. FUNCIONES DEL EDITOR Y VISTA PREVIA
+function accionBotonPublicar() {
+    const tk = localStorage.getItem('tokenAdmin') || localStorage.getItem('token');
+    if (!tk) {
+        alert('🌿 Inicia sesión con tu cuenta Bosquesina (o regístrate gratis) para compartir una historia o reporte.');
+        document.getElementById('modalLoginClasico').classList.remove('oculto');
+        return;
+    }
+    toggleEditorCronica();
+}
+
+function toggleAsistenteRapidito() {
+    const caja = document.getElementById('caja-asistente-rapido');
+    if (!caja) return;
+    caja.style.display = (caja.style.display === 'none') ? 'block' : 'none';
+}
+
+function generarDesdeAsistente() {
+    const p1 = document.getElementById('asist-p1').value.trim();
+    const p2 = document.getElementById('asist-p2').value.trim();
+    const p3 = document.getElementById('asist-p3').value.trim();
+    const foto = document.getElementById('asist-foto').value.trim();
+
+    let armado = '';
+    if (p1) armado += p1 + '\n\n';
+    if (p2) armado += '[titulo]Lo que vivimos en la jornada[/titulo]\n' + p2 + '\n\n';
+    if (foto) armado += '[img]' + foto + '[/img]\n\n';
+    if (p3) armado += '[cita]' + p3 + '[/cita]';
+
+    document.getElementById('cronica-contenido').value = armado.trim();
+    if (!document.getElementById('cronica-resumen').value && p1) {
+        document.getElementById('cronica-resumen').value = p1.substring(0, 120);
+    }
+    actualizarVistaPrevia();
+    document.getElementById('caja-asistente-rapido').style.display = 'none';
+}
+
 function insertarTag(apertura, cierre) {
     const area = document.getElementById('cronica-contenido');
+    if (!area) return;
     const inicio = area.selectionStart;
     const fin = area.selectionEnd;
     const seleccionado = area.value.substring(inicio, fin) || 'Escribe aquí';
@@ -616,53 +726,60 @@ function insertarTag(apertura, cierre) {
 }
 
 function insertarFotoTag() {
-    const url = prompt('Pega aquí el enlace (URL) o ruta de la foto de la jornada:');
+    const url = prompt('Pega aquí el enlace (URL) de la foto de la jornada:');
     if (!url) return;
     const area = document.getElementById('cronica-contenido');
-    area.value += `\n\n[img]${url.trim()}[/img]\n\n`;
+    area.value += '\n\n[img]' + url.trim() + '[/img]\n\n';
     actualizarVistaPrevia();
 }
 
 function actualizarVistaPrevia() {
-    const titulo = document.getElementById('cronica-titulo').value || 'Título de tu crónica...';
-    const etiqueta = document.getElementById('cronica-etiqueta').value || '📍 San Luis, Antioquia • 2026';
-    const contenido = document.getElementById('cronica-contenido').value;
+    const elTitulo = document.getElementById('cronica-titulo');
+    const elEtiqueta = document.getElementById('cronica-etiqueta');
+    const elPortada = document.getElementById('cronica-portada');
+    const elContenido = document.getElementById('cronica-contenido');
+    const elPreview = document.getElementById('vista-previa-vivo');
+    if (!elPreview) return;
+
+    const titulo = (elTitulo && elTitulo.value) ? elTitulo.value : 'Título de tu crónica...';
+    const etiqueta = (elEtiqueta && elEtiqueta.value) ? elEtiqueta.value : '📍 San Luis, Antioquia • 2026';
+    const portada = (elPortada && elPortada.value) ? elPortada.value.trim() : '';
+    const contenido = (elContenido && elContenido.value) ? elContenido.value : '';
     
-    document.getElementById('vista-previa-vivo').innerHTML = `
-        <span style="display:inline-block; background:#e6f3eb; color:#0d4a29; padding:4px 12px; border-radius:20px; font-size:0.82rem; font-weight:bold; margin-bottom:8px;">${etiqueta}</span>
-        <h3 style="margin: 4px 0 12px 0; color:#132a1e;">${titulo}</h3>
-        ${formatearTextoForo(contenido)}
-    `;
+    const imgPortadaHTML = portada ? '<img src="' + portada + '" style="width:100%; max-height:220px; object-fit:cover; border-radius:10px; margin-bottom:10px;">' : '';
+
+    elPreview.innerHTML = 
+        '<span style="display:inline-block; background:#e6f3eb; color:#0d4a29; padding:4px 12px; border-radius:20px; font-size:0.82rem; font-weight:bold; margin-bottom:8px;">' + etiqueta + '</span>' +
+        '<h3 style="margin: 4px 0 12px 0; color:#132a1e;">' + titulo + '</h3>' +
+        imgPortadaHTML +
+        formatearTextoForo(contenido);
 }
 
 function cargarPlantillaBase() {
-    document.getElementById('cronica-contenido').value = 
-`Cuenta aquí en un par de líneas cómo arrancó el día, con quiénes salieron y cómo estaba el clima en la vereda o en el parque.
-
-[titulo]El trabajo de la jornada[/titulo]
-Aquí puedes contar qué hicieron paso a paso: las plántulas que bajaron, el camino por la loma o la conversa con las familias.
-
-[img]PEGA_AQUI_EL_LINK_DE_TU_FOTO[/img]
-
-[cita]Escribe aquí una enseñanza, un saber campesino o algo especial que haya pasado ese día.[/cita]`;
+    const area = document.getElementById('cronica-contenido');
+    if (!area) return;
+    area.value = 'Cuenta aquí en un par de líneas cómo arrancó el día, con quiénes salieron y cómo estaba el clima en la vereda o en el parque.\n\n[titulo]El trabajo de la jornada[/titulo]\nAquí puedes contar qué hicieron paso a paso: las plántulas que bajaron, el camino por la loma o la conversa con las familias.\n\n[img]PEGA_AQUI_EL_LINK_DE_TU_FOTO[/img]\n\n[cita]Escribe aquí una enseñanza, un saber campesino o algo especial que haya pasado ese día.[/cita]';
     actualizarVistaPrevia();
 }
 
 function toggleManualReportero() {
     const caja = document.getElementById('caja-manual-reportero');
-    caja.style.display = caja.style.display === 'none' ? 'block' : 'none';
+    if (!caja) return;
+    caja.style.display = (caja.style.display === 'none') ? 'block' : 'none';
 }
 
-function toggleEditorCronica(cronicaEditar = null) {
+function toggleEditorCronica(cronicaEditar) {
     const panel = document.getElementById('panel-editor-cronica');
+    if (!panel) return;
     if (panel.style.display === 'none' || cronicaEditar) {
         panel.style.display = 'block';
-        document.getElementById('cronica-id-edicion').value = cronicaEditar ? cronicaEditar._id : '';
+        const esIdTemporal = cronicaEditar && String(cronicaEditar._id).indexOf('base-') === 0;
+        document.getElementById('cronica-id-edicion').value = (cronicaEditar && !esIdTemporal) ? cronicaEditar._id : '';
         document.getElementById('cronica-categoria').value = cronicaEditar ? cronicaEditar.categoria : categoriaTerritorioActual;
         document.getElementById('cronica-etiqueta').value = cronicaEditar ? cronicaEditar.etiquetaLugarFecha : '';
         document.getElementById('cronica-titulo').value = cronicaEditar ? cronicaEditar.titulo : '';
         document.getElementById('cronica-resumen').value = cronicaEditar ? cronicaEditar.resumen : '';
-        document.getElementById('cronica-portada').value = cronicaEditar ? (cronicaEditar.imagenPortada || '') : '';
+        document.getElementById('cronica-portada').value = (cronicaEditar && cronicaEditar.imagenPortada) ? cronicaEditar.imagenPortada : '';
         document.getElementById('cronica-contenido').value = cronicaEditar ? cronicaEditar.contenido : '';
         actualizarVistaPrevia();
         panel.scrollIntoView({ behavior: 'smooth' });
@@ -681,745 +798,18 @@ function cambiarCategoriaTerritorio(cat) {
     const descBanner = document.getElementById('desc-banner-territorio');
 
     if (cat === 'campo-mesa') {
-        btnCampo.style.background = '#0d4a29'; btnCampo.style.color = 'white';
-        btnBosque.style.background = 'white'; btnBosque.style.color = '#0d4a29';
-        banner.style.background = '#f2f8f4'; banner.style.borderLeftColor = '#0d4a29';
-        tituloBanner.style.color = '#0d4a29';
-        tituloBanner.innerText = '🌱 Del Campo a la Mesa';
-        descBanner.innerText = 'Cada vez que bajamos de las veredas al parque, traemos arbolitos nativos criados en nuestro vivero comunitario, cosechas limpias y la palabra de quienes cuidan la tierra.';
+        if (btnCampo) { btnCampo.style.background = '#0d4a29'; btnCampo.style.color = 'white'; }
+        if (btnBosque) { btnBosque.style.background = 'white'; btnBosque.style.color = '#0d4a29'; }
+        if (banner) { banner.style.background = '#f2f8f4'; banner.style.borderLeftColor = '#0d4a29'; }
+        if (tituloBanner) { tituloBanner.style.color = '#0d4a29'; tituloBanner.innerText = '🌱 Del Campo a la Mesa'; }
+        if (descBanner) { descBanner.innerText = 'Cada vez que bajamos de las veredas al parque, traemos arbolitos nativos criados en nuestro vivero comunitario, cosechas limpias y la palabra de quienes cuidan la tierra.'; }
     } else {
-        btnBosque.style.background = '#0d4a29'; btnBosque.style.color = 'white';
-        btnCampo.style.background = 'white'; btnCampo.style.color = '#0d4a29';
-        banner.style.background = '#fdf6f0'; banner.style.borderLeftColor = '#c86428';
-        tituloBanner.style.color = '#b55016';
-        tituloBanner.innerText = '🥾 Salidas al Bosque';
-        descBanner.innerText = 'Detrás de cada arbolito en bolsa hay kilómetros de loma, búsqueda de semillas en la montaña, monitoreo de árboles madre y siembras hombro a hombro.';
+        if (btnBosque) { btnBosque.style.background = '#0d4a29'; btnBosque.style.color = 'white'; }
+        if (btnCampo) { btnCampo.style.background = 'white'; btnCampo.style.color = '#0d4a29'; }
+        if (banner) { banner.style.background = '#fdf6f0'; banner.style.borderLeftColor = '#c86428'; }
+        if (tituloBanner) { tituloBanner.style.color = '#b55016'; tituloBanner.innerText = '🥾 Salidas al Bosque'; }
+        if (descBanner) { descBanner.innerText = 'Detrás de cada arbolito en bolsa hay kilómetros de loma, búsqueda de semillas en la montaña, monitoreo de árboles madre y siembras hombro a hombro.'; }
     }
-    dibujarCronicas();
-}
-
-// 4. CARGAR Y DIBUJAR LAS CRÓNICAS UNIFICADAS (OPCIÓN A)
-async function cargarCronicasTerritorio() {
-    try {
-        const res = await fetch('/api/cronicas');
-        listaCronicasGlobal = await res.json();
-        dibujarCronicas();
-    } catch (e) { console.error('Error cargando crónicas:', e); }
-}
-
-function dibujarCronicas() {
-    const contenedor = document.getElementById('contenedor-cronicas-territorio');
-    if (!contenedor) return;
-    const rol = localStorage.getItem('rol');
-    const filtradas = listaCronicasGlobal.filter(c => c.categoria === categoriaTerritorioActual);
-
-    if (filtradas.length === 0) {
-        contenedor.innerHTML = `<p style="text-align:center; color:#666; padding: 30px;">Aún no hay relatos en esta sección. ¡Anímate a escribir el primero!</p>`;
-        return;
-    }
-
-    contenedor.innerHTML = filtradas.map(c => `
-        <article style="background: white; border-radius: 16px; padding: 28px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); border-left: 6px solid ${c.categoria === 'campo-mesa' ? '#0d4a29' : '#c86428'};">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
-                <span style="background: #e6f3eb; color: #0d4a29; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">
-                    ${c.etiquetaLugarFecha}
-                </span>
-                ${(rol === 'Fundador' || rol === 'Custodio') ? `
-                    <div>
-                        <button onclick='prepararEdicionCronica("\${c._id}")' style="background:#eef5f0; color:#0d4a29; border:1px solid #0d4a29; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:0.82rem;">✏️ Editar crónica</button>
-                    </div>
-                ` : ''}
-            </div>
-
-            <h2 style="color: #102a1c; margin: 6px 0 12px 0; font-size: 1.65rem;">${c.titulo}</h2>
-            <p style="color: #4a5d52; font-size: 1.05rem; margin-bottom: 18px; font-weight: 500;">${c.resumen}</p>
-
-            <!-- Cuerpo completo desplegable para leer como artículo de blog -->
-            <div id="cuerpo-cronica-${c._id}" style="display: none; border-top: 1px solid #e4ece7; padding-top: 18px; margin-top: 14px;">
-                ${formatearTextoForo(c.contenido)}
-            </div>
-
-            <button id="btn-leer-${c._id}" onclick="toggleLecturaCronica('${c._id}')" 
-                    style="background: #0d4a29; color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 8px;">
-                📖 Leer crónica completa y ver fotos
-            </button>
-        </article>
-    `).join('');
-}
-
-function toggleLecturaCronica(id) {
-    const cuerpo = document.getElementById(`cuerpo-cronica-${id}`);
-    const btn = document.getElementById(`btn-leer-${id}`);
-    if (cuerpo.style.display === 'none') {
-        cuerpo.style.display = 'block';
-        btn.innerText = '🔼 Cerrar crónica';
-        btn.style.background = '#4a5d52';
-    } else {
-        cuerpo.style.display = 'none';
-        btn.innerText = '📖 Leer crónica completa y ver fotos';
-        btn.style.background = '#0d4a29';
-    }
-}
-
-function prepararEdicionCronica(id) {
-    const encontrada = listaCronicasGlobal.find(x => x._id === id);
-    if (encontrada) toggleEditorCronica(encontrada);
-}
-
-async function guardarCronica() {
-    const token = localStorage.getItem('token');
-    const idEdicion = document.getElementById('cronica-id-edicion').value;
-    const datos = {
-        categoria: document.getElementById('cronica-categoria').value,
-        etiquetaLugarFecha: document.getElementById('cronica-etiqueta').value,
-        titulo: document.getElementById('cronica-titulo').value,
-        resumen: document.getElementById('cronica-resumen').value,
-        imagenPortada: document.getElementById('cronica-portada').value,
-        contenido: document.getElementById('cronica-contenido').value
-    };
-
-    const url = idEdicion ? `/api/cronicas/${idEdicion}` : '/api/cronicas';
-    const metodo = idEdicion ? 'PUT' : 'POST';
-
-    const res = await fetch(url, {
-        method: metodo,
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(datos)
-    });
-    const rta = await res.json();
-    alert(rta.mensaje || rta.error);
-    if (res.ok) {
-        toggleEditorCronica();
-        cargarCronicasTerritorio();
-    }
-}
-
-// 5. CONTROL DE INTERFAZ SEGÚN EL ROL (PROTECCIÓN VISUAL PARA VIGÍAS)
-function aplicarPermisosVisualesPorRol() {
-    const rol = localStorage.getItem('rol');
-    const token = localStorage.getItem('token');
-
-    // Mostrar botón de escribir crónica a cualquier usuario con sesión iniciada
-    const btnEscribir = document.getElementById('btn-abrir-editor-cronica');
-    if (btnEscribir) btnEscribir.style.display = token ? 'inline-block' : 'none';
-
-    // Si es Vigía o no ha iniciado sesión, ocultar todos los botones de "Gestionar Inventario"
-    if (rol !== 'Fundador' && rol !== 'Custodio') {
-        document.querySelectorAll('button').forEach(boton => {
-            if (boton.innerText.includes('Gestionar Inventario')) {
-                boton.style.display = 'none';
-            }
-        });
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    cargarCronicasTerritorio();
-    aplicarPermisosVisualesPorRol();
-});
-
-let sesionIniciada = false;
-let esGestor = false; // Solo true para Fundador o Custodio (Oculta inventario y panel a los Vigías)
-window.especiesGlobal = []; window.lotesGlobal = []; window.arbolesMatrizGlobal = [];
-let especieActualId = null; let especieSeleccionadaMicrositio = null;
-
-function obtenerCabecerasSeguras() {
-    return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('tokenAdmin')}` };
-}
-
-async function cargarCatalogo() {
-    const lista = document.getElementById('listaPlantulas');
-    if(lista) {
-        lista.innerHTML = '<div style="width: 100%; text-align: center; padding: 40px;"><h3 style="color: #2d6a4f;">🌱 Conectando con el servidor...</h3><p>Esto puede tomar hasta 1 minuto si el sistema estaba en reposo.</p></div>';
-    }
-
-    const selVitrina = document.getElementById('esp-nombre-select');
-    const selLoteArbol = document.getElementById('lote-arbolMatriz');
-    
-    try {
-        const [resEspecies, resLotes] = await Promise.all([ fetch(`${hostUrl}/api/especies`), fetch(`${hostUrl}/api/lotes`) ]);
-        window.especiesGlobal = await resEspecies.json(); 
-        window.lotesGlobal = await resLotes.json();
-        
-        // Solo carga árboles matriz si el usuario es Fundador o Custodio (esGestor)
-        if (esGestor) {
-            const resArboles = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
-            if (resArboles.ok) { window.arbolesMatrizGlobal = await resArboles.json(); }
-            selLoteArbol.innerHTML = '<option value="">-- Selecciona el Árbol Madre --</option>';
-            window.arbolesMatrizGlobal.forEach(a => selLoteArbol.innerHTML += `<option value="${a._id}">${a.codigoArbol} - ${a.nombreComun} (${a.veredaSector})</option>`);
-            selVitrina.innerHTML = '<option value="">-- Selecciona Especie --</option>';
-            window.especiesGlobal.forEach(e => selVitrina.innerHTML += `<option value="${e._id}">${e.nombreComun}</option>`);
-        }
-        
-        if(lista) {
-            lista.innerHTML = '';
-            if (window.especiesGlobal.length === 0) { lista.innerHTML = '<p style="text-align:center; width:100%;">No hay especies aún.</p>'; actualizarDashboard(); return; }
-
-            window.especiesGlobal.forEach(especie => {
-                const misLotes = window.lotesGlobal.filter(l => (l.arbolMatrizId && l.arbolMatrizId.nombreComun === especie.nombreComun) || (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id)));
-                let activas = 0;
-                misLotes.forEach(l => { if (l.estadoActual !== 'Sembrada' && l.estadoActual !== 'Semillero' && l.estadoActual !== 'Germinación') { activas += l.cantidadActual; } });
-                let img = especie.imagenUrl ? `<img src="${especie.imagenUrl}" class="img-arbol">` : `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
-                
-                // OCULTO PARA VIGÍAS Y VISITANTES: Solo Fundador y Custodio ven 'Gestionar Inventario'
-                const btnGest = esGestor ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionInventario('${especie._id}')">⚙ Gestionar Inventario</button>` : '';
-
-                lista.innerHTML += `
-                    <li class="item-planta">
-                        ${img}
-                        <div class="info-arbol">
-                            <h3 style="margin-bottom:2px;">${especie.nombreComun}</h3> 
-                            <i style="color:#52796f; font-size:13px;">${especie.nombreCientifico || ''}</i>
-                            <p style="margin-top:8px;">${(especie.caracteristicas || 'Especie nativa custodiada en San Luis.').substring(0, 75)}...</p>
-                            <div class="estadisticas" style="margin-top: 10px; margin-bottom: 10px;"><span>Plántulas Disponibles</span><strong style="font-size: 16px;">${activas} uds.</strong></div>
-                            <div class="acciones-tarjeta">
-                                <button class="btn-classic-primary" style="width: 100%;" onclick="abrirMicrositio('${especie._id}')">Conocer especie</button>
-                                ${btnGest}
-                            </div>
-                        </div>
-                    </li>`;
-            });
-        }
-        actualizarDashboard();
-    } catch (error) { console.log(error); }
-}
-
-let especieInventarioActiva = null;
-
-function abrirGestionInventario(especieId) {
-    if (!esGestor) return; // Doble candado contra Vigías
-    especieInventarioActiva = especieId;
-    const especie = window.especiesGlobal.find(e => e._id === especieId);
-    if (!especie) return;
-    const nombreComun = especie.nombreComun;
-    document.getElementById('nombreEspecieLotes').innerText = `Gestión de: ${nombreComun}`;
-    const rolActual = localStorage.getItem('rolUsuario');
-    const misLotes = window.lotesGlobal.filter(l => ((l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun) || (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id))) && (rolActual === 'Fundador' || rolActual === 'Admin' || l.registradoPor === localStorage.getItem('emailUsuario')));
-    const cont = document.getElementById('contenedorLotesActivos'); 
-    if (misLotes.length === 0) {
-        cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No hay registros de esta especie bajo tu gestión.</p>';
-        document.getElementById('modalGestionLotes').classList.remove('oculto');
-        return;
-    }
-    let htmlSemillero = '<h4 style="color:#e07a5f; border-bottom: 2px solid #e07a5f; padding-bottom:5px; margin-top:0;">En Semillero</h4>';
-    let htmlVivero = '<h4 style="color:#2d6a4f; border-bottom: 2px solid #2d6a4f; padding-bottom:5px; margin-top:25px;">En Vivero</h4>';
-    let contadorSemillero = 0; let contadorVivero = 0;
-    misLotes.forEach(l => {
-        const madre = l.arbolMatrizId ? l.arbolMatrizId.codigoArbol : 'Madre Antigua';
-        const btnEliminar = `<button style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 14px; cursor: pointer; color: #cf222e;" onclick="eliminarRegistroDefinitivo('${l._id}')">✖</button>`;
-        if (l.estadoActual === 'Semillero' || l.estadoActual === 'Germinación') {
-            contadorSemillero++;
-            htmlSemillero += `<div style="position: relative; border: 1px dashed #e07a5f; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #fffaf8;">${btnEliminar}<strong style="color: #c15539;">Madre: ${madre}</strong><p style="font-size: 13px; color: #555; margin: 5px 0;"><b>${l.cantidadActual}</b> semillas en tierra.</p><div style="display: flex; gap: 8px; margin-top: 10px;"><button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; border-color: #e07a5f; color: #c15539; font-weight: bold;" onclick="prepAvanzar('${l._id}')">Germinaron</button><button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff; border: 1px solid #e07a5f; color: #e07a5f;" onclick="prepRetirar('${l._id}')">Registrar pérdida</button></div></div>`;
-        } else if (l.estadoActual === 'Vivero' || l.estadoActual === 'Lista para transplante') {
-            contadorVivero++;
-            htmlVivero += `<div style="position: relative; border: 1px solid #74c69d; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #f1f7f3;">${btnEliminar}<strong style="color: #1b4332;">Madre: ${madre}</strong><p style="font-size: 13px; color: #1b4332; margin: 5px 0;"><b>${l.cantidadActual}</b> plántulas en bolsa.</p><div style="display: flex; gap: 8px; margin-top: 10px;"><button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; border-color: #2d6a4f; color: #1b4332; font-weight: bold;" onclick="prepAvanzar('${l._id}')">Sembrar en campo</button><button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff; border: 1px solid #74c69d; color: #2d6a4f;" onclick="prepRetirar('${l._id}')">Registrar pérdida</button></div></div>`;
-        }
-    });
-    if (contadorSemillero === 0) htmlSemillero += '<p style="font-size:13px; color:#888;">No hay semillas en tierra.</p>';
-    if (contadorVivero === 0) htmlVivero += '<p style="font-size:13px; color:#888;">No hay plántulas en bolsa.</p>';
-    cont.innerHTML = htmlSemillero + htmlVivero;
-    document.getElementById('modalGestionLotes').classList.remove('oculto');
-}
-
-async function eliminarRegistroDefinitivo(idRegistro) {
-    if (!confirm('¿Seguro que deseas eliminar este registro por completo?')) return;
-    try {
-        const res = await fetch(`${hostUrl}/api/lotes/${idRegistro}`, { method: 'DELETE', headers: obtenerCabecerasSeguras() });
-        if (res.ok) { await cargarCatalogo(); abrirGestionInventario(especieInventarioActiva); } else { alert('No se pudo eliminar.'); }
-    } catch (error) { console.error('Error al eliminar:', error); }
-}
-
-function actualizarDashboard() {
-    if (!esGestor) return;
-    let totalPlantas = 0; let registrosActivos = 0; let arbolesCosecha = 0;
-    window.lotesGlobal.forEach(l => { if (l.estadoActual !== 'Sembrada' && l.estadoActual !== 'Semillero' && l.estadoActual !== 'Germinación') { totalPlantas += l.cantidadActual; registrosActivos++; } });
-    window.arbolesMatrizGlobal.forEach(a => { let est = a.monitoreos.length ? a.monitoreos[a.monitoreos.length-1].estadoFenologico : ''; if (est === 'Semilla madura') arbolesCosecha++; });
-    document.getElementById('stat-plantulas').innerText = totalPlantas;
-    document.getElementById('stat-lotes').innerText = registrosActivos; 
-    document.getElementById('stat-cosecha').innerText = arbolesCosecha;
-}
-
-document.getElementById('formArbolMatriz').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const datos = { codigoArbol: document.getElementById('arbol-codigo').value, nombreComun: document.getElementById('arbol-especie').value, nombreCientifico: document.getElementById('arbol-cientifico').value, finca: document.getElementById('arbol-finca').value, veredaSector: document.getElementById('arbol-vereda').value, custodio: document.getElementById('arbol-custodio').value, coordenadasGPS: document.getElementById('arbol-gps').value };
-    const res = await fetch(`${hostUrl}/api/arboles-matriz`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify(datos) });
-    if (res.ok) { document.getElementById('formArbolMatriz').reset(); alert((await res.json()).mensaje); cargarCatalogo(); }
-});
-
-document.getElementById('formLote').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const res = await fetch(`${hostUrl}/api/lotes`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ arbolMatrizId: document.getElementById('lote-arbolMatriz').value, cantidadInicial: parseInt(document.getElementById('lote-cantidad').value), origen: { responsableRecoleccion: document.getElementById('lote-responsable').value, fechaRecoleccion: document.getElementById('lote-fecha').value } }) });
-    if (res.ok) { document.getElementById('formLote').reset(); alert('Registro generado.'); cargarCatalogo(); }
-});
-
-document.getElementById('formEspecie').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('esp-nombre-select').value;
-    const res = await fetch(`${hostUrl}/api/especies/${id}`, { method: 'PUT', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ imagenUrl: document.getElementById('esp-imagen').value, caracteristicas: document.getElementById('esp-caracteristicas').value }) });
-    if (res.ok) { document.getElementById('formEspecie').reset(); alert('Vitrina actualizada.'); cargarCatalogo(); }
-});
-
-// --- POSTULACIÓN DE VIGÍA A CUSTODIO ---
-async function abrirModalPostulacion() {
-    document.getElementById('modalPostulacionCustodio').classList.remove('oculto');
-    const cajaEstado = document.getElementById('cajaEstadoPostulacion');
-    const form = document.getElementById('formPostularCustodio');
-    cajaEstado.style.display = 'block';
-    cajaEstado.style.background = '#f8fbf9';
-    cajaEstado.innerText = 'Consultando estado de tu perfil...';
-
-    try {
-        const res = await fetch(`${hostUrl}/api/mi-perfil`, { headers: obtenerCabecerasSeguras() });
-        if (!res.ok) throw new Error('Error al leer perfil');
-        const usuario = await res.json();
-        const post = usuario.postulacionCustodio || { estado: 'Ninguna' };
-
-        if (post.estado === 'Pendiente') {
-            cajaEstado.style.background = '#fff3cd';
-            cajaEstado.style.color = '#856404';
-            cajaEstado.style.border = '1px solid #ffeeba';
-            cajaEstado.innerHTML = `⏳ <b>Solicitud en revisión:</b> Ya enviaste tu postulación para la vereda <b>${post.vereda}</b> (${post.tamañoPredio}). El equipo Fundador la revisará pronto.`;
-            document.getElementById('post-vereda').value = post.vereda || '';
-            document.getElementById('post-tamano').value = post.tamañoPredio || '';
-            document.getElementById('post-bosque').value = post.tipoBosque || '';
-            document.getElementById('btnEnviarPostulacion').innerText = 'Actualizar datos de mi postulación';
-        } else if (post.estado === 'Aprobada' || usuario.rol === 'Custodio') {
-            cajaEstado.style.background = '#d4edda';
-            cajaEstado.style.color = '#155724';
-            cajaEstado.style.border = '1px solid #c3e6cb';
-            cajaEstado.innerHTML = `🎉 <b>¡Felicidades! Tu solicitud fue aprobada.</b> Cierra sesión y vuelve a ingresar para activar tu Panel de Control de Custodio.`;
-            form.classList.add('oculto');
-        } else if (post.estado === 'Rechazada') {
-            cajaEstado.style.background = '#f8d7da';
-            cajaEstado.style.color = '#721c24';
-            cajaEstado.style.border = '1px solid #f5c6cb';
-            cajaEstado.innerHTML = `⚠️ Tu solicitud anterior no pudo ser aprobada en este momento. Puedes actualizar la información de tu predio y enviarla nuevamente.`;
-        } else {
-            cajaEstado.style.display = 'none';
-        }
-    } catch (error) {
-        cajaEstado.style.display = 'none';
-    }
-}
-
-document.getElementById('formPostularCustodio')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const datos = {
-        vereda: document.getElementById('post-vereda').value,
-        tamañoPredio: document.getElementById('post-tamano').value,
-        tipoBosque: document.getElementById('post-bosque').value
-    };
-    try {
-        const res = await fetch(`${hostUrl}/api/postular-custodio`, {
-            method: 'POST',
-            headers: obtenerCabecerasSeguras(),
-            body: JSON.stringify(datos)
-        });
-        const data = await res.json();
-        if (res.ok) {
-            alert(data.mensaje || '¡Postulación enviada con éxito!');
-            abrirModalPostulacion();
-        } else {
-            alert(data.error || 'No se pudo enviar la postulación.');
-        }
-    } catch (error) {
-        alert('Error de conexión al enviar la postulación.');
-    }
-});
-
-// --- GESTIÓN EXCLUSIVA DEL FUNDADOR ---
-async function cargarPostulacionesPendientes() {
-    const cont = document.getElementById('listaPostulacionesPendientes');
-    if (!cont) return;
-    try {
-        const res = await fetch(`${hostUrl}/api/postulaciones-pendientes`, { headers: obtenerCabecerasSeguras() });
-        if (!res.ok) { cont.innerHTML = '<p style="color:#888;">Sin acceso o ruta pendiente de despliegue en servidor.</p>'; return; }
-        const pendientes = await res.json();
-        if (pendientes.length === 0) {
-            cont.innerHTML = '<p style="color:#52796f; background:#f1f7f3; padding:10px; border-radius:6px;">✅ No hay solicitudes pendientes en este momento.</p>';
-            return;
-        }
-        cont.innerHTML = '';
-        pendientes.forEach(u => {
-            const p = u.postulacionCustodio || {};
-            cont.innerHTML += `
-                <div style="border: 1px solid #dce8e0; background: #ffffff; padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: left;">
-                    <strong style="color: #1b4332;">👤 ${u.email}</strong>
-                    <p style="margin: 4px 0; font-size: 12px;">📍 <b>Vereda:</b> ${p.vereda || '-'} | 📐 <b>Predio:</b> ${p.tamañoPredio || '-'}</p>
-                    <p style="margin: 4px 0 10px 0; font-size: 12px; color: #354f52;">🌿 <b>Bosque:</b> ${p.tipoBosque || '-'}</p>
-                    <div style="display: flex; gap: 8px;">
-                        <button type="button" class="btn-principal" style="background: #2d6a4f; padding: 6px 12px; font-size: 12px; flex: 1;" onclick="resolverPostulacion('${u._id}', 'Aprobada')">✔ Aprobar como Custodio</button>
-                        <button type="button" class="btn-classic-danger" style="padding: 6px 12px; font-size: 12px; flex: 1;" onclick="resolverPostulacion('${u._id}', 'Rechazada')">✖ Rechazar</button>
-                    </div>
-                </div>`;
-        });
-    } catch (error) {
-        cont.innerHTML = '<p style="color:#888;">No se pudieron cargar las solicitudes.</p>';
-    }
-}
-
-async function resolverPostulacion(userId, decision) {
-    if (!confirm(`¿Seguro que deseas marcar esta postulación como ${decision}?`)) return;
-    try {
-        const res = await fetch(`${hostUrl}/api/resolver-postulacion/${userId}`, {
-            method: 'PUT',
-            headers: obtenerCabecerasSeguras(),
-            body: JSON.stringify({ decision })
-        });
-        const data = await res.json();
-        alert(data.mensaje || data.error);
-        cargarPostulacionesPendientes();
-    } catch (error) {
-        alert('Error al procesar la decisión.');
-    }
-}
-
-document.getElementById('formRegistrarAsociado')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const res = await fetch(`${hostUrl}/api/registrar-asociado`, {
-        method: 'POST',
-        headers: obtenerCabecerasSeguras(),
-        body: JSON.stringify({
-            email: document.getElementById('asociado-email').value,
-            password: document.getElementById('asociado-password').value
-        })
-    });
-    const data = await res.json();
-    if (res.ok) {
-        document.getElementById('formRegistrarAsociado').reset();
-        alert(data.mensaje);
-    } else {
-        alert(data.error || 'Error al registrar Custodio');
-    }
-});
-
-async function abrirModalMonitoreo() {
-    if (!esGestor) return;
-    const cont = document.getElementById('listaArbolesMonitoreo');
-    document.getElementById('modalMonitoreoArboles').classList.remove('oculto');
-    cont.innerHTML = 'Cargando tus árboles...';
-    const res = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
-    window.arbolesMatrizGlobal = await res.json();
-    const rol = localStorage.getItem('rolUsuario');
-    const misArboles = rol === 'Fundador' ? window.arbolesMatrizGlobal : window.arbolesMatrizGlobal.filter(a => a.registradoPor === localStorage.getItem('emailUsuario'));
-    cont.innerHTML = '';
-    if (misArboles.length === 0) { cont.innerHTML = '<p style="font-size:13px; color:#666;">No tienes árboles bajo tu custodia.</p>'; return; }
-    misArboles.forEach(a => {
-        let est = a.monitoreos.length ? a.monitoreos[a.monitoreos.length-1].estadoFenologico : 'Recién registrado';
-        let etiq = est === 'Semilla madura' ? `<div style="background:#cf222e;color:white;padding:4px;border-radius:4px;font-size:11px;">🚨 ¡COSECHAR!</div>` : `<div style="background:#d8eadd;padding:4px;border-radius:4px;font-size:11px;">Actual: ${est}</div>`;
-        cont.innerHTML += `<div style="border:1px solid #d0d7de; padding:15px; border-radius:8px; margin-bottom:10px; position: relative;"><div style="position: absolute; top: 15px; right: 15px;"><button style="background: none; border: none; font-size: 16px; cursor: pointer;" onclick="editarArbol('${a._id}')">✏</button></div>${etiq}<h4 style="margin-top: 10px; width: 85%;">${a.codigoArbol} - ${a.nombreComun}</h4><p>📍 ${a.veredaSector} (Custodio: ${a.custodio})</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"><button onclick="registrarFenologia('${a._id}', 'Hojas')">🍃 Hojas</button><button onclick="registrarFenologia('${a._id}', 'Floración')">🌼 Flor</button><button onclick="registrarFenologia('${a._id}', 'Fruto verde')">🍏 Verde</button><button onclick="registrarFenologia('${a._id}', 'Semilla madura')" style="color:red; font-weight:bold;">🌰 Madura</button></div></div>`;
-    });
-    actualizarDashboard();
-}
-
-function editarArbol(id) {
-    const arbol = window.arbolesMatrizGlobal.find(a => a._id === id);
-    if (!arbol) return;
-    document.getElementById('edit-arbol-id').value = arbol._id; document.getElementById('edit-arbol-especie').value = arbol.nombreComun || ''; document.getElementById('edit-arbol-cientifico').value = arbol.nombreCientifico || ''; document.getElementById('edit-arbol-codigo').value = arbol.codigoArbol || ''; document.getElementById('edit-arbol-finca').value = arbol.finca || ''; document.getElementById('edit-arbol-vereda').value = arbol.veredaSector || ''; document.getElementById('edit-arbol-custodio').value = arbol.custodio || '';
-    document.getElementById('modalMonitoreoArboles').classList.add('oculto'); document.getElementById('modalEditarArbol').classList.remove('oculto');
-}
-
-document.getElementById('formEditarArbol')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('edit-arbol-id').value;
-    const datosActualizados = { nombreComun: document.getElementById('edit-arbol-especie').value, nombreCientifico: document.getElementById('edit-arbol-cientifico').value, codigoArbol: document.getElementById('edit-arbol-codigo').value, finca: document.getElementById('edit-arbol-finca').value, veredaSector: document.getElementById('edit-arbol-vereda').value, custodio: document.getElementById('edit-arbol-custodio').value };
-    try {
-        const res = await fetch(`${hostUrl}/api/arboles-matriz/${id}`, { method: 'PUT', headers: obtenerCabecerasSeguras(), body: JSON.stringify(datosActualizados) });
-        if (res.ok) { document.getElementById('modalEditarArbol').classList.add('oculto'); alert('Árbol actualizado correctamente.'); abrirModalMonitoreo(); } else { alert('Hubo un error al guardar.'); }
-    } catch (error) { console.error('Error:', error); }
-});
-
-async function registrarFenologia(id, estado) {
-    if(!confirm(`Reportar: ${estado}?`)) return;
-    await fetch(`${hostUrl}/api/arboles-matriz/${id}/monitoreo`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ estadoFenologico: estado, observaciones: 'Campo' }) });
-    abrirModalMonitoreo();
-}
-
-function abrirModalDirectorio() {
-    const cont = document.getElementById('listaDirectorioRed');
-    document.getElementById('modalDirectorioArboles').classList.remove('oculto');
-    cont.innerHTML = '';
-    if (window.arbolesMatrizGlobal.length === 0) { cont.innerHTML = '<p style="font-size:13px; color:#666;">La red aún no tiene árboles registrados.</p>'; return; }
-    window.arbolesMatrizGlobal.forEach(a => {
-        let est = a.monitoreos.length ? a.monitoreos[a.monitoreos.length-1].estadoFenologico : 'Sin reporte';
-        let colorBorde = est === 'Semilla madura' ? '#cf222e' : '#d0d7de';
-        let alerta = est === 'Semilla madura' ? '<b style="color:#cf222e;"> (🚨 Listo para cosechar)</b>' : '';
-        cont.innerHTML += `<div style="border:1px solid ${colorBorde}; padding:12px; border-radius:8px; background:#f8fbf9;"><h4 style="margin: 0 0 5px 0; color:#1f2328; font-size:14px;">${a.codigoArbol} - ${a.nombreComun}</h4><p style="margin: 0 0 5px 0; font-size: 12px; color:#57606a;">📍 Vereda: ${a.veredaSector}</p><p style="margin: 0; font-size: 12px; color:#57606a;">👤 Custodio: <b>${a.custodio}</b></p><p style="margin: 5px 0 0 0; font-size: 12px; color:#1b4332;">Estado: ${est}${alerta}</p></div>`;
-    });
-}
-
-function abrirMicrositio(id) {
-    const especie = window.especiesGlobal.find(i => i._id === id); especieActualId = id; especieSeleccionadaMicrositio = especie.nombreComun;
-    document.getElementById('detalle-nombre').innerText = especie.nombreComun; document.getElementById('detalle-caracteristicas').innerText = especie.caracteristicas;
-    document.getElementById('detalle-imagen').src = especie.imagenUrl; document.getElementById('detalle-imagen').style.display = especie.imagenUrl ? 'block' : 'none';
-    const contSaberes = document.getElementById('contenedor-saberes'); contSaberes.innerHTML = '';
-    if(especie.saberes.length) especie.saberes.forEach(s => contSaberes.innerHTML += `<p>"${s.descripcion}" - <b>${s.autor}</b></p>`); else contSaberes.innerHTML = 'Sin saberes registrados.';
-    // Solo Fundador y Custodio pueden aportar directamente al muro sin moderación previa
-    document.getElementById('contenedorBotonAportarSaber').className = esGestor ? '' : 'oculto';
-    cancelarSaber(); document.getElementById('modalDetalleEspecie').classList.remove('oculto');
-}
-function activarAporteSaber() { document.getElementById('vistaLecturaEspecie').classList.add('oculto'); document.getElementById('formAportarSaber').classList.remove('oculto'); document.getElementById('contenedorBotonAportarSaber').classList.add('oculto'); }
-function cancelarSaber() { document.getElementById('vistaLecturaEspecie').classList.remove('oculto'); document.getElementById('formAportarSaber').classList.add('oculto'); if(esGestor) document.getElementById('contenedorBotonAportarSaber').classList.remove('oculto'); }
-document.getElementById('formAportarSaber').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const res = await fetch(`${hostUrl}/api/especies/${especieActualId}`, { method: 'PUT', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ nuevoSaber: { autor: document.getElementById('saber-autor').value, descripcion: document.getElementById('saber-desc').value } }) });
-    if(res.ok) { await cargarCatalogo(); abrirMicrositio(especieActualId); }
-});
-
-function prepAvanzar(id) { document.getElementById('avanzar-loteId').value = id; document.getElementById('modalAvanzarLote').classList.remove('oculto'); }
-function prepRetirar(id) { document.getElementById('retirar-loteId').value = id; document.getElementById('modalRetiroLote').classList.remove('oculto'); }
-document.getElementById('formAvanzar').addEventListener('submit', async (e) => { 
-    e.preventDefault(); 
-    await fetch(`${hostUrl}/api/lotes/avanzar`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ loteId: document.getElementById('avanzar-loteId').value, nuevoEstado: document.getElementById('avanzar-estado').value, cantidadSuperviviente: document.getElementById('avanzar-cantidad').value, observaciones: document.getElementById('avanzar-obs').value }) }); 
-    document.getElementById('modalAvanzarLote').classList.add('oculto'); await cargarCatalogo(); abrirGestionInventario(especieInventarioActiva);
-});
-document.getElementById('formRetirarLote').addEventListener('submit', async (e) => { 
-    e.preventDefault(); 
-    await fetch(`${hostUrl}/api/lotes/retirar`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ loteId: document.getElementById('retirar-loteId').value, cantidadRetirar: document.getElementById('retirar-loteCantidad').value, motivo: document.getElementById('retirar-loteMotivo').value }) }); 
-    document.getElementById('modalRetiroLote').classList.add('oculto'); await cargarCatalogo(); abrirGestionInventario(especieInventarioActiva);
-});
-
-let carrito = [];
-function apadrinarArbol() { window.open(`https://wa.me/573226575786?text=Quiero apadrinar ${especieSeleccionadaMicrositio}`, '_blank'); }
-function adquirirEjemplar() { let i = carrito.find(x => x.n === especieSeleccionadaMicrositio); if(i) i.c++; else carrito.push({n:especieSeleccionadaMicrositio, c:1}); actUI(); document.getElementById('modalCarrito').classList.remove('oculto'); }
-function actUI() { document.getElementById('listaCarrito').innerHTML = carrito.map(i => `<li>${i.n} - ${i.c} uds</li>`).join(''); document.getElementById('btnCarrito').className = carrito.length ? 'carrito-flotante' : 'oculto'; }
-function enviarWhatsApp() { window.open(`https://wa.me/573105632387?text=Interés en: ` + carrito.map(i => `${i.c}x ${i.n}`).join(', '), '_blank'); }
-
-// --- FUNCIONES DE LOS MICROSITIOS ---
-function cambiarMicrositio(idActual, idDestino) {
-    document.getElementById(idActual).classList.add('oculto');
-    document.getElementById(idDestino).classList.remove('oculto');
-}
-
-async function procesarLoginClasico() {
-    const res = await fetch(`${hostUrl}/api/login`, { 
-        method: 'POST', headers: {'Content-Type':'application/json'}, 
-        body: JSON.stringify({ email: document.getElementById('login-email-clasico').value, password: document.getElementById('login-password-clasico').value }) 
-    });
-    if(res.ok) { 
-        const d = await res.json(); 
-        localStorage.setItem('tokenAdmin', d.token); 
-        localStorage.setItem('rolUsuario', d.rol); 
-        localStorage.setItem('emailUsuario', d.email); 
-        location.reload(); 
-    } else { 
-        alert('Credenciales incorrectas'); 
-    }
-}
-
-async function procesarRegistroPublico() {
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-password').value;
-    const res = await fetch(`${hostUrl}/api/registro-publico`, { 
-        method: 'POST', headers: {'Content-Type':'application/json'}, 
-        body: JSON.stringify({ email, password }) 
-    });
-    const data = await res.json();
-    if(res.ok) {
-        alert(data.mensaje);
-        cambiarMicrositio('modalRegistroPublico', 'modalLoginClasico');
-    } else {
-        alert(data.error);
-    }
-}
-
-async function solicitarRecuperacion() {
-    const email = document.getElementById('rec-email').value;
-    alert("Procesando...");
-    const res = await fetch(`${hostUrl}/api/olvide-password`, { 
-        method: 'POST', headers: {'Content-Type':'application/json'}, 
-        body: JSON.stringify({ email }) 
-    });
-    const data = await res.json();
-    alert(data.mensaje || data.error);
-}
-
-function toggleAdmin() { 
-    if(sesionIniciada) { 
-        localStorage.clear(); 
-        location.reload(); 
-    } else {
-        document.getElementById('modalLoginClasico').classList.remove('oculto'); 
-    }
-}
-
-window.onload = () => { 
-    const token = localStorage.getItem('tokenAdmin');
-    const rol = localStorage.getItem('rolUsuario');
-    const email = localStorage.getItem('emailUsuario');
-
-    if (token) { 
-        sesionIniciada = true;
-        esGestor = (rol === 'Fundador' || rol === 'Custodio' || rol === 'Admin');
-
-        const btnLogin = document.getElementById('btn-nav-login');
-        if (btnLogin) btnLogin.classList.add('oculto');
-        document.getElementById('btnModoAdmin').innerText = '🚪 Cerrar Sesión';
-
-        const badge = document.getElementById('badge-usuario-activo');
-        if (badge) {
-            badge.innerText = `🌿 ${rol}: ${email}`;
-            badge.classList.remove('oculto');
-        }
-
-        if (esGestor) {
-            document.getElementById('btn-nav-admin').classList.remove('oculto');
-            if (rol === 'Fundador' || rol === 'Admin') {
-                const secFundador = document.getElementById('seccionCrearBosquesino');
-                if (secFundador) secFundador.classList.remove('oculto');
-                cargarPostulacionesPendientes();
-            }
-            cargarCatalogo();
-            cargarTerritorio();
-            cambiarVista('panelAdmin');
-        } else {
-            document.getElementById('btn-nav-admin').classList.add('oculto');
-            document.getElementById('btn-nav-postular').classList.remove('oculto');
-            document.getElementById('bannerPostulacionAlianza').classList.remove('oculto');
-            cargarCatalogo();
-            cargarTerritorio();
-            cambiarVista('vista-catalogo');
-        }
-    } else {
-        cargarCatalogo(); 
-        cargarTerritorio();
-    } 
-};
-
-function cambiarVista(idVistaDestino) {
-    if (idVistaDestino === 'panelAdmin' && !esGestor) {
-        idVistaDestino = 'vista-catalogo';
-    }
-    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin', 'vista-legal','vista-territorio'];
-    vistas.forEach(vista => {
-        const elemento = document.getElementById(vista);
-        if (elemento) { 
-            elemento.classList.add('oculto'); 
-            elemento.classList.remove('vista-activa'); 
-        }
-    });
-    const vistaDestino = document.getElementById(idVistaDestino);
-    if (vistaDestino) { 
-        vistaDestino.classList.remove('oculto'); 
-        void vistaDestino.offsetWidth; 
-        vistaDestino.classList.add('vista-activa'); 
-    }
-    const nav = document.getElementById('menu-principal');
-    if (idVistaDestino === 'vista-inicio') { 
-        nav.classList.add('oculto'); 
-    } else { 
-        nav.classList.remove('oculto'); 
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-async function cargarTerritorio() {
-    const gridPlaza = document.getElementById('grid-plaza');
-    const listaBitacora = document.getElementById('lista-bitacora');
-    if (!gridPlaza || !listaBitacora) return;
-
-    try {
-        const res = await fetch(`${hostUrl}/api/territorio`);
-        if (!res.ok) return;
-        const publicaciones = await res.json();
-
-        const pubPlaza = publicaciones.filter(p => p.categoria === 'plaza');
-        const pubBitacora = publicaciones.filter(p => p.categoria === 'bitacora');
-
-        // Renderizar Mercados / Plaza (Si no hay nada, queda limpio sin fotos forzadas)
-        if (pubPlaza.length === 0) {
-            gridPlaza.innerHTML = '<p style="text-align:center; color:#666; grid-column: 1/-1; padding: 30px;">🌱 Espacio listo para compartir nuestras próximas jornadas en la plaza.</p>';
-        } else {
-            gridPlaza.innerHTML = pubPlaza.map(p => `
-                <div style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #dce8e0; position: relative;">
-                    ${esGestor ? `<button onclick="eliminarPublicacionTerritorio('\${p._id}')" style="position:absolute; top:10px; right:10px; background:rgba(207,34,46,0.9); color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer; font-weight:bold;" title="Eliminar">✖</button>` : ''}
-                    ${p.imagenUrl ? `<img src="${p.imagenUrl}" alt="${p.titulo}" style="width: 100%; height: 220px; object-fit: cover;">` : ''}
-                    <div style="padding: 20px;">
-                        <span style="background: #e9f5ed; color: #2d6a4f; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px;">📍 ${p.fechaLugar}</span>
-                        <h4 style="color: #1b4332; margin: 12px 0 8px 0; font-size: 18px;">${p.titulo}</h4>
-                        <p style="color: #444; font-size: 14px; line-height: 1.6; margin-bottom: 10px;">${p.descripcion}</p>
-                        <small style="color: #52796f; font-style: italic;">✍️ Por: ${p.autor}</small>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Renderizar Bitácora del Bosque
-        if (pubBitacora.length === 0) {
-            listaBitacora.innerHTML = '<p style="text-align:center; color:#666; padding: 30px;">🥾 Aún no se han publicado bitácoras de salidas al bosque.</p>';
-        } else {
-            listaBitacora.innerHTML = pubBitacora.map(p => `
-                <div style="background: #fff; border: 1px solid #dce8e0; border-left: 6px solid #1b4332; border-radius: 10px; padding: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
-                    ${esGestor ? `<button onclick="eliminarPublicacionTerritorio('\${p._id}')" style="position:absolute; top:12px; right:12px; background:none; color:#cf222e; border:none; font-size:16px; cursor:pointer;" title="Eliminar">✖</button>` : ''}
-                    <span style="color: #52796f; font-size: 12px; font-weight: bold;">🌲 ${p.fechaLugar}</span>
-                    <h4 style="color: #1b4332; font-size: 19px; margin: 6px 0 10px 0;">${p.titulo}</h4>
-                    ${p.imagenUrl ? `<img src="${p.imagenUrl}" alt="${p.titulo}" style="width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">` : ''}
-                    <p style="color: #444; font-size: 14px; line-height: 1.6; margin: 0 0 8px 0;">${p.descripcion}</p>
-                    <small style="color: #52796f; font-style: italic;">✍️ Relato de: ${p.autor}</small>
-                </div>
-            `).join('');
-        }
-    } catch (error) { console.log(error); }
-}
-
-document.getElementById('formPublicarTerritorio')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const datos = {
-        categoria: document.getElementById('pub-categoria').value,
-        titulo: document.getElementById('pub-titulo').value,
-        fechaLugar: document.getElementById('pub-fecha').value,
-        imagenUrl: document.getElementById('pub-imagen').value,
-        autorNombre: document.getElementById('pub-autor').value,
-        descripcion: document.getElementById('pub-descripcion').value
-    };
-    const res = await fetch(`${hostUrl}/api/territorio`, {
-        method: 'POST',
-        headers: obtenerCabecerasSeguras(),
-        body: JSON.stringify(datos)
-    });
-    if (res.ok) {
-        document.getElementById('formPublicarTerritorio').reset();
-        alert('¡Publicado con éxito!');
-        cargarTerritorio();
-    } else {
-        alert('Error al publicar.');
-    }
-});
-
-async function eliminarPublicacionTerritorio(id) {
-    if (!confirm('¿Deseas eliminar esta publicación de la página?')) return;
-    const res = await fetch(`${hostUrl}/api/territorio/${id}`, {
-        method: 'DELETE',
-        headers: obtenerCabecerasSeguras()
-    });
-    if (res.ok) cargarTerritorio();
-}
-
-function alternarSubvistaTerritorio(subvista) {
-    const divPlaza = document.getElementById('subvista-plaza');
-    const divBitacora = document.getElementById('subvista-bitacora');
-    const tabPlaza = document.getElementById('tab-plaza');
-    const tabBitacora = document.getElementById('tab-bitacora');
-
-    if (subvista === 'plaza') {
-        divPlaza.classList.remove('oculto');
-        divBitacora.classList.add('oculto');
-        tabPlaza.style.background = '#1b4332';
-        tabPlaza.style.color = '#ffffff';
-        tabBitacora.style.background = 'transparent';
-        tabBitacora.style.color = '#1b4332';
-    } else {
-        divPlaza.classList.add('oculto');
-        divBitacora.classList.remove('oculto');
-        tabBitacora.style.background = '#1b4332';
-        tabBitacora.style.color = '#ffffff';
-        tabPlaza.style.background = 'transparent';
-        tabPlaza.style.color = '#1b4332';
-    }
-}
-
-function enviarInteresWhatsApp() {
-    window.open(`https://wa.me/573226575786?text=Hola Bosquesinos, estoy interesado en colaborar con la asociación. Me gustaría hablar sobre...`, '_blank');
 }
 </script>
 </body>

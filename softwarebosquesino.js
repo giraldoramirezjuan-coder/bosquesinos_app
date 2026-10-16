@@ -214,7 +214,7 @@ function verificarAcceso(req, res, next) {
 }
 
 function soloGestores(req, res, next) {
-    if (req.rol === 'Fundador' || req.rol === 'Custodio') {
+    if (req.rol === 'Fundador' || req.rol === 'Custodio' || req.rol === 'Admin') {
         next();
     } else {
         return res.status(403).json({ error: 'Solo Custodios y Fundadores pueden realizar esta acción.' });
