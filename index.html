@@ -111,110 +111,29 @@
 
 <!-- === NUEVA CAJA: DEL MONTE A LA PLAZA Y BITÁCORA VISUAL === -->
 <section id="vista-territorio" class="oculto" style="padding: 50px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
-    
-    <!-- ENCABEZADO Y SELECTOR DE MÓDULOS -->
-    <div style="text-align: center; margin-bottom: 40px;">
-        <h2 style="color: var(--color-brand-forest); font-size: 34px; margin-bottom: 10px;">Territorio Vivo Bosquesino</h2>
-        <p style="color: var(--color-text-muted); max-width: 750px; margin: 0 auto 25px auto; font-size: 16px;">
-            El recorrido real de nuestra conservación: desde las lomas donde custodiamos y sembramos bajo la lluvia, hasta el encuentro con la comunidad en el parque de San Luis.
+    <div style="text-align: center; margin-bottom: 35px;">
+        <h2 style="color: var(--color-brand-forest); font-size: 34px; margin-bottom: 10px;">Del Monte a la Plaza</h2>
+        <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto 25px auto; font-size: 16px;">
+            Historias vivas de nuestra asociación: salidas al bosque, siembras y encuentros en el pueblo.
         </p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
             <button id="tab-plaza" class="btn-principal btn-suave" style="width: max-content; padding: 12px 24px; background: #1b4332; border-radius: 30px;" onclick="alternarSubvistaTerritorio('plaza')">
-                🧺 1. Del Monte a la Plaza (Mercados)
+                🧺 Mercados y Plaza
             </button>
             <button id="tab-bitacora" class="btn-classic-secondary btn-suave" style="width: max-content; padding: 12px 24px; border-radius: 30px; border: 2px solid #1b4332; color: #1b4332; font-weight: bold;" onclick="alternarSubvistaTerritorio('bitacora')">
-                🥾 2. Bitácora Visual (Salidas al Bosque)
+                🥾 Bitácora del Bosque
             </button>
         </div>
     </div>
 
-    <!-- SUBMÓDULO 1: DEL MONTE A LA PLAZA (MERCADOS CAMPESINOS) -->
+    <!-- Contenedores que se llenan solos desde la Base de Datos -->
     <div id="subvista-plaza">
-        <div style="background: #f1f7f3; border-left: 5px solid #2d6a4f; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-            <h3 style="color: #1b4332; margin-top: 0;">🧺 Mercados Campesinos San Luis</h3>
-            <p style="color: #354f52; font-size: 14.5px; margin-bottom: 0;">
-                Cada vez que bajamos al parque principal, llevamos plántulas nativas criadas en nuestro vivero comunitario, semillas y saberes campesinos para conectar el campo con el pueblo.
-            </p>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
-            <!-- Tarjeta Jornada Octubre -->
-            <div style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #dce8e0;">
-                <img src="https://drive.google.com/thumbnail?id=1pyvWR8LHDVtZfV6M_5dclePlyVLfDvHC&sz=w1000" alt="Mercado Campesino" style="width: 100%; height: 220px; object-fit: cover;">
-                <div style="padding: 20px;">
-                    <span style="background: #e9f5ed; color: #2d6a4f; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px;">📍 Parque Principal San Luis • Octubre 2026</span>
-                    <h4 style="color: #1b4332; margin: 12px 0 8px 0; font-size: 18px;">Jornada de Octubre: Vivero en la Plaza</h4>
-                    <p style="color: #555; font-size: 13.5px; line-height: 1.5;">
-                        Exhibición de especies nativas listas para adopción y diálogo directo con las familias sanluisanas sobre el cuidado de nuestras cuencas.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Tarjeta Jornada Septiembre 1 -->
-            <div style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #dce8e0;">
-                <img src="https://drive.google.com/thumbnail?id=1x_val35a-NsFuVwPPdxVR7ZEKnUIC4Kf&sz=w1000" alt="Comunidad Bosquesina" style="width: 100%; height: 220px; object-fit: cover;">
-                <div style="padding: 20px;">
-                    <span style="background: #e9f5ed; color: #2d6a4f; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px;">📍 San Luis, Antioquia • Septiembre 2026</span>
-                    <h4 style="color: #1b4332; margin: 12px 0 8px 0; font-size: 18px;">Encuentro de Saberes y Semillas</h4>
-                    <p style="color: #555; font-size: 13.5px; line-height: 1.5;">
-                        Reconocimiento de árboles maderables y frutales nativos junto a los productores y custodios de las veredas.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Tarjeta Jornada Septiembre 2 -->
-            <div style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #dce8e0;">
-                <img src="https://drive.google.com/thumbnail?id=1rHzkyriuCkhqdqhYI0idqqZQNvgGKAZe&sz=w1000" alt="Muestra Campesina" style="width: 100%; height: 220px; object-fit: cover;">
-                <div style="padding: 20px;">
-                    <span style="background: #e9f5ed; color: #2d6a4f; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px;">🌱 Economía Regenerativa • Septiembre 2026</span>
-                    <h4 style="color: #1b4332; margin: 12px 0 8px 0; font-size: 18px;">Alianza Campo y Pueblo</h4>
-                    <p style="color: #555; font-size: 13.5px; line-height: 1.5;">
-                        Cada ejemplar entregado en la plaza respalda directamente el trabajo de recolección y viverismo en las fincas custodias.
-                    </p>
-                </div>
-            </div>
-        </div>
+        <div id="grid-plaza" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;"></div>
     </div>
 
-    <!-- SUBMÓDULO 2: BITÁCORA VISUAL (SALIDAS AL BOSQUE) -->
     <div id="subvista-bitacora" class="oculto">
-        <div style="background: #fffaf8; border-left: 5px solid #e07a5f; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-            <h3 style="color: #c15539; margin-top: 0;">🥾 Bitácora de Expediciones y Siembra</h3>
-            <p style="color: #555; font-size: 14.5px; margin-bottom: 0;">
-                Detrás de cada plántula en bolsa hay kilómetros de loma, monitoreo fenológico, ascenso a árboles madre y jornadas de reforestación comunitaria.
-            </p>
-        </div>
-
-        <!-- Línea de tiempo de expediciones -->
-        <div style="display: flex; flex-direction: column; gap: 20px; max-width: 850px; margin: 0 auto;">
-            
-            <!-- Entrada 1: La jornada de ayer bajo la lluvia -->
-            <div style="background: #fff; border: 1px solid #dce8e0; border-left: 6px solid #1b4332; border-radius: 10px; padding: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
-                    <span style="background: #1b4332; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 15px;">🌧️ JORNADA DE SIEMBRA</span>
-                    <span style="color: #52796f; font-size: 12px; font-weight: bold;">Octubre 2026 • Montañas de San Luis</span>
-                </div>
-                <h4 style="color: #1b4332; font-size: 19px; margin: 5px 0 10px 0;">Hombro a hombro con la montaña: 1 km de ascenso en canasta</h4>
-                <p style="color: #444; font-size: 14px; line-height: 1.6; margin: 0;">
-                    Jornada intensiva de plantación en lomas de alta pendiente. Pese al barro liso y la fuerte brisa de temporada de lluvias, el equipo transportó los árboles en canasta durante un kilómetro de ascenso para devolverle cobertura nativa a la montaña.
-                </p>
-            </div>
-
-            <!-- Entrada 2: Monitoreo y recolección -->
-            <div style="background: #fff; border: 1px solid #dce8e0; border-left: 6px solid #e07a5f; border-radius: 10px; padding: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
-                    <span style="background: #e07a5f; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 15px;">🌲 SALIDA AL BOSQUE</span>
-                    <span style="color: #52796f; font-size: 12px; font-weight: bold;">Septiembre 2026 • Bosques Nativos</span>
-                </div>
-                <h4 style="color: #1b4332; font-size: 19px; margin: 5px 0 10px 0;">Identificación de Árboles Semilleros y Fenología</h4>
-                <p style="color: #444; font-size: 14px; line-height: 1.6; margin: 0;">
-                    Recorrido de custodia forestal para verificar el estado de floración y maduración de frutos en árboles madre, registrando coordenadas protegidas para asegurar la trazabilidad genética de nuestras próximas cosechas.
-                </p>
-            </div>
-
-        </div>
+        <div id="lista-bitacora" style="display: flex; flex-direction: column; gap: 20px; max-width: 850px; margin: 0 auto;"></div>
     </div>
-
 </section>
 
 <!-- === CAJA 3: GENTE BOSQUESINA === -->
@@ -288,6 +207,26 @@
                     <input type="url" id="esp-imagen" placeholder="URL de la fotografía para el público" required>
                     <textarea id="esp-caracteristicas" placeholder="Características botánicas..."></textarea>
                     <button type="submit" class="btn-principal" style="background: #40916c;">Actualizar Vitrina Pública</button>
+                </form>
+            </div>
+        </details>
+
+        <!-- PASO 3.5: PUBLICAR EN DEL MONTE A LA PLAZA / BITÁCORA -->
+        <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
+            <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌿 Publicar en "Del Monte a la Plaza" o "Bitácora"</summary>
+            <div style="padding: 0 15px 15px 15px;">
+                <p style="font-size: 12px; color: #52796f; margin-bottom: 10px;">Agrega una jornada de mercado campesino o una salida al bosque consensuada con el grupo.</p>
+                <form id="formPublicarTerritorio" autocomplete="off">
+                    <select id="pub-categoria" required>
+                        <option value="plaza">🧺 Del Monte a la Plaza (Mercados / Pueblo)</option>
+                        <option value="bitacora">🥾 Bitácora Visual (Salidas al Bosque / Siembra)</option>
+                    </select>
+                    <input type="text" id="pub-titulo" placeholder="Título de la historia o jornada" required>
+                    <input type="text" id="pub-fecha" placeholder="Fecha y Lugar (Ej: Octubre 2026 • Parque San Luis)" required>
+                    <input type="url" id="pub-imagen" placeholder="URL de la foto (Opcional)">
+                    <input type="text" id="pub-autor" placeholder="Publicado por (Ej: Equipo Bosquesinos)" required>
+                    <textarea id="pub-descripcion" placeholder="Cuenta la historia con el sentir campesino del grupo..." style="min-height: 90px;" required></textarea>
+                    <button type="submit" class="btn-principal" style="background: #2d6a4f;">Publicar en la Página</button>
                 </form>
             </div>
         </details>
@@ -983,7 +922,6 @@ window.onload = () => {
         }
 
         if (esGestor) {
-            // Fundador y Custodio ven el engranaje y entran al Panel de Control
             document.getElementById('btn-nav-admin').classList.remove('oculto');
             if (rol === 'Fundador' || rol === 'Admin') {
                 const secFundador = document.getElementById('seccionCrearBosquesino');
@@ -991,17 +929,19 @@ window.onload = () => {
                 cargarPostulacionesPendientes();
             }
             cargarCatalogo();
+            cargarTerritorio();
             cambiarVista('panelAdmin');
         } else {
-            // Si es VIGÍA: No ve el Panel de Control ni 'Gestionar Inventario', pero sí puede postularse a Custodio
             document.getElementById('btn-nav-admin').classList.add('oculto');
             document.getElementById('btn-nav-postular').classList.remove('oculto');
             document.getElementById('bannerPostulacionAlianza').classList.remove('oculto');
             cargarCatalogo();
+            cargarTerritorio();
             cambiarVista('vista-catalogo');
         }
-    } else { 
+    } else {
         cargarCatalogo(); 
+        cargarTerritorio();
     } 
 };
 
@@ -1030,6 +970,88 @@ function cambiarVista(idVistaDestino) {
         nav.classList.remove('oculto'); 
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function cargarTerritorio() {
+    const gridPlaza = document.getElementById('grid-plaza');
+    const listaBitacora = document.getElementById('lista-bitacora');
+    if (!gridPlaza || !listaBitacora) return;
+
+    try {
+        const res = await fetch(`${hostUrl}/api/territorio`);
+        if (!res.ok) return;
+        const publicaciones = await res.json();
+
+        const pubPlaza = publicaciones.filter(p => p.categoria === 'plaza');
+        const pubBitacora = publicaciones.filter(p => p.categoria === 'bitacora');
+
+        // Renderizar Mercados / Plaza (Si no hay nada, queda limpio sin fotos forzadas)
+        if (pubPlaza.length === 0) {
+            gridPlaza.innerHTML = '<p style="text-align:center; color:#666; grid-column: 1/-1; padding: 30px;">🌱 Espacio listo para compartir nuestras próximas jornadas en la plaza.</p>';
+        } else {
+            gridPlaza.innerHTML = pubPlaza.map(p => `
+                <div style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #dce8e0; position: relative;">
+                    ${esGestor ? `<button onclick="eliminarPublicacionTerritorio('\${p._id}')" style="position:absolute; top:10px; right:10px; background:rgba(207,34,46,0.9); color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer; font-weight:bold;" title="Eliminar">✖</button>` : ''}
+                    ${p.imagenUrl ? `<img src="${p.imagenUrl}" alt="${p.titulo}" style="width: 100%; height: 220px; object-fit: cover;">` : ''}
+                    <div style="padding: 20px;">
+                        <span style="background: #e9f5ed; color: #2d6a4f; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px;">📍 ${p.fechaLugar}</span>
+                        <h4 style="color: #1b4332; margin: 12px 0 8px 0; font-size: 18px;">${p.titulo}</h4>
+                        <p style="color: #444; font-size: 14px; line-height: 1.6; margin-bottom: 10px;">${p.descripcion}</p>
+                        <small style="color: #52796f; font-style: italic;">✍️ Por: ${p.autor}</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Renderizar Bitácora del Bosque
+        if (pubBitacora.length === 0) {
+            listaBitacora.innerHTML = '<p style="text-align:center; color:#666; padding: 30px;">🥾 Aún no se han publicado bitácoras de salidas al bosque.</p>';
+        } else {
+            listaBitacora.innerHTML = pubBitacora.map(p => `
+                <div style="background: #fff; border: 1px solid #dce8e0; border-left: 6px solid #1b4332; border-radius: 10px; padding: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
+                    ${esGestor ? `<button onclick="eliminarPublicacionTerritorio('\${p._id}')" style="position:absolute; top:12px; right:12px; background:none; color:#cf222e; border:none; font-size:16px; cursor:pointer;" title="Eliminar">✖</button>` : ''}
+                    <span style="color: #52796f; font-size: 12px; font-weight: bold;">🌲 ${p.fechaLugar}</span>
+                    <h4 style="color: #1b4332; font-size: 19px; margin: 6px 0 10px 0;">${p.titulo}</h4>
+                    ${p.imagenUrl ? `<img src="${p.imagenUrl}" alt="${p.titulo}" style="width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">` : ''}
+                    <p style="color: #444; font-size: 14px; line-height: 1.6; margin: 0 0 8px 0;">${p.descripcion}</p>
+                    <small style="color: #52796f; font-style: italic;">✍️ Relato de: ${p.autor}</small>
+                </div>
+            `).join('');
+        }
+    } catch (error) { console.log(error); }
+}
+
+document.getElementById('formPublicarTerritorio')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const datos = {
+        categoria: document.getElementById('pub-categoria').value,
+        titulo: document.getElementById('pub-titulo').value,
+        fechaLugar: document.getElementById('pub-fecha').value,
+        imagenUrl: document.getElementById('pub-imagen').value,
+        autorNombre: document.getElementById('pub-autor').value,
+        descripcion: document.getElementById('pub-descripcion').value
+    };
+    const res = await fetch(`${hostUrl}/api/territorio`, {
+        method: 'POST',
+        headers: obtenerCabecerasSeguras(),
+        body: JSON.stringify(datos)
+    });
+    if (res.ok) {
+        document.getElementById('formPublicarTerritorio').reset();
+        alert('¡Publicado con éxito!');
+        cargarTerritorio();
+    } else {
+        alert('Error al publicar.');
+    }
+});
+
+async function eliminarPublicacionTerritorio(id) {
+    if (!confirm('¿Deseas eliminar esta publicación de la página?')) return;
+    const res = await fetch(`${hostUrl}/api/territorio/${id}`, {
+        method: 'DELETE',
+        headers: obtenerCabecerasSeguras()
+    });
+    if (res.ok) cargarTerritorio();
 }
 
 function alternarSubvistaTerritorio(subvista) {

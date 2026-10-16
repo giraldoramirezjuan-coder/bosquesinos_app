@@ -410,6 +410,57 @@ app.put('/api/resolver-postulacion/:id', verificarAcceso, async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al resolver postulación' }); }
 });
 
+// --- MODELO Y RUTAS PARA "DEL MONTE A LA PLAZA" Y "BITÁCORA" ---
+const publicacionTerritorioSchema = new mongoose.Schema({
+    categoria: { type: String, enum: ['plaza', 'bitacora'], required: true }, // 'plaza' o 'bitacora'
+    titulo: { type: String, required: true },
+    fechaLugar: { type: String, required: true }, // Ej: "Octubre 2026 • Parque de San Luis"
+    descripcion: { type: String, required: true },
+    imagenUrl: { type: String, default: '' },
+    autor: { type: String, required: true },
+    fechaCreacion: { type: Date, default: Date.now }
+});
+const PublicacionTerritorio = mongoose.model('PublicacionTerritorio', publicacionTerritorioSchema);
+
+// GET Público: Cualquier visitante ve lo que el grupo haya decidido publicar
+app.get('/api/territorio', async (req, res) => {
+    try {
+        const publicaciones = await PublicacionTerritorio.find().sort({ fechaCreacion: -1 });
+        res.json(publicaciones);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al cargar publicaciones' });
+    }
+});
+
+// POST Protegido: Fundador o Custodio agrega una historia o jornada desde su cuenta
+app.post('/api/territorio', verificarAcceso, soloGestores, async (req, res) => {
+    try {
+        const { categoria, titulo, fechaLugar, descripcion, imagenUrl, autorNombre } = req.body;
+        const nuevaPub = new PublicacionTerritorio({
+            categoria,
+            titulo: String(titulo).trim(),
+            fechaLugar: String(fechaLugar).trim(),
+            descripcion: String(descripcion).trim(),
+            imagenUrl: String(imagenUrl || '').trim(),
+            autor: String(autorNombre || req.usuarioActual).trim()
+        });
+        await nuevaPub.save();
+        res.status(201).json({ mensaje: '¡Historia publicada en Territorio Vivo!' });
+    } catch (error) {
+        res.status(400).json({ error: 'Error al guardar la publicación' });
+    }
+});
+
+// DELETE Protegido: Fundador o Custodio puede borrar una tarjeta si se equivocó
+app.delete('/api/territorio/:id', verificarAcceso, soloGestores, async (req, res) => {
+    try {
+        await PublicacionTerritorio.findByIdAndDelete(req.params.id);
+        res.json({ mensaje: 'Publicación eliminada.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar publicación' });
+    }
+});
+
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => { console.log(`Servidor activo en puerto ${PORT}`); });
