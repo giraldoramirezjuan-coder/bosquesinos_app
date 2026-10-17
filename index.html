@@ -1006,32 +1006,106 @@ function abrirGestionInventario(especieId) {
     const especie = window.especiesGlobal.find(e => e._id === especieId);
     if (!especie) return;
     const nombreComun = especie.nombreComun;
-    document.getElementById('nombreEspecieLotes').innerText = `Gestión de: ${nombreComun}`;
+    document.getElementById('nombreEspecieLotes').innerText = `Trazabilidad e Inventario: ${nombreComun}`;
+    
     const rolActual = localStorage.getItem('rolUsuario');
-    const misLotes = window.lotesGlobal.filter(l => ((l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun) || (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id))) && (rolActual === 'Fundador' || rolActual === 'Admin' || l.registradoPor === localStorage.getItem('emailUsuario')));
+    const misLotes = window.lotesGlobal.filter(l => 
+        ((l.arbolMatrizId && l.arbolMatrizId.nombreComun === nombreComun) || 
+         (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id))) && 
+        (rolActual === 'Fundador' || rolActual === 'Admin' || l.registradoPor === localStorage.getItem('emailUsuario'))
+    );
+    
     const cont = document.getElementById('contenedorLotesActivos'); 
     if (misLotes.length === 0) {
-        cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No hay registros de esta especie bajo tu gestión.</p>';
+        cont.innerHTML = '<p style="font-size:13px; color:#666; text-align:center;">No hay lotes registrados para esta especie.</p>';
         document.getElementById('modalGestionLotes').classList.remove('oculto');
         return;
     }
-    let htmlSemillero = '<h4 style="color:#e07a5f; border-bottom: 2px solid #e07a5f; padding-bottom:5px; margin-top:0;">En Semillero</h4>';
-    let htmlVivero = '<h4 style="color:#2d6a4f; border-bottom: 2px solid #2d6a4f; padding-bottom:5px; margin-top:25px;">En Vivero</h4>';
-    let contadorSemillero = 0; let contadorVivero = 0;
+
+    let htmlSemillero = '<h4 style="color:#e07a5f; border-bottom: 2px solid #e07a5f; padding-bottom:5px; margin-top:0;">🌰 1. En Semillero (Germinación)</h4>';
+    let htmlVivero = '<h4 style="color:#2d6a4f; border-bottom: 2px solid #2d6a4f; padding-bottom:5px; margin-top:20px;">🌱 2. En Vivero (En Bolsa)</h4>';
+    let htmlSembrados = '<h4 style="color:#1b4332; border-bottom: 2px solid #1b4332; padding-bottom:5px; margin-top:20px;">⛰️ 3. Sembrados en Montaña</h4>';
+    
+    let cSem = 0, cViv = 0, cSemb = 0;
+
     misLotes.forEach(l => {
-        const madre = l.arbolMatrizId ? l.arbolMatrizId.codigoArbol : 'Madre Antigua';
-        const btnEliminar = `<button style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 14px; cursor: pointer; color: #cf222e;" onclick="eliminarRegistroDefinitivo('${l._id}')">✖</button>`;
+        const madre = l.arbolMatrizId ? `${l.arbolMatrizId.codigoArbol} (${l.arbolMatrizId.veredaSector || 'San Luis'})` : 'Madre Histórica';
+        const recolector = (l.origen && l.origen.responsableRecoleccion) ? l.origen.responsableRecoleccion : l.registradoPor;
+        const btnEliminar = `<button style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 14px; cursor: pointer; color: #cf222e;" onclick="eliminarRegistroDefinitivo('${l._id}')" title="Eliminar lote">✖</button>`;
+
+        // Construir la línea de tiempo (historial) de este lote
+        let pasosHtml = '';
+        if (l.historial && l.historial.length > 0) {
+            pasosHtml = l.historial.map(h => {
+                const f = h.fechaEvento ? new Date(h.fechaEvento).toLocaleDateString('es-CO') : '';
+                return `<li style="margin-bottom: 6px; font-size: 12px; color: #354f52;">
+                    <b>${f} - ${h.estadoAlcanzado}:</b> ${h.cantidadSuperviviente} uds. 
+                    <i>(${h.observaciones || 'Sin obs'})</i> — 👤 ${h.responsable || ''}
+                </li>`;
+            }).join('');
+        } else {
+            pasosHtml = '<li style="font-size:12px; color:#888;">Sin eventos adicionales registrados.</li>';
+        }
+
+        const bloqueHistorial = `
+            <details style="margin-top: 8px; background: #ffffff; border: 1px solid #dce8e0; border-radius: 6px; padding: 6px 10px;">
+                <summary style="font-size: 12px; font-weight: bold; color: #2d6a4f; cursor: pointer; padding: 2px 0 !important;">
+                    📜 Ver Trazabilidad (${l.codigoLote || 'Lote'})
+                </summary>
+                <div style="margin-top: 8px; border-top: 1px dashed #dce8e0; padding-top: 6px; text-align: left;">
+                    <div style="font-size: 11.5px; color: #52796f; margin-bottom: 6px;">
+                        🌳 <b>Árbol Madre:</b> ${madre} | 🧗 <b>Recolector:</b> ${recolector}
+                    </div>
+                    <ul style="margin: 0; padding-left: 18px;">${pasosHtml}</ul>
+                </div>
+            </details>`;
+
         if (l.estadoActual === 'Semillero' || l.estadoActual === 'Germinación') {
-            contadorSemillero++;
-            htmlSemillero += `<div style="position: relative; border: 1px dashed #e07a5f; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #fffaf8;">${btnEliminar}<strong style="color: #c15539;">Madre: ${madre}</strong><p style="font-size: 13px; color: #555; margin: 5px 0;"><b>${l.cantidadActual}</b> semillas en tierra.</p><div style="display: flex; gap: 8px; margin-top: 10px;"><button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; border-color: #e07a5f; color: #c15539; font-weight: bold;" onclick="prepAvanzar('${l._id}')">Germinaron</button><button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff; border: 1px solid #e07a5f; color: #e07a5f;" onclick="prepRetirar('${l._id}')">Registrar pérdida</button></div></div>`;
+            cSem++;
+            htmlSemillero += `
+                <div style="position: relative; border: 1px dashed #e07a5f; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #fffaf8;">
+                    ${btnEliminar}
+                    <span style="font-size:11px; background:#fde8e2; color:#c15539; padding:2px 8px; border-radius:10px; font-weight:bold;">${l.codigoLote}</span>
+                    <strong style="color: #c15539; display:block; margin-top:4px;">Madre: ${madre}</strong>
+                    <p style="font-size: 13px; color: #555; margin: 5px 0;"><b>${l.cantidadActual}</b> de ${l.cantidadInicial} semillas en tierra.</p>
+                    ${bloqueHistorial}
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; border-color: #e07a5f; color: #c15539; font-weight: bold;" onclick="prepAvanzar('${l._id}')">🌱 Pasar a Vivero</button>
+                        <button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff; border: 1px solid #e07a5f; color: #e07a5f;" onclick="prepRetirar('${l._id}')">Registrar pérdida</button>
+                    </div>
+                </div>`;
         } else if (l.estadoActual === 'Vivero' || l.estadoActual === 'Lista para transplante') {
-            contadorVivero++;
-            htmlVivero += `<div style="position: relative; border: 1px solid #74c69d; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #f1f7f3;">${btnEliminar}<strong style="color: #1b4332;">Madre: ${madre}</strong><p style="font-size: 13px; color: #1b4332; margin: 5px 0;"><b>${l.cantidadActual}</b> plántulas en bolsa.</p><div style="display: flex; gap: 8px; margin-top: 10px;"><button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; border-color: #2d6a4f; color: #1b4332; font-weight: bold;" onclick="prepAvanzar('${l._id}')">Sembrar en campo</button><button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff; border: 1px solid #74c69d; color: #2d6a4f;" onclick="prepRetirar('${l._id}')">Registrar pérdida</button></div></div>`;
+            cViv++;
+            htmlVivero += `
+                <div style="position: relative; border: 1px solid #74c69d; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #f1f7f3;">
+                    ${btnEliminar}
+                    <span style="font-size:11px; background:#d8f3dc; color:#1b4332; padding:2px 8px; border-radius:10px; font-weight:bold;">${l.codigoLote}</span>
+                    <strong style="color: #1b4332; display:block; margin-top:4px;">Madre: ${madre}</strong>
+                    <p style="font-size: 13px; color: #1b4332; margin: 5px 0;"><b>${l.cantidadActual}</b> plántulas listas en bolsa (de ${l.cantidadInicial} semillas).</p>
+                    ${bloqueHistorial}
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button class="btn-classic-secondary" style="flex: 1; padding: 8px; font-size: 12px; border-color: #2d6a4f; color: #1b4332; font-weight: bold;" onclick="prepAvanzar('${l._id}')">⛰️ Sembrar en campo</button>
+                        <button class="btn-classic-danger" style="flex: 1; padding: 8px; font-size: 12px; font-weight: bold; background: #fff; border: 1px solid #74c69d; color: #2d6a4f;" onclick="prepRetirar('${l._id}')">Registrar salida/pérdida</button>
+                    </div>
+                </div>`;
+        } else if (l.estadoActual === 'Sembrada') {
+            cSemb++;
+            htmlSembrados += `
+                <div style="position: relative; border: 2px solid #2d6a4f; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #e9f5ed;">
+                    ${btnEliminar}
+                    <span style="font-size:11px; background:#1b4332; color:#ffffff; padding:2px 8px; border-radius:10px; font-weight:bold;">✅ ${l.codigoLote} • EN MONTAÑA</span>
+                    <strong style="color: #1b4332; display:block; margin-top:4px;">Origen: ${madre}</strong>
+                    <p style="font-size: 13px; color: #1b4332; margin: 5px 0;"><b>${l.cantidadActual}</b> árboles sembrados en territorio.</p>
+                    ${bloqueHistorial}
+                </div>`;
         }
     });
-    if (contadorSemillero === 0) htmlSemillero += '<p style="font-size:13px; color:#888;">No hay semillas en tierra.</p>';
-    if (contadorVivero === 0) htmlVivero += '<p style="font-size:13px; color:#888;">No hay plántulas en bolsa.</p>';
-    cont.innerHTML = htmlSemillero + htmlVivero;
+
+    if (cSem === 0) htmlSemillero += '<p style="font-size:12.5px; color:#888;">No hay semillas en germinación.</p>';
+    if (cViv === 0) htmlVivero += '<p style="font-size:12.5px; color:#888;">No hay plántulas en bolsa.</p>';
+    if (cSemb === 0) htmlSembrados += '<p style="font-size:12.5px; color:#888;">Aún no hay lotes marcados como sembrados en campo.</p>';
+
+    cont.innerHTML = htmlSemillero + htmlVivero + htmlSembrados;
     document.getElementById('modalGestionLotes').classList.remove('oculto');
 }
 
