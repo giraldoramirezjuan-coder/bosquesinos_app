@@ -47,7 +47,7 @@
     <div style="display: flex; flex-direction: row; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
         
         <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
-            📖 Cuaderno y Catálogo
+            📖 Catálogo Bosquesino
         </button>
 
         <!-- AHORA SÍ VISIBLE EN TODA LA PÁGINA -->
@@ -89,7 +89,7 @@
         
         <div style="display: flex; flex-direction: row; gap: 20px; justify-content: center; align-items: center; margin-top: 30px; flex-wrap: wrap;">
             <button class="btn-primary btn-dinamico" style="width: max-content !important; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-brand-forest); color: #ffffff; border: 2px solid var(--color-brand-forest); white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
-                📖 Explorar Cuaderno y Catálogo
+                📖 Explorar Catálogo
             </button>
             
             <button class="btn-primary btn-dinamico" style="width: max-content !important; margin: 0; padding: 15px 30px; font-size: 16px; background: var(--color-accent-sun); color: var(--color-text-primary); border: 2px solid var(--color-accent-sun); font-weight: bold; white-space: nowrap;" onclick="cambiarVista('vista-territorio')">
@@ -102,7 +102,7 @@
 <!-- === CAJA 2: CATÁLOGO === -->
 <section id="vista-catalogo" class="oculto" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
     <div style="text-align: center; margin-bottom: 40px;">
-        <h2 style="color: var(--color-brand-forest); font-size: 32px;">Cuaderno Bosquesino</h2>
+        <h2 style="color: var(--color-brand-forest); font-size: 32px;">Catálogo Bosquesino</h2>
         <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">Conoce las historias de nuestras especies nativas. Cada plántula guarda una memoria campesina y el esfuerzo de recuperación de nuestros bosques.</p>
     </div>
     <ul id="listaPlantulas"></ul>
@@ -113,22 +113,22 @@
   <div style="text-align: center; margin-bottom: 28px;">
     <h1 style="color: #0d4a29; font-size: 2.2rem; margin-bottom: 10px;">Territorio Vivo Bosquesino</h1>
     <p style="color: #4a5d52; max-width: 680px; margin: 0 auto 22px; font-size: 1.05rem;">
-      El recorrido real de nuestra gente: desde las trochas donde cuidamos los árboles madre y sembramos bajo el agua, hasta el encuentro en el parque de San Luis.
+      Cuidamos el agua y los árboles madre; florecemos en los bosques de San Luis.
     </p>
 
     <!-- BOTONES DE NAVEGACIÓN COMPACTOS Y MONTAÑEROS -->
     <div style="display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap;">
       <button id="tab-campo-mesa" onclick="cambiarCategoriaTerritorio('campo-mesa')" 
               style="width: max-content !important; padding: 12px 26px; border-radius: 30px; border: 2px solid #0d4a29; background: #0d4a29; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; margin: 0;">
-        🌱 Del Campo a la Mesa
+        🌱 Del Campo a la Mesa "Mercados Campesinos" 
       </button>
       <button id="tab-salidas-bosque" onclick="cambiarCategoriaTerritorio('salidas-bosque')" 
               style="width: max-content !important; padding: 12px 26px; border-radius: 30px; border: 2px solid #0d4a29; background: white; color: #0d4a29; font-weight: bold; cursor: pointer; font-size: 1rem; margin: 0;">
-        🥾 Salidas al Bosque
+        🥾 Salidas al Bosque 
       </button>
       <button id="btn-abrir-editor-cronica" onclick="accionBotonPublicar()" 
               style="width: max-content !important; padding: 12px 24px; border-radius: 30px; border: none; background: #c86428; color: white; font-weight: bold; cursor: pointer; font-size: 0.98rem; margin: 0; box-shadow: 0 4px 12px rgba(200,100,40,0.25);">
-        ✍️ Contar una Historia / Reporte
+        ✍️ Contar una Historia 
       </button>
     </div>
   </div>
@@ -138,15 +138,15 @@
     <div style="flex: 1; min-width: 260px;">
       <h3 id="titulo-banner-territorio" style="margin: 0 0 6px 0; color: #0d4a29;">🌱 Del Campo a la Mesa</h3>
       <p id="desc-banner-territorio" style="margin: 0; color: #3b4d43;">
-        Cada vez que bajamos de las veredas al parque, traemos arbolitos nativos criados en nuestro vivero comunitario, cosechas limpias y la palabra de quienes cuidan la tierra.
+        Semillas vivas, cosechas limpias y la palabra de quienes cuidan el territorio. 
       </p>
     </div>
     <!-- CAJITA PARA ANIMAR A LA COMUNIDAD A ESCRIBIR -->
     <div style="background: #ffffff; border: 1px dashed #74c69d; padding: 12px 16px; border-radius: 10px; text-align: left; max-width: 320px;">
-      <strong style="color: #0d4a29; font-size: 0.9rem; display: block; margin-bottom: 4px;">🌿 ¿Estuviste en una siembra o en la plaza?</strong>
+      <strong style="color: #0d4a29; font-size: 0.9rem; display: block; margin-bottom: 4px;">🌿 ¿Estuviste en una siembra o en un encuentro ecológico?</strong>
       <span style="font-size: 0.82rem; color: #52796f; display: block; margin-bottom: 8px;">Anímate a dejar el recuerdo con tus propias palabras. Tenemos una guía de 3 pregunticas para ayudarte.</span>
       <button type="button" onclick="accionBotonPublicar()" style="width: max-content !important; background: #e9f5ed; color: #0d4a29; border: 1px solid #0d4a29; padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: bold; cursor: pointer; margin: 0;">
-        ✨ Escribir mi relato guiado
+        ✨ Escribe tu cuento guiado
       </button>
     </div>
   </div>
@@ -156,7 +156,7 @@
        ========================================================= -->
   <div id="panel-editor-cronica" style="display: none; background: #ffffff; border: 2px solid #d4e3da; border-radius: 14px; padding: 24px; margin-bottom: 35px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-      <h2 id="titulo-modal-editor" style="margin: 0; color: #0d4a29;">✍️ Armar Crónica Bosquesina</h2>
+      <h2 id="titulo-modal-editor" style="margin: 0; color: #0d4a29;">✍️ Armar Cuento Bosquesina</h2>
       <div style="display: flex; gap: 8px; flex-wrap: wrap;">
         <button type="button" onclick="toggleAsistenteRapidito()" style="width: max-content !important; margin: 0; background: #fff4ec; color: #b85418; border: 1px solid #e0a882; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600;">
           🪄 Armar con 3 preguntas (Fácil)
@@ -174,7 +174,7 @@
         <input type="text" id="asist-p1" placeholder="1. ¿A qué vereda o lugar fueron, cómo estaba el clima y quiénes estuvieron?" style="margin: 0 !important; padding: 10px !important;">
         <input type="text" id="asist-p2" placeholder="2. ¿Qué hicieron en la jornada? (Ej: sembramos abarco, charlamos en el parque...)" style="margin: 0 !important; padding: 10px !important;">
         <input type="text" id="asist-p3" placeholder="3. ¿Qué enseñanza, frase bonita o anécdota les dejó el día?" style="margin: 0 !important; padding: 10px !important;">
-        <input type="text" id="asist-foto" placeholder="Opcional: Pega aquí el link de una foto de ese día" style="margin: 0 !important; padding: 10px !important;">
+        <input type="text" id="asist-foto" placeholder="Opcional: Puedes poner aquí el link URL de una foto de ese día" style="margin: 0 !important; padding: 10px !important;">
         <button type="button" onclick="generarDesdeAsistente()" style="width: max-content !important; background: #c86428; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 0;">
           ✨ Pasar mis respuestas al editor
         </button>
@@ -183,9 +183,9 @@
 
     <!-- MANUAL DESPLEGABLE PARA CUALQUIER BOSQUESINO CURIOSO -->
     <div id="caja-manual-reportero" style="display: none; background: #f9fbf9; border: 1px dashed #7ba68c; border-radius: 10px; padding: 16px; margin-bottom: 18px; font-size: 0.93rem; color: #2c3e35;">
-      <h4 style="margin-top: 0; color: #0d4a29;">🌲 ¿Cómo armar un reporte que dé gusto leer?</h4>
+      <h4 style="margin-top: 0; color: #0d4a29;">🌲 ¿Cómo armar un cuento que dé gusto leer?</h4>
       <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-        <li><strong>Habla con naturalidad:</strong> Cuenta cómo estaba el camino, qué vereda visitaron y qué compartieron.</li>
+        <li><strong>Habla con confianza:</strong> Cuenta cómo estaba el clima, qué vereda visitaron y qué compartieron.</li>
         <li><strong>Unifica las fotos del mismo día:</strong> Si tienes 2 o 3 fotos de la misma jornada, mételas todas en este mismo relato usando el botón <strong>[📷 Insertar Foto]</strong>.</li>
         <li><strong>Usa la barra de botones:</strong> Pon <strong>[H Subtítulo]</strong> para separar momentos y <strong>[💬 Resaltar Saber]</strong> para destacar una enseñanza campesina.</li>
       </ul>
@@ -202,7 +202,7 @@
         </select>
       </div>
       <div>
-        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Lugar y Mes real (Etiqueta superior)</label>
+        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Lugar y Mes (Etiqueta superior)</label>
         <input type="text" id="cronica-etiqueta" oninput="actualizarVistaPrevia()" placeholder="Ej: 📍 Parque de San Luis • Septiembre 2026" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
       </div>
     </div>
@@ -214,7 +214,7 @@
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 14px;">
       <div>
-        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Resumen cortico (se ve en la tarjeta)</label>
+        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Resumen corto (se ve en la tarjeta)</label>
         <input type="text" id="cronica-resumen" oninput="actualizarVistaPrevia()" placeholder="Una frase que invite a leer la historia completa..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
       </div>
       <div>
@@ -285,7 +285,7 @@
 <!-- === CAJA 4: PANEL DE CONTROL PRIVADO (EXCLUSIVO FUNDADOR Y CUSTODIO) === -->
 <section id="panelAdmin" class="oculto" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
     <div class="tarjeta-admin" style="max-width: 800px; margin: 0 auto;">
-        <h3 style="color: #2a4d31; margin-top: 0; text-align: center;">Panel de Control Bosquesino</h3>
+        <h3 style="color: #2a4d31; margin-top: 0; text-align: center;">Panel de Bosquesino</h3>
         
         <!-- PASO 1 -->
         <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
@@ -388,7 +388,7 @@
         <div style="text-align: center; margin-bottom: 15px;">
             <span style="font-size: 36px;">🌳</span>
             <h2 style="color: #1b4332; margin: 5px 0; font-family: serif; font-size: 24px;">Postulación a Custodio</h2>
-            <p style="color: #52796f; font-size: 13px; margin: 0;">Pasa de Vigía a guardián activo de árboles semilleros y lotes en tu vereda.</p>
+            <p style="color: #52796f; font-size: 13px; margin: 0;">Asume el rol de guardián activo en su vereda, custodiando los árboles semilleros y los lotes comunitarios..</p>
         </div>
 
         <!-- Estado actual de la postulación -->
@@ -568,7 +568,7 @@
 </section>
 
 <footer class="footer-discreto" style="position: relative; padding: 40px 20px 20px 20px; text-align: center; background-color: #06351f; color: #a3b18a;">
-    <p style="margin: 0; font-size: 14px; font-weight: 500; color: #dce8e0;">Cultivando vida y protegiendo nuestros ríos desde San Luis, Antioquia.</p>
+    <p style="margin: 0; font-size: 14px; font-weight: 500; color: #dce8e0;">En San Luis la vida se siembra despacio y los ríos fluyen protegidos por nuestra gente.</p>
     
     <div style="margin-top: 15px; display: flex; justify-content: center; font-size: 13px;">
         <span style="cursor: pointer; text-decoration: underline; opacity: 0.8; transition: 0.3s;" onclick="cambiarVista('vista-legal')">
