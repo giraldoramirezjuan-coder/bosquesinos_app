@@ -612,12 +612,12 @@ const CRONICAS_BASE_LOCAL = [
     },
     {
         _id: 'base-octubre-bosque',
-        titulo: 'Hombro a hombro con la montaña: 1 km de ascenso con los árboles en canasta',
+        titulo: 'Hombro a hombro con la montaña cuidamos los arboles para ir a sembrarlos después de la lluvia',
         categoria: 'salidas-bosque',
         etiquetaLugarFecha: '🌧️ Montañas de San Luis • Octubre 2026',
-        resumen: 'Jornada de siembra en loma de alta pendiente. Pese al barro liso y la brisa de temporada de lluvias, subimos los árboles a pulso para devolverle abrigo a la montaña.',
+        resumen: 'Jornada de siembra pese a la brisa de temporada de lluvias, cuidamos los árboles a pulso para devolverle abrigo a la montaña.',
         autor: 'Equipo Bosquesinos',
-        contenido: 'Detrás de cada plántula que germina en el vivero hay kilómetros de trocha, loma parada y botas embarradas. En esta salida nos fuimos a sembrar en una ladera alta donde la montaña pedía árboles a gritos.\n\n[titulo]Subiendo la loma en canasta[/titulo]\nAunque el clima nos recibió con aguacero y viento frío, nos repartimos el peso en canastas y arrancamos el ascenso de un kilómetro por el barro liso. Cuando el terreno se pone pesado es cuando más se siente el trabajo en equipo.\n\n[cita]Sembrar en temporada de lluvias cuesta el doble en la subida, pero es la garantía de que el arbolito agarre raíz firme en su nueva tierra.[/cita]\n\nAl final de la tarde dejamos los árboles bien plantados, sabiendo que en unos años esa loma volverá a ser abrigo para el agua y los animales del cañón.'
+        contenido: 'Detrás de cada plántula que germina en el vivero hay saberes, caminos y custodios protegiendo nustros arboles madre.\n\n[titulo]Subiendo la loma en canasta[/titulo]\nAunque el clima nos recibió con aguacero y viento frío, nos repartimos el peso en canastas y arrancamos el ascenso de un kilómetro por el barro liso. Cuando el terreno se pone pesado es cuando más se siente el trabajo en equipo.\n\n[cita]Sembrar en temporada de lluvias cuesta el doble en la subida, pero es la garantía de que el arbolito agarre raíz firme en su nueva tierra.[/cita]\n\nAl final de la tarde dejamos los árboles bien plantados, sabiendo que en unos años esa loma volverá a ser abrigo para el agua y los animales del cañón.'
     }
 ];
 
@@ -670,7 +670,7 @@ function formatearTextoForo(textoCrudo) {
 function accionBotonPublicar() {
     const tk = localStorage.getItem('tokenAdmin') || localStorage.getItem('token');
     if (!tk) {
-        alert('🌿 Inicia sesión con tu cuenta Bosquesina (o regístrate gratis) para compartir una historia o reporte.');
+        alert('🌿 Inicia sesión con tu cuenta Bosquesina (o regístrate gratis) para compartir una historia.');
         document.getElementById('modalLoginClasico').classList.remove('oculto');
         return;
     }
@@ -730,7 +730,7 @@ function actualizarVistaPrevia() {
     const elPreview = document.getElementById('vista-previa-vivo');
     if (!elPreview) return;
 
-    const titulo = (elTitulo && elTitulo.value) ? elTitulo.value : 'Título de tu crónica...';
+    const titulo = (elTitulo && elTitulo.value) ? elTitulo.value : 'Título de tu enseñanza...';
     const etiqueta = (elEtiqueta && elEtiqueta.value) ? elEtiqueta.value : '📍 San Luis, Antioquia • 2026';
     const portada = (elPortada && elPortada.value) ? elPortada.value.trim() : '';
     const contenido = (elContenido && elContenido.value) ? elContenido.value : '';
@@ -747,7 +747,7 @@ function actualizarVistaPrevia() {
 function cargarPlantillaBase() {
     const area = document.getElementById('cronica-contenido');
     if (!area) return;
-    area.value = 'Cuenta aquí en un par de líneas cómo arrancó el día, con quiénes salieron y cómo estaba el clima en la vereda o en el parque.\n\n[titulo]El trabajo de la jornada[/titulo]\nAquí puedes contar qué hicieron paso a paso: las plántulas que bajaron, el camino por la loma o la conversa con las familias.\n\n[img]PEGA_AQUI_EL_LINK_DE_TU_FOTO[/img]\n\n[cita]Escribe aquí una enseñanza, un saber campesino o algo especial que haya pasado ese día.[/cita]';
+    area.value = 'Cuenta aquí en un par de líneas cómo arrancó el día, con quiénes salieron y cómo estaba el clima en la vereda.\n\n[titulo]El trabajo de la jornada[/titulo]\nAquí puedes contar qué hicieron paso a paso: las plántulas que bajaron, el camino por la loma o la conversa con las familias.\n\n[img]PEGA_AQUI_EL_LINK_DE_TU_FOTO[/img]\n\n[cita]Escribe aquí una enseñanza, un saber campesino o algo especial que haya pasado ese día.[/cita]';
     actualizarVistaPrevia();
 }
 
@@ -791,13 +791,13 @@ function cambiarCategoriaTerritorio(cat) {
         if (btnBosque) { btnBosque.style.background = 'white'; btnBosque.style.color = '#0d4a29'; }
         if (banner) { banner.style.background = '#f2f8f4'; banner.style.borderLeftColor = '#0d4a29'; }
         if (tituloBanner) { tituloBanner.style.color = '#0d4a29'; tituloBanner.innerText = '🌱 Del Campo a la Mesa'; }
-        if (descBanner) { descBanner.innerText = 'Cada vez que bajamos de las veredas al parque, traemos arbolitos nativos criados en nuestro vivero comunitario, cosechas limpias y la palabra de quienes cuidan la tierra.'; }
+        if (descBanner) { descBanner.innerText = 'Cada vez que bajamos de las veredas, traemos la conservación a nuestro vivero comunitario, cosechas limpias y las palabras de quienes cuidan la tierra.'; }
     } else {
         if (btnBosque) { btnBosque.style.background = '#0d4a29'; btnBosque.style.color = 'white'; }
         if (btnCampo) { btnCampo.style.background = 'white'; btnCampo.style.color = '#0d4a29'; }
         if (banner) { banner.style.background = '#fdf6f0'; banner.style.borderLeftColor = '#c86428'; }
         if (tituloBanner) { tituloBanner.style.color = '#b55016'; tituloBanner.innerText = '🥾 Salidas al Bosque'; }
-        if (descBanner) { descBanner.innerText = 'Detrás de cada arbolito en bolsa hay kilómetros de loma, búsqueda de semillas en la montaña, monitoreo de árboles madre y siembras hombro a hombro.'; }
+        if (descBanner) { descBanner.innerText = 'Detrás de cada arbolito en bolsa hay kilómetros de raíces, búsqueda de semillas en la montaña, monitoreo de árboles madre y siembras comunitarias.'; }
     }
     dibujarCronicas();
 }
@@ -845,21 +845,25 @@ function dibujarCronicas() {
 
         const imgPortada = c.imagenPortada ? '<img src="' + c.imagenPortada + '" alt="' + c.titulo + '" style="width:100%; max-height:360px; object-fit:cover; border-radius:12px; margin-bottom:16px;">' : '';
 
-        html += '<article style="background: white; border-radius: 16px; padding: 28px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); border-left: 6px solid ' + colorBorde + '; text-align: left;">' +
-            '<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">' +
-                '<span style="background: #e6f3eb; color: #0d4a29; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">' + c.etiquetaLugarFecha + '</span>' +
+        html += '<article style="background: #fdfbf7; border-radius: 8px; padding: 35px 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e8e3d8; text-align: left; max-width: 800px; margin: 0 auto;">' +
+            '<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #e8e3d8; padding-bottom: 15px;">' +
+                '<span style="color: #6d5b4b; font-size: 0.85rem; font-style: italic; letter-spacing: 0.5px;">' + c.etiquetaLugarFecha + '</span>' +
                 botonesEdicion +
             '</div>' +
-            '<h2 style="color: #102a1c; margin: 6px 0 12px 0; font-size: 1.65rem;">' + c.titulo + '</h2>' +
+            '<h2 style="color: #2a332a; margin: 0 0 15px 0; font-size: 1.8rem; font-family: Georgia, serif; line-height: 1.3;">' + c.titulo + '</h2>' +
             imgPortada +
-            '<p style="color: #4a5d52; font-size: 1.05rem; margin-bottom: 18px; font-weight: 500; line-height: 1.6;">' + c.resumen + '</p>' +
-            '<div id="cuerpo-cronica-' + c._id + '" style="display: none; border-top: 1px solid #e4ece7; padding-top: 18px; margin-top: 14px;">' +
+            '<p style="color: #5c665e; font-size: 1.1rem; margin-bottom: 25px; line-height: 1.6;">' + c.resumen + '</p>' +
+            '<div id="cuerpo-cronica-' + c._id + '" style="display: none; border-top: 1px dashed #d0c8b8; padding-top: 25px; margin-top: 20px; font-family: Georgia, serif;">' +
                 formatearTextoForo(c.contenido) +
-                '<p style="font-size: 0.85rem; color: #52796f; font-style: italic; margin-top: 16px;">✍️ Relato compartido por: ' + (c.autor || 'Equipo Bosquesinos') + '</p>' +
+                '<div style="margin-top: 30px; text-align: right;">' +
+                    '<span style="font-size: 0.9rem; color: #8c8173; font-style: italic;">✍️ Relato de: ' + (c.autor || 'Equipo Bosquesinos') + '</span>' +
+                '</div>' +
             '</div>' +
-            '<button id="btn-leer-' + c._id + '" onclick="toggleLecturaCronica(\'' + c._id + '\')" style="width: max-content !important; background: #0d4a29; color: white; border: none; padding: 10px 22px; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 8px;">' +
-                '📖 Leer crónica completa y ver fotos' +
-            '</button>' +
+            '<div style="text-align: center; margin-top: 15px;">' +
+                '<button id="btn-leer-' + c._id + '" onclick="toggleLecturaCronica(\'' + c._id + '\')" style="background: transparent; color: #8a6a4b; border: 1px solid #8a6a4b; padding: 8px 20px; border-radius: 4px; font-size: 0.9rem; cursor: pointer; transition: 0.3s;">' +
+                    'Leer relato completo' +
+                '</button>' +
+            '</div>' +
         '</article>';
     }
     contenedor.innerHTML = html;
