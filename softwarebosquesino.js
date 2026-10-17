@@ -38,6 +38,7 @@ mongoose.connect(uri)
   .then(() => {
     console.log('¡Conexión a MongoDB Atlas exitosa!');
     crearUsuarioAdmin(); 
+    crearCronicasIniciales();
   })
   .catch(err => console.error('Error conectando a la base de datos:', err));
 
@@ -125,9 +126,9 @@ const cronicaSchema = new mongoose.Schema({
         enum: ['campo-mesa', 'salidas-bosque'], 
         required: true 
     },
-    etiquetaLugarFecha: { type: String, required: true }, // Ej: "Parque Principal San Luis • Septiembre 2026"
+    etiquetaLugarFecha: { type: String, required: true },
     resumen: { type: String, required: true },
-    contenido: { type: String, required: true }, // Texto con etiquetas estilo foro ([img], [cita], etc.)
+    contenido: { type: String, required: true },
     imagenPortada: { type: String, default: '' },
     autor: { type: String, required: true },
     estado: { type: String, enum: ['Publicado', 'Pendiente'], default: 'Publicado' },
@@ -135,7 +136,7 @@ const cronicaSchema = new mongoose.Schema({
 });
 const Cronica = mongoose.model('Cronica', cronicaSchema);
 
-// --- AUTO-CREACIÓN FUNDADOR ---
+// --- AUTO-CREACIÓN FUNDADOR Y CRÓNICAS BASE ---
 async function crearUsuarioAdmin() {
   try {
     const usuarioExiste = await User.findOne({ email: 'bosquesinos' });
@@ -156,7 +157,7 @@ async function crearCronicasIniciales() {
                     categoria: 'campo-mesa',
                     etiquetaLugarFecha: '📍 Parque Principal San Luis • Septiembre 2026',
                     resumen: 'Bajamos de las veredas al parque principal con el vivero comunitario, cosechas frescas y la historia viva detrás de cada semilla.',
-                    imagenPortada: 'URL_FOTO_1_PARQUE', // Puedes cambiarla luego desde el editor
+                    imagenPortada: '',
                     autor: 'Equipo Bosquesinos',
                     estado: 'Publicado',
                     contenido: `Cada vez que bajamos de la montaña al parque principal, traemos mucho más que matas en bolsa: traemos el trabajo de las familias custodias y la memoria de nuestros bosques. En esta jornada de septiembre armamos mesa en el parque para conversar sin afán con la gente del pueblo.
@@ -164,19 +165,13 @@ async function crearCronicasIniciales() {
 [titulo]El vivero comunitario en la plaza[/titulo]
 Llegamos temprano a acomodar los arbolitos nativos listos para adopción. Muchas familias se acercaron a preguntar cómo sembrarlos en sus solares y fincas para cuidar los nacimientos de agua.
 
-[img]URL_FOTO_1_PARQUE[/img]
-
 [titulo]Conversando sobre semillas y árboles madre[/titulo]
 A mitad de la mañana se armó el mostrario alrededor de la mesa. Entre vecinos y productores estuvieron reconociendo las semillas de nuestros árboles maderables y frutales, recordando cuáles sirven para darle sombra al agua y cuáles alimentan a los animales del bosque.
 
-[img]URL_FOTO_2_PARQUE[/img]
-
-[cita]Cada arbolito que alguien se lleva en la plaza respalda directamente las caminadas de recolección en el monte y la gestion de los viverons en las veredas.[/cita]
+[cita]Cada arbolito que alguien se lleva en la plaza respalda directamente las caminadas de recolección en el monte y la gestión de los viveros en las veredas.[/cita]
 
 [titulo]Cosecha limpia y alimento de verdad[/titulo]
-Se comparten los frutos de la tierra y preparaciones hechas en casa, demostrando que cuidar el monte y producir comida sana van de la mano.
-
-[img]URL_FOTO_3_PARQUE[/img]`
+Se comparten los frutos de la tierra y preparaciones hechas en casa, demostrando que cuidar el monte y producir comida sana van de la mano.`
                 },
                 {
                     titulo: 'Hombro a hombro con la montaña: 1 km de ascenso con los árboles al hombro',
@@ -221,18 +216,21 @@ function soloGestores(req, res, next) {
     }
 }
 
+// =======================================================
+//   RUTAS DE CRÓNICAS (TERRITORIO VIVO)
+// =======================================================
 app.get('/api/cronicas', async (req, res) => {
     try {
-        const cronicas = await Cronica.find({ estado: 'Publicado' }).sort({ fechaCreacion: -1 });
+        const filtro = req.query.todas === 'true' ? {} : { estado: 'Publicado' };
+        const cronicas = await Cronica.find(filtro).sort({ fechaCreacion: -1 });
         res.json(cronicas);
     } catch (error) { res.status(500).json({ error: 'Error al cargar las crónicas' }); }
 });
 
-
 app.post('/api/cronicas', verificarAcceso, async (req, res) => {
     try {
         const { titulo, categoria, etiquetaLugarFecha, resumen, contenido, imagenPortada } = req.body;
-        const estadoInicial = (req.rol === 'Fundador' || req.rol === 'Custodio') ? 'Publicado' : 'Pendiente';
+        const estadoInicial = (req.rol === 'Fundador' || req.rol === 'Custodio' || req.rol === 'Admin') ? 'Publicado' : 'Pendiente';
         
         const nueva = new Cronica({
             titulo, categoria, etiquetaLugarFecha, resumen, contenido, imagenPortada,
@@ -257,14 +255,14 @@ app.put('/api/cronicas/:id', verificarAcceso, soloGestores, async (req, res) => 
 
 app.delete('/api/cronicas/:id', verificarAcceso, async (req, res) => {
     try {
-        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo un Fundador puede borrar crónicas.' });
+        if (req.rol !== 'Fundador' && req.rol !== 'Admin') return res.status(403).json({ error: 'Solo un Fundador puede borrar crónicas.' });
         await Cronica.findByIdAndDelete(req.params.id);
         res.json({ mensaje: 'Crónica eliminada' });
     } catch (error) { res.status(500).json({ error: 'Error al eliminar' }); }
 });
 
 // =======================================================
-//   RUTAS PÚBLICAS
+//   RUTAS PÚBLICAS (CATÁLOGO Y CUENTAS)
 // =======================================================
 app.get('/api/especies', async (req, res) => {
     try { res.json(await Especie.find()); } catch (error) { res.status(500).json({ error: 'Error al obtener vitrina' }); }
@@ -288,7 +286,7 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/registro-publico', async (req, res) => {
     try {
         if (await User.findOne({ email: String(req.body.email).trim() })) {
-            return res.status(400).json({ error: 'El correo ya está registrado.' });
+            return res.status(400).json({ error: 'El correo o usuario ya está registrado.' });
         }
         const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
         const nuevoUsuario = new User({ 
@@ -303,7 +301,7 @@ app.post('/api/registro-publico', async (req, res) => {
 
 app.post('/api/olvide-password', async (req, res) => {
     try {
-        if (!nodemailer) return res.status(503).json({ error: 'Servicio de correo en mantenimiento.' });
+        if (!nodemailer) return res.status(503).json({ error: 'Por favor solicita el restablecimiento directo por WhatsApp con el Fundador.' });
         const usuario = await User.findOne({ email: req.body.email });
         if (!usuario) return res.status(404).json({ error: 'No hay un usuario con ese correo.' });
 
@@ -318,7 +316,7 @@ app.post('/api/olvide-password', async (req, res) => {
         });
 
         await transporter.sendMail({
-            from: '"Bosquesinos San Luis" <tu-correo@gmail.com>',
+            from: `"Asociación Bosquesinos San Luis" <${process.env.EMAIL_USER}>`,
             to: usuario.email,
             subject: 'Recuperación de Contraseña - Bosquesinos',
             text: `Has solicitado restablecer tu contraseña.\n\nTu código de recuperación es: ${resetToken}\n\nEste código es válido por 15 minutos.`
@@ -350,7 +348,7 @@ app.post('/api/reset-password', async (req, res) => {
 });
 
 // =======================================================
-//   RUTAS PROTEGIDAS (ASOCIACIÓN)
+//   RUTAS PROTEGIDAS (VIVERO Y ASOCIACIÓN)
 // =======================================================
 app.post('/api/registrar-asociado', verificarAcceso, async (req, res) => {
     try {
@@ -360,6 +358,20 @@ app.post('/api/registrar-asociado', verificarAcceso, async (req, res) => {
         await new User({ email: String(req.body.email).trim(), password: passwordEncriptada, rol: 'Custodio' }).save();
         res.status(201).json({ mensaje: 'Custodio registrado con éxito.' });
     } catch (error) { res.status(400).json({ error: 'Error al registrar' }); }
+});
+
+// PUT: Fundador restablece la contraseña de cualquier compañero directamente
+app.put('/api/fundador-reset-password', verificarAcceso, async (req, res) => {
+    try {
+        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo el Fundador puede restablecer contraseñas.' });
+        const { identificador, nuevaPassword } = req.body;
+        const usuario = await User.findOne({ email: String(identificador).trim() });
+        if (!usuario) return res.status(404).json({ error: 'No se encontró ningún usuario con ese nombre o correo.' });
+        
+        usuario.password = await bcrypt.hash(String(nuevaPassword), 10);
+        await usuario.save();
+        res.json({ mensaje: `¡Contraseña de ${usuario.email} restablecida con éxito!` });
+    } catch (error) { res.status(500).json({ error: 'Error al cambiar la contraseña.' }); }
 });
 
 app.get('/api/arboles-matriz', verificarAcceso, soloGestores, async (req, res) => {
@@ -390,7 +402,6 @@ app.post('/api/arboles-matriz', verificarAcceso, soloGestores, async (req, res) 
     } catch (error) { res.status(400).json({ error: 'Error o código repetido' }); }
 });
 
-// PUT: Editar datos de un Árbol Semillero
 app.put('/api/arboles-matriz/:id', verificarAcceso, soloGestores, async (req, res) => {
     try {
         const arbolActualizado = await ArbolMatriz.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -523,57 +534,6 @@ app.put('/api/resolver-postulacion/:id', verificarAcceso, async (req, res) => {
         await usuario.save();
         res.json({ mensaje: `Postulación ${decision.toLowerCase()} con éxito.` });
     } catch (error) { res.status(500).json({ error: 'Error al resolver postulación' }); }
-});
-
-// --- MODELO Y RUTAS PARA "DEL MONTE A LA PLAZA" Y "BITÁCORA" ---
-const publicacionTerritorioSchema = new mongoose.Schema({
-    categoria: { type: String, enum: ['plaza', 'bitacora'], required: true }, // 'plaza' o 'bitacora'
-    titulo: { type: String, required: true },
-    fechaLugar: { type: String, required: true }, // Ej: "Octubre 2026 • Parque de San Luis"
-    descripcion: { type: String, required: true },
-    imagenUrl: { type: String, default: '' },
-    autor: { type: String, required: true },
-    fechaCreacion: { type: Date, default: Date.now }
-});
-const PublicacionTerritorio = mongoose.model('PublicacionTerritorio', publicacionTerritorioSchema);
-
-// GET Público: Cualquier visitante ve lo que el grupo haya decidido publicar
-app.get('/api/territorio', async (req, res) => {
-    try {
-        const publicaciones = await PublicacionTerritorio.find().sort({ fechaCreacion: -1 });
-        res.json(publicaciones);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al cargar publicaciones' });
-    }
-});
-
-// POST Protegido: Fundador o Custodio agrega una historia o jornada desde su cuenta
-app.post('/api/territorio', verificarAcceso, soloGestores, async (req, res) => {
-    try {
-        const { categoria, titulo, fechaLugar, descripcion, imagenUrl, autorNombre } = req.body;
-        const nuevaPub = new PublicacionTerritorio({
-            categoria,
-            titulo: String(titulo).trim(),
-            fechaLugar: String(fechaLugar).trim(),
-            descripcion: String(descripcion).trim(),
-            imagenUrl: String(imagenUrl || '').trim(),
-            autor: String(autorNombre || req.usuarioActual).trim()
-        });
-        await nuevaPub.save();
-        res.status(201).json({ mensaje: '¡Historia publicada en Territorio Vivo!' });
-    } catch (error) {
-        res.status(400).json({ error: 'Error al guardar la publicación' });
-    }
-});
-
-// DELETE Protegido: Fundador o Custodio puede borrar una tarjeta si se equivocó
-app.delete('/api/territorio/:id', verificarAcceso, soloGestores, async (req, res) => {
-    try {
-        await PublicacionTerritorio.findByIdAndDelete(req.params.id);
-        res.json({ mensaje: 'Publicación eliminada.' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al eliminar publicación' });
-    }
 });
 
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
