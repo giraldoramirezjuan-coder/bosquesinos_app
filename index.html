@@ -811,6 +811,141 @@ function cambiarCategoriaTerritorio(cat) {
         if (descBanner) { descBanner.innerText = 'Detrás de cada arbolito en bolsa hay kilómetros de loma, búsqueda de semillas en la montaña, monitoreo de árboles madre y siembras hombro a hombro.'; }
     }
 }
+dibujarCronicas();
+
+
+
+// 4. CARGAR Y DIBUJAR LAS CRÓNICAS
+async function cargarCronicasTerritorio() {
+    try {
+        const res = await fetch(hostUrl + '/api/cronicas');
+        if (res.ok) {
+            const datos = await res.json();
+            listaCronicasGlobal = (Array.isArray(datos) && datos.length > 0) ? datos : CRONICAS_BASE_LOCAL;
+        } else {
+            listaCronicasGlobal = CRONICAS_BASE_LOCAL;
+        }
+    } catch (e) {
+        listaCronicasGlobal = CRONICAS_BASE_LOCAL;
+    }
+    dibujarCronicas();
+}
+
+function dibujarCronicas() {
+    const contenedor = document.getElementById('contenedor-cronicas-territorio');
+    if (!contenedor) return;
+    const puedeEditar = usuarioPuedeGestionar();
+    const filtradas = listaCronicasGlobal.filter(function(c) { return c.categoria === categoriaTerritorioActual; });
+
+    if (filtradas.length === 0) {
+        contenedor.innerHTML = '<p style="text-align:center; color:#666; padding: 30px;">Aún no hay relatos en esta sección. ¡Haz clic en "Contar una Historia" para inaugurarla!</p>';
+        return;
+    }
+
+    let html = '';
+    for (let i = 0; i < filtradas.length; i++) {
+        const c = filtradas[i];
+        const colorBorde = (c.categoria === 'campo-mesa') ? '#0d4a29' : '#c86428';
+        const esBase = String(c._id).indexOf('base-') === 0;
+        
+        let botonesEdicion = '';
+        if (puedeEditar) {
+            botonesEdicion = '<div style="display: flex; gap: 8px;">' +
+                '<button onclick="prepararEdicionCronica(\'' + c._id + '\')" style="width: max-content !important; margin: 0; background:#eef5f0; color:#0d4a29; border:1px solid #0d4a29; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:0.84rem; font-weight:bold;">✏️ Editar crónica</button>' +
+                (!esBase ? '<button onclick="eliminarCronicaTerritorio(\'' + c._id + '\')" style="width: max-content !important; margin: 0; background:#fff0f0; color:#cf222e; border:1px solid #cf222e; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:0.84rem;">🗑️</button>' : '') +
+            '</div>';
+        }
+
+        const imgPortada = c.imagenPortada ? '<img src="' + c.imagenPortada + '" alt="' + c.titulo + '" style="width:100%; max-height:360px; object-fit:cover; border-radius:12px; margin-bottom:16px;">' : '';
+
+        html += '<article style="background: white; border-radius: 16px; padding: 28px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); border-left: 6px solid ' + colorBorde + '; text-align: left;">' +
+            '<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">' +
+                '<span style="background: #e6f3eb; color: #0d4a29; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">' + c.etiquetaLugarFecha + '</span>' +
+                botonesEdicion +
+            '</div>' +
+            '<h2 style="color: #102a1c; margin: 6px 0 12px 0; font-size: 1.65rem;">' + c.titulo + '</h2>' +
+            imgPortada +
+            '<p style="color: #4a5d52; font-size: 1.05rem; margin-bottom: 18px; font-weight: 500; line-height: 1.6;">' + c.resumen + '</p>' +
+            '<div id="cuerpo-cronica-' + c._id + '" style="display: none; border-top: 1px solid #e4ece7; padding-top: 18px; margin-top: 14px;">' +
+                formatearTextoForo(c.contenido) +
+                '<p style="font-size: 0.85rem; color: #52796f; font-style: italic; margin-top: 16px;">✍️ Relato compartido por: ' + (c.autor || 'Equipo Bosquesinos') + '</p>' +
+            '</div>' +
+            '<button id="btn-leer-' + c._id + '" onclick="toggleLecturaCronica(\'' + c._id + '\')" style="width: max-content !important; background: #0d4a29; color: white; border: none; padding: 10px 22px; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 8px;">' +
+                '📖 Leer crónica completa y ver fotos' +
+            '</button>' +
+        '</article>';
+    }
+    contenedor.innerHTML = html;
+}
+
+function toggleLecturaCronica(id) {
+    const cuerpo = document.getElementById('cuerpo-cronica-' + id);
+    const btn = document.getElementById('btn-leer-' + id);
+    if (!cuerpo || !btn) return;
+    if (cuerpo.style.display === 'none') {
+        cuerpo.style.display = 'block';
+        btn.innerText = '🔼 Cerrar crónica';
+        btn.style.background = '#4a5d52';
+    } else {
+        cuerpo.style.display = 'none';
+        btn.innerText = '📖 Leer crónica completa y ver fotos';
+        btn.style.background = '#0d4a29';
+    }
+}
+
+function prepararEdicionCronica(id) {
+    const encontrada = listaCronicasGlobal.find(function(x) { return String(x._id) === String(id); });
+    if (encontrada) toggleEditorCronica(encontrada);
+}
+
+async function guardarCronica() {
+    const idEdicion = document.getElementById('cronica-id-edicion').value;
+    const datos = {
+        categoria: document.getElementById('cronica-categoria').value,
+        etiquetaLugarFecha: document.getElementById('cronica-etiqueta').value.trim(),
+        titulo: document.getElementById('cronica-titulo').value.trim(),
+        resumen: document.getElementById('cronica-resumen').value.trim(),
+        imagenPortada: document.getElementById('cronica-portada').value.trim(),
+        contenido: document.getElementById('cronica-contenido').value.trim()
+    };
+
+    if (!datos.titulo || !datos.etiquetaLugarFecha || !datos.resumen || !datos.contenido) {
+        alert('Por favor completa el título, el lugar/mes, el resumen y el relato.');
+        return;
+    }
+
+    const url = idEdicion ? (hostUrl + '/api/cronicas/' + idEdicion) : (hostUrl + '/api/cronicas');
+    const metodo = idEdicion ? 'PUT' : 'POST';
+
+    try {
+        const res = await fetch(url, {
+            method: metodo,
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify(datos)
+        });
+        const rta = await res.json();
+        alert(rta.mensaje || rta.error);
+        if (res.ok) {
+            categoriaTerritorioActual = datos.categoria;
+            toggleEditorCronica();
+            await cargarCronicasTerritorio();
+            cambiarCategoriaTerritorio(datos.categoria);
+        }
+    } catch (e) {
+        alert('Error de conexión al guardar la crónica.');
+    }
+}
+
+async function eliminarCronicaTerritorio(id) {
+    if (!confirm('¿Seguro que deseas eliminar esta crónica?')) return;
+    try {
+        const res = await fetch(hostUrl + '/api/cronicas/' + id, {
+            method: 'DELETE',
+            headers: obtenerCabecerasSeguras()
+        });
+        if (res.ok) cargarCronicasTerritorio();
+    } catch (e) { console.error(e); }
+}
 
 window.onload = function() { 
     const token = localStorage.getItem('tokenAdmin');
