@@ -811,6 +811,82 @@ function cambiarCategoriaTerritorio(cat) {
         if (descBanner) { descBanner.innerText = 'Detrás de cada arbolito en bolsa hay kilómetros de loma, búsqueda de semillas en la montaña, monitoreo de árboles madre y siembras hombro a hombro.'; }
     }
 }
+
+window.onload = function() { 
+    const token = localStorage.getItem('tokenAdmin');
+    const rol = localStorage.getItem('rolUsuario');
+    const email = localStorage.getItem('emailUsuario');
+    const vistaGuardada = sessionStorage.getItem('vistaActivaBosquesinos');
+
+    if (token) { 
+        sesionIniciada = true;
+        esGestor = (rol === 'Fundador' || rol === 'Custodio' || rol === 'Admin');
+
+        const btnLogin = document.getElementById('btn-nav-login');
+        if (btnLogin) btnLogin.classList.add('oculto');
+        document.getElementById('btnModoAdmin').innerText = '🚪 Cerrar Sesión';
+
+        const badge = document.getElementById('badge-usuario-activo');
+        if (badge) {
+            badge.innerText = '🌿 ' + rol + ': ' + email;
+            badge.classList.remove('oculto');
+        }
+
+        if (esGestor) {
+            document.getElementById('btn-nav-admin').classList.remove('oculto');
+            if (rol === 'Fundador' || rol === 'Admin') {
+                const secFundador = document.getElementById('seccionCrearBosquesino');
+                if (secFundador) secFundador.classList.remove('oculto');
+                cargarPostulacionesPendientes();
+            }
+        } else {
+            document.getElementById('btn-nav-admin').classList.add('oculto');
+            document.getElementById('btn-nav-postular').classList.remove('oculto');
+            document.getElementById('bannerPostulacionAlianza').classList.remove('oculto');
+        }
+
+        cargarCatalogo();
+        cargarCronicasTerritorio();
+        cambiarVista(vistaGuardada || 'vista-catalogo');
+    } else {
+        cargarCatalogo(); 
+        cargarCronicasTerritorio();
+        if (vistaGuardada) cambiarVista(vistaGuardada);
+    } 
+};
+
+function cambiarVista(idVistaDestino) {
+    if (idVistaDestino === 'panelAdmin' && !esGestor) {
+        idVistaDestino = 'vista-catalogo';
+    }
+    sessionStorage.setItem('vistaActivaBosquesinos', idVistaDestino);
+
+    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin', 'vista-legal', 'vista-territorio'];
+    vistas.forEach(function(vista) {
+        const elemento = document.getElementById(vista);
+        if (elemento) { 
+            elemento.classList.add('oculto'); 
+            elemento.classList.remove('vista-activa'); 
+        }
+    });
+    const vistaDestino = document.getElementById(idVistaDestino);
+    if (vistaDestino) { 
+        vistaDestino.classList.remove('oculto'); 
+        void vistaDestino.offsetWidth; 
+        vistaDestino.classList.add('vista-activa'); 
+    }
+    const nav = document.getElementById('menu-principal');
+    if (idVistaDestino === 'vista-inicio') { 
+        nav.classList.add('oculto'); 
+    } else { 
+        nav.classList.remove('oculto'); 
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function enviarInteresWhatsApp() {
+    window.open('https://wa.me/573226575786?text=Hola Bosquesinos, estoy interesado en colaborar con la asociación. Me gustaría hablar sobre...', '_blank');
+}
 </script>
 </body>
 </html>
