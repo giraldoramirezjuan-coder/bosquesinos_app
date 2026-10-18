@@ -536,6 +536,39 @@ app.put('/api/resolver-postulacion/:id', verificarAcceso, async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al resolver postulación' }); }
 });
 
+// GET: Listar todos los usuarios registrados (Exclusivo Fundador)
+app.get('/api/usuarios', verificarAcceso, async (req, res) => {
+    try {
+        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo el Fundador puede ver el directorio de usuarios.' });
+        const usuarios = await User.find({}, '-password').sort({ rol: 1, email: 1 });
+        res.json(usuarios);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener la lista de usuarios.' });
+    }
+});
+
+// PUT: Cambiar el rol de cualquier usuario con un clic (Exclusivo Fundador)
+app.put('/api/usuarios/:id/rol', verificarAcceso, async (req, res) => {
+    try {
+        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo el Fundador puede cambiar roles.' });
+        const { nuevoRol } = req.body;
+        if (!['Fundador', 'Custodio', 'Vigía'].includes(nuevoRol)) {
+            return res.status(400).json({ error: 'Rol no válido.' });
+        }
+        const usuario = await User.findById(req.params.id);
+        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado.' });
+
+        usuario.rol = nuevoRol;
+        if (nuevoRol === 'Custodio' && usuario.postulacionCustodio) {
+            usuario.postulacionCustodio.estado = 'Aprobada';
+        }
+        await usuario.save();
+        res.json({ mensaje: `Rol de ${usuario.email} actualizado a ${nuevoRol}.` });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar el rol.' });
+    }
+});
+
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => { console.log(`Servidor activo en puerto ${PORT}`); });

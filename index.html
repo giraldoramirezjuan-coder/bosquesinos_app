@@ -283,100 +283,130 @@
     </div>
 </section>
 
-<!-- === CAJA 4: PANEL DE CONTROL PRIVADO (EXCLUSIVO FUNDADOR Y CUSTODIO) === -->
+<!-- === CAJA 4: PANEL DE CONTROL DIVIDIDO (OPERACIÓN VS GOBERNANZA) === -->
 <section id="panelAdmin" class="oculto" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
-    <div class="tarjeta-admin" style="max-width: 800px; margin: 0 auto;">
-        <h3 style="color: #2a4d31; margin-top: 0; text-align: center;">Panel de Bosquesino</h3>
-        
-        <!-- PASO 1 -->
-        <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
-            <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌳 1. Registrar Nuevo Árbol Semillero</summary>
-            <div style="padding: 0 15px 15px 15px;">
-                <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ <strong>Seguridad:</strong> Coordenadas GPS encriptadas con AES-256.</p>
-                <form id="formArbolMatriz" autocomplete="off">
-                    <input type="text" id="arbol-especie" placeholder="Nombre Común (Ej: Guayacán Amarillo)" required>
-                    <input type="text" id="arbol-cientifico" placeholder="Nombre Científico (Opcional)">
-                    <input type="text" id="arbol-codigo" placeholder="Código Único del Árbol (Ej: AM-GUAY-01)" required>
-                    <input type="text" id="arbol-finca" placeholder="Nombre de la Finca" required>
-                    <input type="text" id="arbol-vereda" placeholder="Vereda o Sector" required>
-                    <input type="text" id="arbol-custodio" placeholder="Campesino Custodio" required>
-                    <input type="text" id="arbol-gps" placeholder="Coordenadas GPS (Ej: 6.0423, -74.9951)" required>
-                    <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero (Protegido)</button>
-                </form>
-            </div>
-        </details>
+    <div class="tarjeta-admin" style="max-width: 850px; margin: 0 auto;">
+        <h3 style="color: #1b4332; margin-top: 0; text-align: center; font-size: 24px;">Panel de Control Bosquesino</h3>
 
-        <!-- PASO 2 -->
-        <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
-            <summary style="padding: 14px; font-weight: 600; color: #e07a5f; cursor: pointer;">🌱 2. Registrar Nueva Cosecha De Semillas</summary>
-            <div style="padding: 0 15px 15px 15px;">
-                <form id="formLote" autocomplete="off">
-                    <select id="lote-arbolMatriz" required><option value="">-- Selecciona el Árbol Madre recolectado --</option></select>
-                    <input type="number" id="lote-cantidad" placeholder="Cantidad de semillas recolectadas" min="1" required>
-                    <input type="text" id="lote-responsable" placeholder="Responsables del trepado/recolección" required>
-                    <input type="date" id="lote-fecha" required>
-                    <button type="submit" class="btn-principal" style="background: #e07a5f;">Generar Registro en Semillero</button>
-                </form>
-            </div>
-        </details>
+        <!-- SELECTOR DE PESTAÑAS (El botón de Gobernanza solo le aparece al Fundador) -->
+        <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; flex-wrap: wrap;">
+            <button type="button" id="btn-tab-vivero" class="btn-principal btn-suave" style="width: max-content !important; padding: 10px 22px; border-radius: 25px; background: #1b4332; color: white; margin: 0;" onclick="cambiarTabAdmin('vivero')">
+                🌱 1. Operación Vivero y Campo
+            </button>
+            <button type="button" id="btn-tab-gobernanza" class="btn-classic-secondary btn-suave oculto" style="width: max-content !important; padding: 10px 22px; border-radius: 25px; border: 2px solid #8a5a00; color: #8a5a00; background: #fffdf5; font-weight: bold; margin: 0;" onclick="cambiarTabAdmin('gobernanza')">
+                👑 2. Gobernanza y Roles (Fundador)
+            </button>
+        </div>
 
-        <!-- PASO 3 -->
-        <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
-            <summary style="padding: 14px; font-weight: 600; color: #2d6a4f; cursor: pointer;">📖 3. Registrar Plántulas (Vitrina)</summary>
-            <div style="padding: 0 15px 15px 15px;">
-                <form id="formEspecie" autocomplete="off">
-                    <select id="esp-nombre-select" required><option value="">-- Selecciona una Especie en Vivero --</option></select>
-                    <input type="url" id="esp-imagen" placeholder="URL de la fotografía para el público" required>
-                    <textarea id="esp-caracteristicas" placeholder="Características botánicas..."></textarea>
-                    <button type="submit" class="btn-principal" style="background: #40916c;">Actualizar Vitrina Pública</button>
-                </form>
-            </div>
-        </details>
+        <!-- =======================================================
+             PESTAÑA 1: OPERACIÓN VIVERO (Visible para Custodio y Fundador)
+             ======================================================= -->
+        <div id="subpanel-vivero">
+            <p style="font-size: 13px; color: #52796f; text-align: center; margin-top: 0; margin-bottom: 18px;">
+                Herramientas de registro diario para árboles madre, cosecha de semillas y vitrina del vivero.
+            </p>
 
-
-
-        <!-- PASO 4 -->
-        <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
-            <summary style="padding: 14px; font-weight: 600; color: #386641; cursor: pointer; user-select: none;">🌍 4. Inteligencia Comunitaria:</summary>
-            <div style="padding: 15px; text-align: center;">
-                <p style="font-size: 12px; color: #555; margin-top: 0; margin-bottom: 15px; text-align: left;">Vista previa del esfuerzo colectivo.</p>
-                <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-                    <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; border: 1px solid #eef4f0;"><span style="font-size: 18px; font-weight: bold; color: #2d6a4f;" id="stat-plantulas">0</span><br><span style="font-size: 11px; color: #555;">Plántulas Vivas</span></div>
-                    <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; border: 1px solid #eef4f0;"><span style="font-size: 18px; font-weight: bold; color: #e07a5f;" id="stat-lotes">0</span><br><span style="font-size: 11px; color: #555;">Registros Activos</span></div>
-                    <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; border: 1px solid #eef4f0;"><span style="font-size: 18px; font-weight: bold; color: #cf222e;" id="stat-cosecha">0</span><br><span style="font-size: 11px; color: #555;">Por Cosechar</span></div>
+            <!-- PASO 1 -->
+            <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
+                <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌳 1. Registrar Nuevo Árbol Semillero</summary>
+                <div style="padding: 0 15px 15px 15px;">
+                    <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ <strong>Seguridad:</strong> Coordenadas GPS encriptadas con AES-256.</p>
+                    <form id="formArbolMatriz" autocomplete="off">
+                        <input type="text" id="arbol-especie" placeholder="Nombre Común (Ej: Guayacán Amarillo)" required>
+                        <input type="text" id="arbol-cientifico" placeholder="Nombre Científico (Opcional)">
+                        <input type="text" id="arbol-codigo" placeholder="Código Único del Árbol (Ej: AM-GUAY-01)" required>
+                        <input type="text" id="arbol-finca" placeholder="Nombre de la Finca" required>
+                        <input type="text" id="arbol-vereda" placeholder="Vereda o Sector" required>
+                        <input type="text" id="arbol-custodio" placeholder="Campesino Custodio" required>
+                        <input type="text" id="arbol-gps" placeholder="Coordenadas GPS (Ej: 6.0423, -74.9951)" required>
+                        <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero (Protegido)</button>
+                    </form>
                 </div>
-                <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 10px; font-size: 13px; font-weight: bold; border-color: #386641; color: #386641;" onclick="abrirModalDirectorio()">📋 Ver Directorio Completo</button>
-            </div>
-        </details>
+            </details>
 
-        <!-- PASO 5: EXCLUSIVO FUNDADOR (Gestión de Custodios y Postulaciones) -->
-        <details id="seccionCrearBosquesino" class="oculto" style="background: #fffdf5; margin-bottom: 12px; border-radius: 8px; border: 1px solid #f4d35e;">
-            <summary style="padding: 14px; font-weight: 600; color: #8a5a00; cursor: pointer;">👑 5. Gestión de Custodios y Postulaciones (Solo Fundador)</summary>
-            <div style="padding: 0 15px 15px 15px;">
-                <h4 style="color: #1b4332; margin: 10px 0 8px 0; font-size: 14px;">📩 Solicitudes Pendientes de Vigías:</h4>
-                <div id="listaPostulacionesPendientes" style="margin-bottom: 18px; font-size: 13px; color: #555;">
+            <!-- PASO 2 -->
+            <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
+                <summary style="padding: 14px; font-weight: 600; color: #e07a5f; cursor: pointer;">🌱 2. Registrar Nueva Cosecha De Semillas</summary>
+                <div style="padding: 0 15px 15px 15px;">
+                    <form id="formLote" autocomplete="off">
+                        <select id="lote-arbolMatriz" required><option value="">-- Selecciona el Árbol Madre recolectado --</option></select>
+                        <input type="number" id="lote-cantidad" placeholder="Cantidad de semillas recolectadas" min="1" required>
+                        <input type="text" id="lote-responsable" placeholder="Responsables del trepado/recolección" required>
+                        <input type="date" id="lote-fecha" required>
+                        <button type="submit" class="btn-principal" style="background: #e07a5f;">Generar Registro en Semillero</button>
+                    </form>
+                </div>
+            </details>
+
+            <!-- PASO 3 -->
+            <details style="background: #f8fbf9; margin-bottom: 16px; border-radius: 8px; border: 1px solid #d8eadd;">
+                <summary style="padding: 14px; font-weight: 600; color: #2d6a4f; cursor: pointer;">📖 3. Actualizar Plántulas en Vitrina Pública</summary>
+                <div style="padding: 0 15px 15px 15px;">
+                    <form id="formEspecie" autocomplete="off">
+                        <select id="esp-nombre-select" required><option value="">-- Selecciona una Especie en Vivero --</option></select>
+                        <input type="url" id="esp-imagen" placeholder="URL de la fotografía para el público" required>
+                        <textarea id="esp-caracteristicas" placeholder="Características botánicas..."></textarea>
+                        <button type="submit" class="btn-principal" style="background: #40916c;">Actualizar Vitrina Pública</button>
+                    </form>
+                </div>
+            </details>
+
+            <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalMonitoreo()">
+                👀 Seguimiento Fenológico de Mis Árboles Semilleros
+            </button>
+        </div>
+
+        <!-- =======================================================
+             PESTAÑA 2: GOBERNANZA Y ROLES (Exclusivo Fundador)
+             ======================================================= -->
+        <div id="subpanel-gobernanza" class="oculto">
+            
+            <!-- TARJETA A: RESUMEN DE LA RED -->
+            <div style="background: #f8fbf9; padding: 16px; border-radius: 10px; border: 1px solid #d8eadd; margin-bottom: 16px;">
+                <h4 style="margin: 0 0 10px 0; color: #1b4332;">🌍 Rendimiento Global de la Red</h4>
+                <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                    <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; border: 1px solid #eef4f0;"><span style="font-size: 18px; font-weight: bold; color: #2d6a4f;" id="stat-plantulas">0</span><br><span style="font-size: 11px; color: #555;">Plántulas Vivas</span></div>
+                    <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; border: 1px solid #eef4f0;"><span style="font-size: 18px; font-weight: bold; color: #e07a5f;" id="stat-lotes">0</span><br><span style="font-size: 11px; color: #555;">Lotes en Vivero</span></div>
+                    <div style="text-align: center; background: #ffffff; padding: 10px; border-radius: 6px; flex: 1; border: 1px solid #eef4f0;"><span style="font-size: 18px; font-weight: bold; color: #cf222e;" id="stat-cosecha">0</span><br><span style="font-size: 11px; color: #555;">Árboles por Cosechar</span></div>
+                </div>
+                <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 10px; font-size: 13px; font-weight: bold; border-color: #386641; color: #386641;" onclick="abrirModalDirectorio()">📋 Ver Directorio Completo de Árboles Madre</button>
+            </div>
+
+            <!-- TARJETA B: TABLA INTERACTIVA DE USUARIOS Y CAMBIO DE ROLES -->
+            <div style="background: #fffdf5; padding: 18px; border-radius: 10px; border: 1px solid #f4d35e; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                    <h4 style="margin: 0; color: #8a5a00;">👥 Directorio de Usuarios y Asignación de Roles</h4>
+                    <button type="button" onclick="cargarTablaUsuarios()" style="width: max-content !important; margin: 0; padding: 5px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #8a5a00; background: white; color: #8a5a00; cursor: pointer;">🔄 Actualizar lista</button>
+                </div>
+                <p style="font-size: 12px; color: #666; margin-top: 0; margin-bottom: 12px;">
+                    Cambia el rango de cualquier miembro entre <b>Vigía</b> (visitante con cuenta), <b>Custodio</b> (guardián con acceso al vivero) o <b>Fundador</b> (administrador total), o cámbiale la clave con el botón 🔑.
+                </p>
+                <div id="contenedor-tabla-usuarios" style="overflow-x: auto;">
+                    Cargando usuarios registrados...
+                </div>
+            </div>
+
+            <!-- TARJETA C: SOLICITUDES PENDIENTES DE VIGÍAS -->
+            <details style="background: #ffffff; margin-bottom: 12px; border-radius: 8px; border: 1px solid #dce8e0;" open>
+                <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">📩 Solicitudes de Postulación a Custodio</summary>
+                <div id="listaPostulacionesPendientes" style="padding: 0 15px 15px 15px; font-size: 13px; color: #555;">
                     Cargando solicitudes...
                 </div>
+            </details>
 
-                <hr style="border: 0.5px solid #e9edc9; margin: 15px 0;">
-                <h4 style="color: #1b4332; margin: 0 0 8px 0; font-size: 14px;">➕ Crear Cuenta Directa de Custodio:</h4>
-                <form id="formRegistrarAsociado" autocomplete="off">
-                    <input type="email" id="asociado-email" placeholder="Correo electrónico del nuevo Custodio" required>
-                    <input type="password" id="asociado-password" placeholder="Contraseña asignada" required>
-                    <button type="submit" class="btn-principal" style="background: #2d6a4f;">Registrar Custodio Directamente</button>
-                </form>
-            </div>
-            <hr style="border: 0.5px solid #e9edc9; margin: 15px 0;">
-                <h4 style="color: #1b4332; margin: 0 0 8px 0; font-size: 14px;">🔑 Restablecer Contraseña a un Compañero:</h4>
-                <form id="formAdminResetPassword" autocomplete="off">
-                    <input type="text" id="reset-usuario-target" placeholder="Usuario o Correo del compañero" required>
-                    <input type="text" id="reset-nueva-clave" placeholder="Nueva contraseña asignada" required>
-                    <button type="submit" class="btn-classic-secondary" style="width: 100%; border-color: #c15539; color: #c15539; font-weight: bold;">Actualizar Contraseña de Compañero</button>
-                </form>
-        </details>
+            <!-- TARJETA D: CREAR CUENTA MANUALMENTE -->
+            <details style="background: #ffffff; margin-bottom: 12px; border-radius: 8px; border: 1px solid #dce8e0;">
+                <summary style="padding: 14px; font-weight: 600; color: #2d6a4f; cursor: pointer;">➕ Crear Cuenta Directa a un Compañero</summary>
+                <div style="padding: 0 15px 15px 15px;">
+                    <form id="formRegistrarAsociado" autocomplete="off">
+                        <input type="text" id="asociado-email" placeholder="Nombre de usuario o Correo del nuevo Custodio" required>
+                        <input type="password" id="asociado-password" placeholder="Contraseña asignada" required>
+                        <button type="submit" class="btn-principal" style="background: #2d6a4f;">Registrar como Custodio</button>
+                    </form>
+                </div>
+            </details>
 
-        <hr style="border: 0.5px solid #d8eadd; margin: 15px 0;">
-        <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalMonitoreo()">👀 Seguimiento de Árboles Semilleros</button>
+        </div>
     </div>
 </section>
 
@@ -1235,6 +1265,108 @@ async function resolverPostulacion(userId, decision) {
     } catch (error) { alert('Error al procesar la decisión.'); }
 }
 
+function cambiarTabAdmin(tab) {
+    const subVivero = document.getElementById('subpanel-vivero');
+    const subGob = document.getElementById('subpanel-gobernanza');
+    const btnVivero = document.getElementById('btn-tab-vivero');
+    const btnGob = document.getElementById('btn-tab-gobernanza');
+
+    if (tab === 'gobernanza') {
+        subVivero.classList.add('oculto');
+        subGob.classList.remove('oculto');
+        btnGob.style.background = '#8a5a00';
+        btnGob.style.color = '#ffffff';
+        btnVivero.style.background = 'transparent';
+        btnVivero.style.color = '#1b4332';
+        btnVivero.style.border = '2px solid #1b4332';
+        cargarTablaUsuarios();
+        cargarPostulacionesPendientes();
+    } else {
+        subGob.classList.add('oculto');
+        subVivero.classList.remove('oculto');
+        btnVivero.style.background = '#1b4332';
+        btnVivero.style.color = '#ffffff';
+        btnGob.style.background = '#fffdf5';
+        btnGob.style.color = '#8a5a00';
+    }
+}
+
+async function cargarTablaUsuarios() {
+    const cont = document.getElementById('contenedor-tabla-usuarios');
+    if (!cont) return;
+    try {
+        const res = await fetch(`${hostUrl}/api/usuarios`, { headers: obtenerCabecerasSeguras() });
+        if (!res.ok) { cont.innerHTML = '<p style="color:#888; font-size:13px;">Error al cargar usuarios.</p>'; return; }
+        const usuarios = await res.json();
+
+        let filas = usuarios.map(u => {
+            const colorBadge = u.rol === 'Fundador' ? '#fff3cd; color:#856404;' : (u.rol === 'Custodio' ? '#d8f3dc; color:#1b4332;' : '#f1f3f5; color:#495057;');
+            return `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px 8px; font-size: 13px; font-weight: 600; color: #1b4332;">${u.email}</td>
+                    <td style="padding: 10px 8px;">
+                        <span style="padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; background: ${colorBadge}">${u.rol}</span>
+                    </td>
+                    <td style="padding: 10px 8px;">
+                        <select onchange="cambiarRolUsuario('${u._id}', this.value)" style="margin: 0 !important; padding: 6px 8px !important; font-size: 12px !important; border-radius: 6px; border: 1px solid #ccc; width: auto !important;">
+                            <option value="Vigía" ${u.rol === 'Vigía' ? 'selected' : ''}>Vigía</option>
+                            <option value="Custodio" ${u.rol === 'Custodio' ? 'selected' : ''}>Custodio</option>
+                            <option value="Fundador" ${u.rol === 'Fundador' ? 'selected' : ''}>Fundador</option>
+                        </select>
+                    </td>
+                    <td style="padding: 10px 8px; text-align: center;">
+                        <button type="button" onclick="resetearClaveRapido('${u.email}')" style="width: max-content !important; margin: 0; padding: 5px 10px; font-size: 12px; border-radius: 6px; border: 1px solid #c15539; background: #fffaf8; color: #c15539; cursor: pointer;" title="Cambiar contraseña">
+                            🔑 Clave
+                        </button>
+                    </td>
+                </tr>`;
+        }).join('');
+
+        cont.innerHTML = `
+            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; text-align: left;">
+                <thead>
+                    <tr style="background: #f4efe0; color: #5c4308; font-size: 12px;">
+                        <th style="padding: 10px 8px;">Usuario / Correo</th>
+                        <th style="padding: 10px 8px;">Rol Actual</th>
+                        <th style="padding: 10px 8px;">Cambiar Rol</th>
+                        <th style="padding: 10px 8px; text-align: center;">Soporte</th>
+                    </tr>
+                </thead>
+                <tbody>${filas}</tbody>
+            </table>`;
+    } catch (e) {
+        cont.innerHTML = '<p style="color:#888; font-size:13px;">No se pudo conectar con el directorio de usuarios.</p>';
+    }
+}
+
+async function cambiarRolUsuario(userId, nuevoRol) {
+    try {
+        const res = await fetch(`${hostUrl}/api/usuarios/${userId}/rol`, {
+            method: 'PUT',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify({ nuevoRol })
+        });
+        const data = await res.json();
+        alert(data.mensaje || data.error);
+        cargarTablaUsuarios();
+        cargarPostulacionesPendientes();
+    } catch (e) {
+        alert('Error al cambiar el rol.');
+    }
+}
+
+async function resetearClaveRapido(identificador) {
+    const nuevaPassword = prompt(`🔑 Escribe la nueva contraseña para "${identificador}":`);
+    if (!nuevaPassword || !nuevaPassword.trim()) return;
+    const res = await fetch(`${hostUrl}/api/fundador-reset-password`, {
+        method: 'PUT',
+        headers: obtenerCabecerasSeguras(),
+        body: JSON.stringify({ identificador, nuevaPassword: nuevaPassword.trim() })
+    });
+    const data = await res.json();
+    alert(data.mensaje || data.error);
+}
+
 document.getElementById('formRegistrarAsociado')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const res = await fetch(`${hostUrl}/api/registrar-asociado`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ email: document.getElementById('asociado-email').value, password: document.getElementById('asociado-password').value }) });
@@ -1412,14 +1544,20 @@ window.onload = function() {
         if (btnEditor) btnEditor.classList.remove('oculto');
         if (cajaInvitacion) cajaInvitacion.classList.remove('oculto');
 
+        // AQUÍ VA EL CONTROL DE PERMISOS CORRECTO
         if (esGestor) {
+            // 1. Le muestra el engranaje a Fundadores y Custodios
             document.getElementById('btn-nav-admin').classList.remove('oculto');
+            
+            // 2. Le muestra la pestaña de Gobernanza SOLO al Fundador
             if (rol === 'Fundador' || rol === 'Admin') {
-                const secFundador = document.getElementById('seccionCrearBosquesino');
-                if (secFundador) secFundador.classList.remove('oculto');
+                const btnGob = document.getElementById('btn-tab-gobernanza');
+                if (btnGob) btnGob.classList.remove('oculto');
                 cargarPostulacionesPendientes();
+                cargarTablaUsuarios();
             }
         } else {
+            // 3. Lo que ven los Vigías
             document.getElementById('btn-nav-admin').classList.add('oculto');
             document.getElementById('btn-nav-postular').classList.remove('oculto');
             document.getElementById('bannerPostulacionAlianza').classList.remove('oculto');
