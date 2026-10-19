@@ -569,6 +569,125 @@ app.put('/api/usuarios/:id/rol', verificarAcceso, async (req, res) => {
     }
 });
 
+// =======================================================
+//   FASE 5 (INDEPENDIENTE): SISTEMA DE APADRINAMIENTOS Y QR
+// =======================================================
+const apadrinamientoSchema = new mongoose.Schema({
+    codigoCertificado: { type: String, required: true, unique: true }, // Ej: PAD-2026-A1B2
+    nombrePadrino: { type: String, required: true },
+    plan: { 
+        type: String, 
+        enum: ['Semilla', 'Raíz', 'Naciente', 'Cuenca'], 
+        required: true 
+    },
+    cantidadArboles: { type: Number, required: true },
+    especie: { type: String, required: true },
+    veredaRuta: { type: String, default: 'Rutas Ecológicas San Luis, Antioquia' },
+    loteCodigo: { type: String, default: '' }, // Opcional: por si quieren anotar el código del lote sin alterar el inventario
+    mensajeDedicatoria: { type: String, default: '' },
+    imagenArbolUrl: { type: String, default: '' },
+    fechaInicio: { type: Date, default: Date.now },
+    fechaFinCuidado: { type: Date, required: true }, // Cubre los 2 años de establecimiento
+    estadoCuidado: { 
+        type: String, 
+        default: 'En Vivero / Preparación de Siembra' 
+    },
+    bitacoraMantenimiento: [{
+        fecha: { type: Date, default: Date.now },
+        actividad: { type: String, required: true }, // Ej: "Siembra en loma", "1er Plateo y abono"
+        observaciones: { type: String, default: '' },
+        fotoUrl: { type: String, default: '' },
+        responsable: { type: String, default: '' }
+    }],
+    registradoPor: { type: String, required: true }
+});
+const Apadrinamiento = mongoose.model('Apadrinamiento', apadrinamientoSchema);
+
+// 1. GET Público: Consultar todos los apadrinamientos (para el muro público y buscador QR)
+app.get('/api/apadrinamientos', async (req, res) => {
+    try {
+        const lista = await Apadrinamiento.find().sort({ fechaInicio: -1 });
+        res.json(lista);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener apadrinamientos.' });
+    }
+});
+
+// 2. POST Protegido (Custodios y Fundador): Crear un nuevo Certificado de Apadrinamiento
+app.post('/api/apadrinamientos', verificarAcceso, soloGestores, async (req, res) => {
+    try {
+        const { nombrePadrino, plan, cantidadArboles, especie, veredaRuta, loteCodigo, mensajeDedicatoria, imagenArbolUrl } = req.body;
+        
+        // Generar código único ej: PAD-26-8F4A
+        const sufijo = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const codigoCertificado = `PAD-26-${sufijo}`;
+
+        // Calcular fecha de 2 años de cuidado (24 meses)
+        const fechaFin = new Date();
+        fechaFin.setFullYear(fechaFin.getFullYear() + 2);
+
+        const nuevo = new Apadrinamiento({
+            codigoCertificado,
+            nombrePadrino: String(nombrePadrino).trim(),
+            plan,
+            cantidadArboles: Number(cantidadArboles) || 1,
+            especie: String(especie).trim(),
+            veredaRuta: String(veredaRuta || 'Bosques de San Luis, Antioquia').trim(),
+            loteCodigo: String(loteCodigo || '').trim(),
+            mensajeDedicatoria: String(mensajeDedicatoria || '').trim(),
+            imagenArbolUrl: String(imagenArbolUrl || '').trim(),
+            fechaFinCuidado: fechaFin,
+            estadoCuidado: 'Sembrado / Ciclo de Establecimiento Activo',
+            bitacoraMantenimiento: [{
+                actividad: 'Apertura de Certificado y Asignación de Plántulas',
+                observaciones: 'Inicio del ciclo de acompañamiento y establecimiento por 2 años.',
+                fotoUrl: String(imagenArbolUrl || '').trim(),
+                responsable: req.usuarioActual
+            }],
+            registradoPor: req.usuarioActual
+        });
+
+        await nuevo.save();
+        res.status(201).json({ mensaje: `¡Certificado ${codigoCertificado} creado con éxito!`, apadrinamiento: nuevo });
+    } catch (error) {
+        res.status(400).json({ error: 'Error al registrar el apadrinamiento.' });
+    }
+});
+
+// 3. POST Protegido: Agregar reporte de plateo / mantenimiento de los 2 años
+app.post('/api/apadrinamientos/:id/mantenimiento', verificarAcceso, soloGestores, async (req, res) => {
+    try {
+        const pad = await Apadrinamiento.findById(req.params.id);
+        if (!pad) return res.status(404).json({ error: 'Certificado no encontrado.' });
+
+        if (req.body.estadoCuidado) {
+            pad.estadoCuidado = req.body.estadoCuidado;
+        }
+        pad.bitacoraMantenimiento.push({
+            actividad: req.body.actividad,
+            observaciones: req.body.observaciones || '',
+            fotoUrl: req.body.fotoUrl || '',
+            responsable: req.usuarioActual,
+            fecha: new Date()
+        });
+        await pad.save();
+        res.json({ mensaje: 'Reporte de mantenimiento agregado al certificado.', apadrinamiento: pad });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al registrar mantenimiento.' });
+    }
+});
+
+// 4. DELETE Protegido (Solo Fundador): Eliminar si se creó por error
+app.delete('/api/apadrinamientos/:id', verificarAcceso, async (req, res) => {
+    try {
+        if (req.rol !== 'Fundador' && req.rol !== 'Admin') return res.status(403).json({ error: 'Solo el Fundador puede eliminar certificados.' });
+        await Apadrinamiento.findByIdAndDelete(req.params.id);
+        res.json({ mensaje: 'Certificado eliminado.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar.' });
+    }
+});
+
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => { console.log(`Servidor activo en puerto ${PORT}`); });

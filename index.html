@@ -33,46 +33,90 @@
             border: 1px solid #74c69d;
             white-space: nowrap;
         }
+        /* Menú adaptable para celulares sin ocupar toda la pantalla */
+        #btn-menu-movil { display: none; }
+        @media (max-width: 820px) {
+            #btn-menu-movil {
+                display: inline-flex !important;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 14px !important;
+                border-radius: 20px;
+                border: 1.5px solid #1b4332;
+                background: #f2f8f4;
+                color: #1b4332;
+                font-weight: bold;
+                font-size: 14px !important;
+                cursor: pointer;
+                width: max-content !important;
+                margin: 0 !important;
+            }
+            #contenedor-botones-nav {
+                display: none !important;
+                position: absolute;
+                top: 72px;
+                left: 0;
+                width: 100%;
+                background: #ffffff;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                padding: 16px 5%;
+                box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+                border-top: 1px solid #e4ece7;
+                box-sizing: border-box;
+                gap: 10px !important;
+            }
+            #contenedor-botones-nav.menu-abierto {
+                display: flex !important;
+            }
+            #contenedor-botones-nav button {
+                width: 100% !important;
+                text-align: left;
+                justify-content: flex-start;
+                padding: 12px 16px !important;
+            }
+            #contenedor-botones-nav #btn-nav-admin {
+                width: 100% !important;
+                border-radius: 8px !important;
+            }
+        }
     </style>
 </head>
 <body>
 
 <!-- === BARRA DE NAVEGACIÓN SUPERIOR === -->
-<nav id="menu-principal" class="oculto" style="background: var(--color-surface-white); padding: 15px 5%; box-shadow: var(--shadow-card); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+<nav id="menu-principal" class="oculto" style="background: var(--color-surface-white); padding: 10px 5%; box-shadow: var(--shadow-card); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
     <!-- LADO IZQUIERDO: LOGO -->
     <div style="display: flex; align-items: center; cursor: pointer;" onclick="cambiarVista('vista-inicio')">
-        <img src="bosquesinos.png" alt="Logo Bosquesinos" style="height: 55px; object-fit: contain;">
+        <img src="bosquesinos.png" alt="Logo Bosquesinos" style="height: 48px; object-fit: contain;">
     </div>
+
+    <!-- BOTÓN HAMBURGUESA (Solo aparece en celulares) -->
+    <button type="button" id="btn-menu-movil" onclick="document.getElementById('contenedor-botones-nav').classList.toggle('menu-abierto')">
+        ☰ Menú
+    </button>
+
     <!-- LADO DERECHO: BOTONES -->
-    <div style="display: flex; flex-direction: row; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
-        
+    <div id="contenedor-botones-nav" style="display: flex; flex-direction: row; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
         <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
             📖 Catálogo Bosquesino
         </button>
-
-        <!-- AHORA SÍ VISIBLE EN TODA LA PÁGINA -->
         <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-territorio')">
             🌿 Territorio Vivo
         </button>
-        
+        <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; background: #fff8f0; border-color: #c86428; color: #b55016; font-weight: bold;" onclick="cambiarVista('vista-apadrinar')">
+            💚 Apadrinar
+        </button>
         <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-gente')">
             🤝 Alianza Bosquesina
         </button>
-
-        <!-- BOTÓN EXCLUSIVO PARA VIGÍAS: Postular a Custodio -->
         <button id="btn-nav-postular" class="btn-classic-secondary btn-suave oculto" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; background: #e9f5ed; border-color: #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalPostulacion()">
             🌱 Postular a Custodio
         </button>
-
-        <!-- INSIGNIA DE SESIÓN ACTIVA -->
         <span id="badge-usuario-activo" class="badge-rol oculto"></span>
-
-        <!-- BOTÓN PÚBLICO: Iniciar Sesión (Se oculta si ya ingresó) -->
         <button id="btn-nav-login" class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; border-color: var(--color-brand-forest); color: var(--color-brand-forest); font-weight: bold;" onclick="document.getElementById('modalLoginClasico').classList.remove('oculto')">
             👤 Iniciar Sesión
         </button>
-
-        <!-- BOTÓN SECRETO: Panel Interno (Tamaño compacto redondo corregido) -->
         <button id="btn-nav-admin" class="btn-classic-secondary btn-suave oculto" style="width: 40px !important; height: 40px !important; min-width: 40px !important; margin: 0; padding: 0; font-size: 18px; border-radius: 50%; border: 2px solid var(--color-brand-forest); background: #f2f8f4; color: var(--color-brand-forest); display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;" onclick="cambiarVista('panelAdmin')" title="Panel de Control Vivero">
             ⚙️
         </button>
@@ -128,7 +172,7 @@
       </button>
       <button id="btn-abrir-editor-cronica" class="oculto" onclick="accionBotonPublicar()" 
               style="width: max-content !important; padding: 12px 24px; border-radius: 30px; border: none; background: #c86428; color: white; font-weight: bold; cursor: pointer; font-size: 0.98rem; margin: 0; box-shadow: 0 4px 12px rgba(200,100,40,0.25);">
-        ✍️ Contar una Historia / Reporte
+        ✍️ Contar una Historia 
       </button>
     </div>
   </div>
@@ -157,7 +201,7 @@
        ========================================================= -->
   <div id="panel-editor-cronica" style="display: none; background: #ffffff; border: 2px solid #d4e3da; border-radius: 14px; padding: 24px; margin-bottom: 35px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-      <h2 id="titulo-modal-editor" style="margin: 0; color: #0d4a29;">✍️ Armar Cuento Bosquesina</h2>
+      <h2 id="titulo-modal-editor" style="margin: 0; color: #0d4a29;">✍️ Armar Cuentos Bosquesinos</h2>
       <div style="display: flex; gap: 8px; flex-wrap: wrap;">
         <button type="button" onclick="toggleAsistenteRapidito()" style="width: max-content !important; margin: 0; background: #fff4ec; color: #b85418; border: 1px solid #e0a882; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600;">
           🪄 Armar con 3 preguntas (Fácil)
@@ -209,13 +253,13 @@
     </div>
 
     <div style="margin-bottom: 14px;">
-      <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Título de la crónica</label>
+      <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Título de el cuento </label>
       <input type="text" id="cronica-titulo" oninput="actualizarVistaPrevia()" placeholder="Ej: Septiembre en el Parque: Plántulas, semillas y saberes de nuestra tierra" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px; font-size: 1rem;">
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 14px;">
       <div>
-        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Resumen corto (se ve en la tarjeta)</label>
+        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Resumen corto </label>
         <input type="text" id="cronica-resumen" oninput="actualizarVistaPrevia()" placeholder="Una frase que invite a leer la historia completa..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
       </div>
       <div>
@@ -249,13 +293,186 @@
     <div style="margin-top: 18px; display: flex; justify-content: flex-end; gap: 12px;">
       <button type="button" onclick="toggleEditorCronica()" style="width: max-content !important; margin: 0; padding: 10px 20px; border-radius: 8px; border: 1px solid #aaa; background: white; color: #333; cursor: pointer;">Cancelar</button>
       <button type="button" onclick="guardarCronica()" style="width: max-content !important; margin: 0; padding: 10px 24px; border-radius: 8px; border: none; background: #0d4a29; color: white; font-weight: bold; cursor: pointer;">
-        🚀 Publicar Cr+onica 
+        🚀 Publicar Cuento Bosquesino 
       </button>
     </div>
   </div>
 
   <!-- CONTENEDOR DONDE SE DIBUJAN LAS CRÓNICAS UNIFICADAS -->
   <div id="contenedor-cronicas-territorio" style="display: flex; flex-direction: column; gap: 28px;"></div>
+</section>
+
+<!-- === CAJA 2.8 (INDEPENDIENTE): APADRINAMIENTO CON FLUJO NATURAL === -->
+<section id="vista-apadrinar" class="oculto" style="max-width: 1050px; margin: 0 auto; padding: 40px 20px; min-height: 80vh;">
+    
+    <!-- 1. BIENVENIDA E HISTORIA NATURAL (ANTES DE CUALQUIER BOTÓN O PROCESO) -->
+    <div style="background: #fdfbf7; border: 1px solid #e8e3d8; border-radius: 14px; padding: 38px 28px; margin-bottom: 35px; box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
+        <div style="text-align: center; max-width: 760px; margin: 0 auto 30px auto;">
+            <span style="color: #6d5b4b; font-size: 0.9rem; font-style: italic; letter-spacing: 0.5px;">
+                🌿 Bosques de San Luis, Antioquia • Custodia Campesina
+            </span>
+            <h1 style="color: #1b4332; font-size: 2.2rem; margin: 10px 0 16px 0; font-family: Georgia, serif; line-height: 1.3;">
+                ¿Qué significa apadrinar un árbol con nosotros?
+            </h1>
+            <p style="color: #3b4d43; font-size: 1.08rem; line-height: 1.75; font-family: Georgia, serif; margin-bottom: 14px;">
+                En la montaña sabemos que sembrar un árbol no es solo abrir un hueco y dejarlo a su suerte. Cuando un arbolito pequeño llega al monte, la maleza, el verano o el ganado pueden ahogarlo si nadie vuelve a mirarlo.
+            </p>
+            <p style="color: #4a5d52; font-size: 1.02rem; line-height: 1.7;">
+                Por eso, cuando apadrinas un árbol con <b>Bosquesinos</b>, en realidad estás acompañando <b>dos años completos de su vida</b>: desde que recolectamos la semilla en nuestros árboles madre y la cuidamos en el vivero, hasta que subimos la loma para sembrarlo y regresamos durante 18 meses a limpiarle alrededor (plateo) para que agarre raíz firme y se defienda solo para siempre.
+            </p>
+        </div>
+
+        <!-- EL CAMINO DEL ÁRBOL EN 3 MOMENTOS CLAROS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; border-top: 1px dashed #d8d0c5; padding-top: 26px;">
+            <div style="background: #ffffff; padding: 18px; border-radius: 10px; border: 1px solid #ece8df;">
+                <strong style="color: #0d4a29; font-size: 1.02rem; display: block; margin-bottom: 6px;">🌰 1. Semilla y Vivero (6 meses)</strong>
+                <p style="margin: 0; font-size: 0.9rem; color: #526358; line-height: 1.55;">
+                    Recolectamos semillas de árboles nativos sanos en nuestras veredas y las criamos en bolsa hasta que tengan la fuerza necesaria para ir al campo.
+                </p>
+            </div>
+            <div style="background: #ffffff; padding: 18px; border-radius: 10px; border: 1px solid #ece8df;">
+                <strong style="color: #b55016; font-size: 1.02rem; display: block; margin-bottom: 6px;">🥾 2. Siembra y Cuidado (18 meses)</strong>
+                <p style="margin: 0; font-size: 0.9rem; color: #526358; line-height: 1.55;">
+                    Lo sembramos en nacimientos de agua y bosques protectores, o puedes venir a sembrarlo con nosotros. Hacemos los plateos y abonos para asegurar que viva.
+                </p>
+            </div>
+            <div style="background: #ffffff; padding: 18px; border-radius: 10px; border: 1px solid #ece8df;">
+                <strong style="color: #1b4332; font-size: 1.02rem; display: block; margin-bottom: 6px;">🏷️ 3. Historia Viva y Código QR</strong>
+                <p style="margin: 0; font-size: 0.9rem; color: #526358; line-height: 1.55;">
+                    Recibes un certificado con un código único y QR. Desde aquí podrás mirar en cualquier momento qué especie es, en qué vereda crece y las fotos de su avance.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. LOS PLANES PARA SUMARSE (EL PROCESO DEL USUARIO) -->
+    <div style="text-align: center; margin-bottom: 24px;">
+        <h2 style="color: #1b4332; margin: 0 0 8px 0; font-family: Georgia, serif; font-size: 1.85rem;">Elige cómo quieres sembrar vida</h2>
+        <p style="color: #52796f; max-width: 650px; margin: 0 auto; font-size: 0.98rem;">
+            Cada aporte va directo a sostener el vivero comunitario y el trabajo de las familias campesinas que cuidan el bosque.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(235px, 1fr)); gap: 18px; margin-bottom: 50px;">
+        
+        <!-- PLAN 1 -->
+        <div style="background: white; border: 1px solid #d8eadd; border-radius: 12px; padding: 22px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+            <div>
+                <span style="font-size: 12px; font-weight: bold; color: #2d6a4f; text-transform: uppercase;">Individual / Visitantes</span>
+                <h3 style="margin: 6px 0; color: #1b4332; font-size: 1.4rem; font-family: Georgia, serif;">🌱 Plan Semilla</h3>
+                <div style="font-size: 1.7rem; font-weight: bold; color: #0d4a29; margin: 10px 0;">$40.000 <span style="font-size: 0.85rem; font-weight: normal; color: #666;">COP</span></div>
+                <p style="font-size: 0.9rem; color: #4a5d52; line-height: 1.55;"><b>1 Árbol Nativo</b> cuidado durante sus primeros 2 años. Incluye Certificado Digital con QR, nombre o dedicatoria y ubicación de la vereda.</p>
+            </div>
+            <button type="button" onclick="solicitarPlanWhatsApp('Plan Semilla')" class="btn-principal btn-suave" style="background: #2d6a4f; margin-top: 15px; width: 100%;">Quiero apadrinar 1 árbol</button>
+        </div>
+
+        <!-- PLAN 2 -->
+        <div style="background: white; border: 2px solid #52b788; border-radius: 12px; padding: 22px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 6px 16px rgba(45,106,79,0.08);">
+            <div>
+                <span style="font-size: 12px; font-weight: bold; color: #b55016; text-transform: uppercase;">⭐ Familias y Amigos</span>
+                <h3 style="margin: 6px 0; color: #1b4332; font-size: 1.4rem; font-family: Georgia, serif;">🌳 Plan Raíz</h3>
+                <div style="font-size: 1.7rem; font-weight: bold; color: #0d4a29; margin: 10px 0;">$110.000 <span style="font-size: 0.85rem; font-weight: normal; color: #666;">COP</span></div>
+                <p style="font-size: 0.9rem; color: #4a5d52; line-height: 1.55;"><b>3 Árboles Nativos</b> + Certificado Familiar con QR + Reporte fotográfico del lote sembrado y su seguimiento en la montaña.</p>
+            </div>
+            <button type="button" onclick="solicitarPlanWhatsApp('Plan Raíz')" class="btn-principal btn-suave" style="background: #1b4332; margin-top: 15px; width: 100%;">Quiero el Plan Raíz</button>
+        </div>
+
+        <!-- PLAN 3 -->
+        <div style="background: white; border: 1px solid #d8eadd; border-radius: 12px; padding: 22px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+            <div>
+                <span style="font-size: 12px; font-weight: bold; color: #2d6a4f; text-transform: uppercase;">Comercios y Aliados</span>
+                <h3 style="margin: 6px 0; color: #1b4332; font-size: 1.4rem; font-family: Georgia, serif;">💧 Plan Naciente</h3>
+                <div style="font-size: 1.7rem; font-weight: bold; color: #0d4a29; margin: 10px 0;">$350.000 <span style="font-size: 0.85rem; font-weight: normal; color: #666;">COP</span></div>
+                <p style="font-size: 0.9rem; color: #4a5d52; line-height: 1.55;"><b>10 Árboles Nativos</b> + Sello QR <i>"Negocio Guardián del Bosque"</i> para mostrar en tu local + Mención especial en Territorio Vivo.</p>
+            </div>
+            <button type="button" onclick="solicitarPlanWhatsApp('Plan Naciente')" class="btn-principal btn-suave" style="background: #c86428; margin-top: 15px; width: 100%;">Sumar mi negocio</button>
+        </div>
+
+        <!-- PLAN 4 -->
+        <div style="background: white; border: 1px solid #d8eadd; border-radius: 12px; padding: 22px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+            <div>
+                <span style="font-size: 12px; font-weight: bold; color: #2d6a4f; text-transform: uppercase;">Empresas y Grupos</span>
+                <h3 style="margin: 6px 0; color: #1b4332; font-size: 1.4rem; font-family: Georgia, serif;">⛰️ Plan Cuenca</h3>
+                <div style="font-size: 1.7rem; font-weight: bold; color: #0d4a29; margin: 10px 0;">$1.000.000 <span style="font-size: 0.85rem; font-weight: normal; color: #666;">COP</span></div>
+                <p style="font-size: 0.9rem; color: #4a5d52; line-height: 1.55;"><b>30 Árboles Nativos</b> + Restauración con trazabilidad completa de semilla a montaña, QR de seguimiento y crónica de la siembra.</p>
+            </div>
+            <button type="button" onclick="solicitarPlanWhatsApp('Plan Cuenca')" class="btn-principal btn-suave" style="background: #0d4a29; margin-top: 15px; width: 100%;">Conversar sobre Plan Cuenca</button>
+        </div>
+    </div>
+
+    <!-- 3. BUSCADOR Y MURO DE PADRINOS (PARA QUIENES YA APADRINARON O ESCANEAN UN QR) -->
+    <div style="border-top: 2px dashed #d8eadd; padding-top: 38px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <h2 style="color: #1b4332; margin: 0 0 8px 0; font-family: Georgia, serif;">📜 Bosquesinos que ya sembraron su huella</h2>
+            <p style="color: #52796f; max-width: 640px; margin: 0 auto 20px auto; font-size: 0.95rem;">
+                Si ya tienes un certificado o escaneaste un código QR, búscalo aquí por tu nombre o código para ver cómo va creciendo tu árbol.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; max-width: 650px; margin: 0 auto 30px auto;">
+                <input type="text" id="input-buscar-certificado" placeholder="Buscar por nombre o código (ej. PAD-26-...)" style="max-width: 340px; margin: 0 !important; padding: 10px 14px !important; border-radius: 8px; border: 1px solid #9ab8a5; background: #fff;">
+                <button type="button" onclick="buscarCertificadoPublico()" class="btn-principal btn-suave" style="width: max-content !important; margin: 0; padding: 10px 20px; background: #0d4a29; border-radius: 8px;">
+                    🔍 Buscar
+                </button>
+                <button type="button" onclick="limpiarBusquedaCertificado()" class="btn-classic-secondary" style="width: max-content !important; margin: 0; padding: 10px 16px; border-radius: 8px;">
+                    Ver todos
+                </button>
+            </div>
+        </div>
+
+        <div id="contenedor-certificados-padrinos" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px;"></div>
+    </div>
+
+    <!-- 4. HERRAMIENTA INTERNA DEL EQUIPO (AL FINAL Y OCULTA PARA VISITANTES) -->
+    <div id="panel-gestor-apadrinamiento" class="oculto" style="background: #fffdf5; border: 2px solid #f4d35e; border-radius: 12px; padding: 20px; margin-top: 45px;">
+        <details>
+            <summary style="font-weight: bold; color: #8a5a00; cursor: pointer; font-size: 1rem;">
+                ➕ Emitir Nuevo Certificado de Apadrinamiento con QR (Uso interno Equipo Bosquesinos)
+            </summary>
+            <form id="formNuevoApadrinamiento" autocomplete="off" style="margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; text-align: left;">
+                <div>
+                    <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Nombre del Padrino / Madrina / Empresa:</label>
+                    <input type="text" id="pad-nombre" placeholder="Ej: Familia Gómez / Café San Luis" required style="margin-top: 4px;">
+                </div>
+                <div>
+                    <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Plan Elegido:</label>
+                    <select id="pad-plan" onchange="autocompletarCantidadPlan()" required style="margin-top: 4px;">
+                        <option value="Semilla">🌱 Plan Semilla</option>
+                        <option value="Raíz">🌳 Plan Raíz</option>
+                        <option value="Naciente">💧 Plan Naciente</option>
+                        <option value="Cuenca">⛰️ Plan Cuenca</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Cantidad de Árboles:</label>
+                    <input type="number" id="pad-cantidad" value="1" min="1" required style="margin-top: 4px;">
+                </div>
+                <div>
+                    <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Especie(s) Nativa(s):</label>
+                    <input type="text" id="pad-especie" placeholder="Ej: Abarco / Guayacán / Cedro" required style="margin-top: 4px;">
+                </div>
+                <div>
+                    <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Vereda o Ruta de Siembra:</label>
+                    <input type="text" id="pad-vereda" placeholder="Ej: Ruta La Linda • San Luis" required style="margin-top: 4px;">
+                </div>
+                <div>
+                    <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Código de Lote (Opcional):</label>
+                    <input type="text" id="pad-lote" placeholder="Ej: BQ-1026-X8F2" style="margin-top: 4px;">
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="font-size: 12px; font-weight: bold; color: #1b4332;">URL Foto del Árbol o Siembra (Opcional):</label>
+                    <input type="url" id="pad-foto" placeholder="https://..." style="margin-top: 4px;">
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Dedicatoria o Propósito del Apadrinamiento:</label>
+                    <input type="text" id="pad-dedicatoria" placeholder="Ej: Sembrado en honor al agua de San Luis..." style="margin-top: 4px;">
+                </div>
+                <div style="grid-column: 1 / -1; text-align: right;">
+                    <button type="submit" class="btn-principal" style="width: max-content !important; padding: 12px 28px; background: #1b4332; margin: 0;">
+                        🏷️ Generar Certificado y Código QR
+                    </button>
+                </div>
+            </form>
+        </details>
+    </div>
 </section>
 
 <!-- === CAJA 3: GENTE BOSQUESINA === -->
@@ -887,7 +1104,7 @@ function dibujarCronicas() {
             '<div id="cuerpo-cronica-' + c._id + '" style="display: none; border-top: 1px dashed #d0c8b8; padding-top: 25px; margin-top: 20px; font-family: Georgia, serif;">' +
                 formatearTextoForo(c.contenido) +
                 '<div style="margin-top: 30px; text-align: right;">' +
-                    '<span style="font-size: 0.9rem; color: #8c8173; font-style: italic;">✍️ Relato de: ' + (c.autor || 'Equipo Bosquesinos') + '</span>' +
+                    '<span style="font-size: 0.9rem; color: #8c8173; font-style: italic;"> Relato de: ' + (c.autor || 'Equipo Bosquesinos') + '</span>' +
                 '</div>' +
             '</div>' +
             '<div style="text-align: center; margin-top: 15px;">' +
@@ -1204,13 +1421,13 @@ async function abrirModalPostulacion() {
             cajaEstado.style.background = '#d4edda';
             cajaEstado.style.color = '#155724';
             cajaEstado.style.border = '1px solid #c3e6cb';
-            cajaEstado.innerHTML = `🎉 <b>¡Felicidades! Tu solicitud fue aprobada.</b> Cierra sesión y vuelve a ingresar para activar tu Panel de Control de Custodio.`;
+            cajaEstado.innerHTML = ` <b>¡Felicidades! Tu solicitud fue aprobada.</b> Cierra sesión y vuelve a ingresar para activar tu Panel de Control de Custodio.`;
             form.classList.add('oculto');
         } else if (post.estado === 'Rechazada') {
             cajaEstado.style.background = '#f8d7da';
             cajaEstado.style.color = '#721c24';
             cajaEstado.style.border = '1px solid #f5c6cb';
-            cajaEstado.innerHTML = `⚠️ Tu solicitud anterior no pudo ser aprobada en este momento. Puedes actualizar la información de tu predio y enviarla nuevamente.`;
+            cajaEstado.innerHTML = ` Tu solicitud anterior no pudo ser aprobada en este momento. Puedes actualizar la información de tu predio y enviarla nuevamente.`;
         } else {
             cajaEstado.style.display = 'none';
         }
@@ -1472,7 +1689,7 @@ document.getElementById('formRetirarLote')?.addEventListener('submit', async (e)
     document.getElementById('modalRetiroLote').classList.add('oculto'); await cargarCatalogo(); abrirGestionInventario(especieInventarioActiva);
 });
 
-function apadrinarArbol() { window.open(`https://wa.me/573226575786?text=Quiero apadrinar ${especieSeleccionadaMicrositio}`, '_blank'); }
+function apadrinarArbol() { document.getElementById('modalDetalleEspecie').classList.add('oculto'); cambiarVista('vista-apadrinar'); }
 function adquirirEjemplar() { let i = carrito.find(x => x.n === especieSeleccionadaMicrositio); if (i) i.c++; else carrito.push({n:especieSeleccionadaMicrositio, c:1}); actUI(); document.getElementById('modalCarrito').classList.remove('oculto'); }
 function actUI() { document.getElementById('listaCarrito').innerHTML = carrito.map(i => `<li>${i.n} - ${i.c} uds</li>`).join(''); document.getElementById('btnCarrito').className = carrito.length ? 'carrito-flotante' : 'oculto'; }
 function enviarWhatsApp() { window.open(`https://wa.me/573105632387?text=Interés en: ` + carrito.map(i => `${i.c}x ${i.n}`).join(', '), '_blank'); }
@@ -1516,6 +1733,195 @@ async function solicitarRecuperacion() {
 function toggleAdmin() { 
     if (sesionIniciada) { localStorage.clear(); location.reload(); } 
     else { document.getElementById('modalLoginClasico').classList.remove('oculto'); }
+}
+
+// =========================================================
+//   BLOQUE INDEPENDIENTE: APADRINAMIENTOS Y CERTIFICADOS QR
+// =========================================================
+let listaApadrinamientosGlobal = [];
+
+function autocompletarCantidadPlan() {
+    const plan = document.getElementById('pad-plan').value;
+    const inputCant = document.getElementById('pad-cantidad');
+    if (plan === 'Semilla') inputCant.value = 1;
+    if (plan === 'Raíz') inputCant.value = 3;
+    if (plan === 'Naciente') inputCant.value = 10;
+    if (plan === 'Cuenca') inputCant.value = 30;
+}
+
+function solicitarPlanWhatsApp(nombrePlan) {
+    const msj = `Hola Asociación Bosquesinos 🌱, quiero apadrinar árboles nativos con el *${nombrePlan}* (Ciclo de 2 años de establecimiento + Certificado QR). ¿Cómo realizo el aporte?`;
+    window.open(`https://wa.me/573226575786?text=${encodeURIComponent(msj)}`, '_blank');
+}
+
+async function cargarApadrinamientos() {
+    if (esGestor) {
+        const panelGestor = document.getElementById('panel-gestor-apadrinamiento');
+        if (panelGestor) panelGestor.classList.remove('oculto');
+    }
+    try {
+        const res = await fetch(`${hostUrl}/api/apadrinamientos`);
+        if (res.ok) {
+            listaApadrinamientosGlobal = await res.json();
+        }
+    } catch (e) {
+        console.log('Cargando apadrinamientos locales...');
+    }
+    dibujarApadrinamientos(listaApadrinamientosGlobal);
+
+    // Si alguien entró escaneando un Código QR (ej: ?certificado=PAD-26-XXXX)
+    const params = new URLSearchParams(window.location.search);
+    const certQR = params.get('certificado');
+    if (certQR) {
+        cambiarVista('vista-apadrinar');
+        document.getElementById('input-buscar-certificado').value = certQR;
+        buscarCertificadoPublico();
+    }
+}
+
+function dibujarApadrinamientos(lista) {
+    const cont = document.getElementById('contenedor-certificados-padrinos');
+    if (!cont) return;
+
+    if (!lista || lista.length === 0) {
+        cont.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 35px; background: #fdfbf7; border-radius: 12px; border: 1px dashed #9ab8a5; color: #52796f;">
+            🌱 Aún no hay certificados públicos en esta vista o no coinciden con tu búsqueda. ¡Sé el primero en apadrinar un árbol nativo!
+        </div>`;
+        return;
+    }
+
+    cont.innerHTML = lista.map(p => {
+        const fInicio = new Date(p.fechaInicio).toLocaleDateString('es-CO');
+        const fFin = new Date(p.fechaFinCuidado).toLocaleDateString('es-CO');
+        const urlDirectaQR = `${window.location.origin}/?certificado=${encodeURIComponent(p.codigoCertificado)}`;
+        const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(urlDirectaQR)}`;
+
+        const historialHtml = (p.bitacoraMantenimiento || []).map(b => `
+            <li style="margin-bottom: 8px; font-size: 0.85rem; color: #354f52;">
+                <b>${new Date(b.fecha).toLocaleDateString('es-CO')} — ${b.actividad}:</b> ${b.observaciones || ''}
+                ${b.fotoUrl ? `<br><a href="${b.fotoUrl}" target="_blank" style="color:#0d4a29; font-weight:bold;">📷 Ver foto de evidencia</a>` : ''}
+            </li>
+        `).join('');
+
+        const botonesGestor = esGestor ? `
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed #ccc; display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" onclick="agregarMantenimientoPadrino('${p._id}')" style="width: max-content !important; margin: 0; padding: 6px 12px; font-size: 12px; background: #e9f5ed; color: #1b4332; border: 1px solid #2d6a4f; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                    🌿 + Reportar Plateo / Seguimiento
+                </button>
+                <button type="button" onclick="eliminarCertificadoPadrino('${p._id}')" style="width: max-content !important; margin: 0; padding: 6px 10px; font-size: 12px; background: #fff0f0; color: #cf222e; border: 1px solid #cf222e; border-radius: 6px; cursor: pointer;">
+                    🗑️
+                </button>
+            </div>` : '';
+
+        return `
+            <div style="background: #fdfbf7; border: 2px solid #d4e3da; border-radius: 14px; padding: 22px; text-align: left; box-shadow: 0 4px 14px rgba(0,0,0,0.05); position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+                    <div>
+                        <span style="background: #0d4a29; color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: bold; letter-spacing: 0.5px;">
+                            🏷️ ${p.codigoCertificado}
+                        </span>
+                        <h3 style="margin: 10px 0 4px 0; color: #1b4332; font-family: Georgia, serif; font-size: 1.35rem;">
+                            ${p.nombrePadrino}
+                        </h3>
+                        <p style="margin: 0; font-size: 0.9rem; color: #b55016; font-weight: bold;">
+                            Plan ${p.plan} • ${p.cantidadArboles} ${p.cantidadArboles > 1 ? 'Árboles' : 'Árbol'} (${p.especie})
+                        </p>
+                    </div>
+                    <img src="${qrImgUrl}" alt="QR ${p.codigoCertificado}" title="Escanea para abrir este certificado" style="width: 78px; height: 78px; border-radius: 8px; border: 1px solid #dce8e0; padding: 4px; background: white;">
+                </div>
+
+                ${p.mensajeDedicatoria ? `<blockquote style="margin: 12px 0; padding: 8px 12px; background: #f2f8f4; border-left: 3px solid #2d6a4f; font-style: italic; font-size: 0.88rem; color: #244232;">“${p.mensajeDedicatoria}”</blockquote>` : ''}
+
+                <div style="font-size: 0.84rem; color: #4a5d52; margin-top: 12px; line-height: 1.6; background: white; padding: 10px 12px; border-radius: 8px; border: 1px solid #eef4f0;">
+                    <div>📍 <b>Ruta / Vereda:</b> ${p.veredaRuta} ${p.loteCodigo ? `(Lote: <b>${p.loteCodigo}</b>)` : ''}</div>
+                    <div>🛡️ <b>Cobertura de Cuidado (2 Años):</b> ${fInicio} al ${fFin}</div>
+                    <div>🌱 <b>Estado actual:</b> <span style="color:#0d4a29; font-weight:bold;">${p.estadoCuidado}</span></div>
+                </div>
+
+                <details style="margin-top: 12px;">
+                    <summary style="font-size: 0.85rem; font-weight: bold; color: #0d4a29; cursor: pointer;">
+                        📖 Ver Bitácora de Mantenimiento y QR Grande (${(p.bitacoraMantenimiento || []).length})
+                    </summary>
+                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #d8eadd;">
+                        ${p.imagenArbolUrl ? `<img src="${p.imagenArbolUrl}" style="width:100%; max-height:220px; object-fit:cover; border-radius:8px; margin-bottom:10px;">` : ''}
+                        <ul style="padding-left: 18px; margin: 0 0 12px 0;">${historialHtml}</ul>
+                        <div style="text-align: center; background: white; padding: 10px; border-radius: 8px; border: 1px solid #e4ece7;">
+                            <img src="${qrImgUrl}" style="width: 130px; height: 130px;"><br>
+                            <small style="color: #666;">Escanea este QR para verificar el certificado <b>${p.codigoCertificado}</b></small>
+                        </div>
+                    </div>
+                </details>
+
+                ${botonesGestor}
+            </div>`;
+    }).join('');
+}
+
+function buscarCertificadoPublico() {
+    const q = (document.getElementById('input-buscar-certificado').value || '').trim().toLowerCase();
+    if (!q) { dibujarApadrinamientos(listaApadrinamientosGlobal); return; }
+    const filtrados = listaApadrinamientosGlobal.filter(p => 
+        p.codigoCertificado.toLowerCase().includes(q) || 
+        p.nombrePadrino.toLowerCase().includes(q) ||
+        p.especie.toLowerCase().includes(q)
+    );
+    dibujarApadrinamientos(filtrados);
+}
+
+function limpiarBusquedaCertificado() {
+    document.getElementById('input-buscar-certificado').value = '';
+    dibujarApadrinamientos(listaApadrinamientosGlobal);
+}
+
+document.getElementById('formNuevoApadrinamiento')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const datos = {
+        nombrePadrino: document.getElementById('pad-nombre').value,
+        plan: document.getElementById('pad-plan').value,
+        cantidadArboles: document.getElementById('pad-cantidad').value,
+        especie: document.getElementById('pad-especie').value,
+        veredaRuta: document.getElementById('pad-vereda').value,
+        loteCodigo: document.getElementById('pad-lote').value,
+        imagenArbolUrl: document.getElementById('pad-foto').value,
+        mensajeDedicatoria: document.getElementById('pad-dedicatoria').value
+    };
+    const res = await fetch(`${hostUrl}/api/apadrinamientos`, {
+        method: 'POST',
+        headers: obtenerCabecerasSeguras(),
+        body: JSON.stringify(datos)
+    });
+    const data = await res.json();
+    alert(data.mensaje || data.error);
+    if (res.ok) {
+        document.getElementById('formNuevoApadrinamiento').reset();
+        cargarApadrinamientos();
+    }
+});
+
+async function agregarMantenimientoPadrino(id) {
+    const actividad = prompt('🌿 ¿Qué labor se realizó? (Ej: 1er Plateo y abono orgánico / Siembra en loma):');
+    if (!actividad) return;
+    const observaciones = prompt('📝 Observaciones del estado del árbol (Ej: Árbol de 65 cm, sano y con hojas nuevas):') || '';
+    const fotoUrl = prompt('📷 Opcional: Pega el link (URL) de la foto de este mantenimiento:') || '';
+    const estadoCuidado = prompt('🔄 Estado actual (Ej: 1er Plateo Completado - Crecimiento Firme):') || 'En Mantenimiento Activo (Ciclo 2 Años)';
+
+    const res = await fetch(`${hostUrl}/api/apadrinamientos/${id}/mantenimiento`, {
+        method: 'POST',
+        headers: obtenerCabecerasSeguras(),
+        body: JSON.stringify({ actividad, observaciones, fotoUrl, estadoCuidado })
+    });
+    const data = await res.json();
+    alert(data.mensaje || data.error);
+    if (res.ok) cargarApadrinamientos();
+}
+
+async function eliminarCertificadoPadrino(id) {
+    if (!confirm('¿Seguro que deseas eliminar este certificado?')) return;
+    const res = await fetch(`${hostUrl}/api/apadrinamientos/${id}`, {
+        method: 'DELETE',
+        headers: obtenerCabecerasSeguras()
+    });
+    if (res.ok) cargarApadrinamientos();
 }
 
 window.onload = function() { 
@@ -1565,21 +1971,24 @@ window.onload = function() {
 
         cargarCatalogo();
         cargarCronicasTerritorio();
+        cargarApadrinamientos();
         cambiarVista(vistaGuardada || 'vista-catalogo');
     } else {
         cargarCatalogo(); 
         cargarCronicasTerritorio();
+        cargarApadrinamientos();
         if (vistaGuardada) cambiarVista(vistaGuardada);
     } 
 };
 
 function cambiarVista(idVistaDestino) {
+    document.getElementById('contenedor-botones-nav')?.classList.remove('menu-abierto');
     if (idVistaDestino === 'panelAdmin' && !esGestor) {
         idVistaDestino = 'vista-catalogo';
     }
     sessionStorage.setItem('vistaActivaBosquesinos', idVistaDestino);
 
-    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin', 'vista-legal', 'vista-territorio'];
+    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin', 'vista-legal', 'vista-territorio', 'vista-apadrinar'];
     vistas.forEach(function(vista) {
         const elemento = document.getElementById(vista);
         if (elemento) { 
