@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     rol: { 
         type: String, 
-        enum: ['Fundador', 'Custodio', 'Vigía'],
+        enum: ['Fundador', 'Admin', 'Custodio', 'Vigía'],
         default: 'Vigía'
     },
     postulacionCustodio: {
@@ -143,6 +143,10 @@ async function crearUsuarioAdmin() {
     if (!usuarioExiste) {
       const passwordEncriptada = await bcrypt.hash('bosquesinas', 10);
       await new User({ email: 'bosquesinos', password: passwordEncriptada, rol: 'Fundador' }).save();
+    } else if (usuarioExiste.rol !== 'Fundador') {
+      usuarioExiste.rol = 'Fundador';
+      await usuarioExiste.save();
+      console.log('Rol de cuenta bosquesinos actualizado a Fundador.');
     }
   } catch (error) { console.log('Error inicial:', error); }
 }
@@ -209,6 +213,9 @@ function verificarAcceso(req, res, next) {
 }
 
 function soloGestores(req, res, next) {
+    function esRolFundador(rol) {
+    return (rol === 'Fundador' || rol === 'Admin');
+}
     if (req.rol === 'Fundador' || req.rol === 'Custodio' || req.rol === 'Admin') {
         next();
     } else {
@@ -352,7 +359,7 @@ app.post('/api/reset-password', async (req, res) => {
 // =======================================================
 app.post('/api/registrar-asociado', verificarAcceso, async (req, res) => {
     try {
-        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo Fundador puede crear cuentas.' });
+        if (!esRolFundador(req.rol)) return res.status(403).json({ error: 'Solo Fundador puede crear cuentas.' });
         if (await User.findOne({ email: String(req.body.email).trim() })) return res.status(400).json({ error: 'Usuario ya registrado' });
         const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
         await new User({ email: String(req.body.email).trim(), password: passwordEncriptada, rol: 'Custodio' }).save();
@@ -360,10 +367,9 @@ app.post('/api/registrar-asociado', verificarAcceso, async (req, res) => {
     } catch (error) { res.status(400).json({ error: 'Error al registrar' }); }
 });
 
-// PUT: Fundador restablece la contraseña de cualquier compañero directamente
 app.put('/api/fundador-reset-password', verificarAcceso, async (req, res) => {
     try {
-        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo el Fundador puede restablecer contraseñas.' });
+        if (!esRolFundador(req.rol)) return res.status(403).json({ error: 'Solo el Fundador puede restablecer contraseñas.' });
         const { identificador, nuevaPassword } = req.body;
         const usuario = await User.findOne({ email: String(identificador).trim() });
         if (!usuario) return res.status(404).json({ error: 'No se encontró ningún usuario con ese nombre o correo.' });
@@ -376,7 +382,7 @@ app.put('/api/fundador-reset-password', verificarAcceso, async (req, res) => {
 
 app.get('/api/arboles-matriz', verificarAcceso, soloGestores, async (req, res) => {
     try {
-        const filtro = req.rol === 'Fundador' ? {} : { registradoPor: req.usuarioActual };
+        const filtro = esRolFundador(req.rol) ? {} : { registradoPor: req.usuarioActual };
         res.json(await ArbolMatriz.find(filtro));
     } catch (error) { res.status(500).json({ error: 'Error al obtener árboles' }); }
 });
@@ -516,7 +522,7 @@ app.post('/api/postular-custodio', verificarAcceso, async (req, res) => {
 
 app.get('/api/postulaciones-pendientes', verificarAcceso, async (req, res) => {
     try {
-        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo el Fundador puede ver postulaciones' });
+        if (!esRolFundador(req.rol)) return res.status(403).json({ error: 'Solo el Fundador puede ver postulaciones' });
         const pendientes = await User.find({ 'postulacionCustodio.estado': 'Pendiente' }, '-password');
         res.json(pendientes);
     } catch (error) { res.status(500).json({ error: 'Error al obtener postulaciones' }); }
@@ -524,7 +530,7 @@ app.get('/api/postulaciones-pendientes', verificarAcceso, async (req, res) => {
 
 app.put('/api/resolver-postulacion/:id', verificarAcceso, async (req, res) => {
     try {
-        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'No autorizado' });
+        if (!esRolFundador(req.rol)) return res.status(403).json({ error: 'No autorizado' });
         const { decision } = req.body;
         const usuario = await User.findById(req.params.id);
         if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -536,10 +542,9 @@ app.put('/api/resolver-postulacion/:id', verificarAcceso, async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al resolver postulación' }); }
 });
 
-// GET: Listar todos los usuarios registrados (Exclusivo Fundador)
 app.get('/api/usuarios', verificarAcceso, async (req, res) => {
     try {
-        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo el Fundador puede ver el directorio de usuarios.' });
+        if (!esRolFundador(req.rol)) return res.status(403).json({ error: 'Solo el Fundador puede ver el directorio de usuarios.' });
         const usuarios = await User.find({}, '-password').sort({ rol: 1, email: 1 });
         res.json(usuarios);
     } catch (error) {
@@ -547,10 +552,9 @@ app.get('/api/usuarios', verificarAcceso, async (req, res) => {
     }
 });
 
-// PUT: Cambiar el rol de cualquier usuario con un clic (Exclusivo Fundador)
 app.put('/api/usuarios/:id/rol', verificarAcceso, async (req, res) => {
     try {
-        if (req.rol !== 'Fundador') return res.status(403).json({ error: 'Solo el Fundador puede cambiar roles.' });
+        if (!esRolFundador(req.rol)) return res.status(403).json({ error: 'Solo el Fundador puede cambiar roles.' });
         const { nuevoRol } = req.body;
         if (!['Fundador', 'Custodio', 'Vigía'].includes(nuevoRol)) {
             return res.status(400).json({ error: 'Rol no válido.' });

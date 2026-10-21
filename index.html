@@ -1123,12 +1123,14 @@ function toggleLecturaCronica(id) {
     if (!cuerpo || !btn) return;
     if (cuerpo.style.display === 'none') {
         cuerpo.style.display = 'block';
-        btn.innerText = '🔼 Cerrar crónica';
-        btn.style.background = '#4a5d52';
+        btn.innerText = '🔼 Cerrar relato';
+        btn.style.background = '#f4efe6';
+        btn.style.color = '#5c4732';
     } else {
         cuerpo.style.display = 'none';
-        btn.innerText = '📖 Leer crónica completa y ver fotos';
-        btn.style.background = '#0d4a29';
+        btn.innerText = 'Leer relato completo';
+        btn.style.background = 'transparent';
+        btn.style.color = '#8a6a4b';
     }
 }
 
@@ -1608,7 +1610,9 @@ async function abrirModalMonitoreo() {
     const res = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
     window.arbolesMatrizGlobal = await res.json();
     const rol = localStorage.getItem('rolUsuario');
-    const misArboles = rol === 'Fundador' ? window.arbolesMatrizGlobal : window.arbolesMatrizGlobal.filter(a => a.registradoPor === localStorage.getItem('emailUsuario'));
+    const misArboles = (rol === 'Fundador' || rol === 'Admin') 
+        ? window.arbolesMatrizGlobal 
+        : window.arbolesMatrizGlobal.filter(a => a.registradoPor === localStorage.getItem('emailUsuario'));
     cont.innerHTML = '';
     if (misArboles.length === 0) { cont.innerHTML = '<p style="font-size:13px; color:#666;">No tienes árboles bajo tu custodia.</p>'; return; }
     misArboles.forEach(a => {
@@ -1656,13 +1660,25 @@ function abrirModalDirectorio() {
 }
 
 function abrirMicrositio(id) {
-    const especie = window.especiesGlobal.find(i => i._id === id); especieActualId = id; especieSeleccionadaMicrositio = especie.nombreComun;
-    document.getElementById('detalle-nombre').innerText = especie.nombreComun; document.getElementById('detalle-caracteristicas').innerText = especie.caracteristicas;
-    document.getElementById('detalle-imagen').src = especie.imagenUrl; document.getElementById('detalle-imagen').style.display = especie.imagenUrl ? 'block' : 'none';
-    const contSaberes = document.getElementById('contenedor-saberes'); contSaberes.innerHTML = '';
-    if (especie.saberes.length) especie.saberes.forEach(s => contSaberes.innerHTML += `<p>"${s.descripcion}" - <b>${s.autor}</b></p>`); else contSaberes.innerHTML = 'Sin saberes registrados.';
+    const especie = window.especiesGlobal.find(i => i._id === id); 
+    if (!especie) return;
+    especieActualId = id; 
+    especieSeleccionadaMicrositio = especie.nombreComun;
+    document.getElementById('detalle-nombre').innerText = especie.nombreComun; 
+    document.getElementById('detalle-cientifico').innerText = especie.nombreCientifico || '';
+    document.getElementById('detalle-caracteristicas').innerText = especie.caracteristicas || '';
+    document.getElementById('detalle-imagen').src = especie.imagenUrl || ''; 
+    document.getElementById('detalle-imagen').style.display = especie.imagenUrl ? 'block' : 'none';
+    const contSaberes = document.getElementById('contenedor-saberes'); 
+    contSaberes.innerHTML = '';
+    if (especie.saberes && especie.saberes.length) {
+        especie.saberes.forEach(s => contSaberes.innerHTML += `<p>"${s.descripcion}" - <b>${s.autor}</b></p>`);
+    } else {
+        contSaberes.innerHTML = 'Sin saberes registrados.';
+    }
     document.getElementById('contenedorBotonAportarSaber').className = esGestor ? '' : 'oculto';
-    cancelarSaber(); document.getElementById('modalDetalleEspecie').classList.remove('oculto');
+    cancelarSaber(); 
+    document.getElementById('modalDetalleEspecie').classList.remove('oculto');
 }
 
 function activarAporteSaber() { document.getElementById('vistaLecturaEspecie').classList.add('oculto'); document.getElementById('formAportarSaber').classList.remove('oculto'); document.getElementById('contenedorBotonAportarSaber').classList.add('oculto'); }
@@ -1691,7 +1707,13 @@ document.getElementById('formRetirarLote')?.addEventListener('submit', async (e)
 
 function apadrinarArbol() { document.getElementById('modalDetalleEspecie').classList.add('oculto'); cambiarVista('vista-apadrinar'); }
 function adquirirEjemplar() { let i = carrito.find(x => x.n === especieSeleccionadaMicrositio); if (i) i.c++; else carrito.push({n:especieSeleccionadaMicrositio, c:1}); actUI(); document.getElementById('modalCarrito').classList.remove('oculto'); }
-function actUI() { document.getElementById('listaCarrito').innerHTML = carrito.map(i => `<li>${i.n} - ${i.c} uds</li>`).join(''); document.getElementById('btnCarrito').className = carrito.length ? 'carrito-flotante' : 'oculto'; }
+function actUI() { 
+    document.getElementById('listaCarrito').innerHTML = carrito.map(i => `<li>${i.n} - ${i.c} uds</li>`).join(''); 
+    const totalUnidades = carrito.reduce((acc, i) => acc + i.c, 0);
+    const spanCont = document.getElementById('contadorCarrito');
+    if (spanCont) spanCont.innerText = totalUnidades;
+    document.getElementById('btnCarrito').className = carrito.length ? 'carrito-flotante' : 'oculto'; 
+}
 function enviarWhatsApp() { window.open(`https://wa.me/573105632387?text=Interés en: ` + carrito.map(i => `${i.c}x ${i.n}`).join(', '), '_blank'); }
 
 function cambiarMicrositio(idActual, idDestino) {
