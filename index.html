@@ -834,7 +834,9 @@
 
 <!-- === JAVASCRIPT === -->
 <script>
-const hostUrl = 'https://bosquesinos-sanluis.onrender.com'; 
+const hostUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+    ? 'http://localhost:3000' 
+    : 'https://bosquesinos-sanluis.onrender.com';
 
 let categoriaTerritorioActual = 'campo-mesa';
 let listaCronicasGlobal = [];
