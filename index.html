@@ -516,61 +516,90 @@
         </div>
 
         <!-- =======================================================
-             PESTAÑA 1: OPERACIÓN VIVERO (Visible para Custodio y Fundador)
+             PESTAÑA 1: OPERACIÓN CAMPO, VIVERO Y VITRINA
              ======================================================= -->
         <div id="subpanel-vivero">
-            <p style="font-size: 13px; color: #52796f; text-align: center; margin-top: 0; margin-bottom: 18px;">
-                Herramientas de registro diario para árboles madre, cosecha de semillas y vitrina del vivero.
-            </p>
+            
+            <!-- BLOQUE EXCLUSIVO MOTOR CERRADO (Solo Custodios y Fundador; Oculto para Admin público) -->
+            <div id="bloque-motor-cerrado">
+                <p style="font-size: 13px; color: #52796f; text-align: center; margin-top: 0; margin-bottom: 18px;">
+                    Flujo de campo: Registra primero la Finca y su dueño, vincula allí los Árboles Madre y haz seguimiento a las semillas en vivero.
+                </p>
 
-            <!-- PASO 1 -->
-            <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
-                <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌳 1. Registrar Nuevo Árbol Semillero</summary>
-                <div style="padding: 0 15px 15px 15px;">
-                    <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ <strong>Seguridad:</strong> Coordenadas GPS encriptadas con AES-256.</p>
-                    <form id="formArbolMatriz" autocomplete="off">
-                        <input type="text" id="arbol-especie" placeholder="Nombre Común (Ej: Guayacán Amarillo)" required>
-                        <input type="text" id="arbol-cientifico" placeholder="Nombre Científico (Opcional)">
-                        <input type="text" id="arbol-codigo" placeholder="Código Único del Árbol (Ej: AM-GUAY-01)" required>
-                        <input type="text" id="arbol-finca" placeholder="Nombre de la Finca" required>
-                        <input type="text" id="arbol-vereda" placeholder="Vereda o Sector" required>
-                        <input type="text" id="arbol-custodio" placeholder="Campesino Custodio" required>
-                        <input type="text" id="arbol-gps" placeholder="Coordenadas GPS (Ej: 6.0423, -74.9951)" required>
-                        <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero </button>
-                    </form>
-                </div>
-            </details>
+                <!-- PASO 0: REGISTRAR FINCA Y DUEÑO -->
+                <details style="background: #f4f9f5; margin-bottom: 12px; border-radius: 8px; border: 1px solid #95d5b2;">
+                    <summary style="padding: 14px; font-weight: 600; color: #0d4a29; cursor: pointer;">🏡 1. Registrar Finca / Predio (Vereda y Dueño)</summary>
+                    <div style="padding: 0 15px 15px 15px;">
+                        <p style="font-size: 12px; color: #354f52; margin-bottom: 10px;">
+                            Registra las fincas donde hay bosque nativo para que los Custodios puedan hacerles seguimiento sin que el propietario tenga que manejar la plataforma.
+                        </p>
+                        <form id="formFinca" autocomplete="off">
+                            <input type="text" id="finca-nombre" placeholder="Nombre de la Finca o Predio (Ej: Finca La Esperanza)" required>
+                            <input type="text" id="finca-vereda" placeholder="Vereda o Sector (Ej: Vereda La Linda)" required>
+                            <input type="text" id="finca-propietario" placeholder="Nombre del Dueño / Familia Propietaria" required>
+                            <input type="text" id="finca-contacto" placeholder="Teléfono o contacto del dueño (Opcional)">
+                            <textarea id="finca-obs" placeholder="Notas del bosque (Ej: Bosque húmedo con nacimientos y árboles de abarco...)" style="min-height: 60px;"></textarea>
+                            <button type="submit" class="btn-principal" style="background: #0d4a29;">Guardar Finca en el Directorio</button>
+                        </form>
+                        <div id="lista-fincas-resumen" style="margin-top: 12px; font-size: 12px; color: #2d6a4f;"></div>
+                    </div>
+                </details>
 
-            <!-- PASO 2 -->
-            <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
-                <summary style="padding: 14px; font-weight: 600; color: #e07a5f; cursor: pointer;">🌱 2. Registrar Nueva Cosecha De Semillas</summary>
-                <div style="padding: 0 15px 15px 15px;">
-                    <form id="formLote" autocomplete="off">
-                        <select id="lote-arbolMatriz" required><option value="">-- Selecciona el Árbol Madre recolectado --</option></select>
-                        <input type="number" id="lote-cantidad" placeholder="Cantidad de semillas recolectadas" min="1" required>
-                        <input type="text" id="lote-responsable" placeholder="Responsables del trepado/recolección" required>
-                        <input type="date" id="lote-fecha" required>
-                        <button type="submit" class="btn-principal" style="background: #e07a5f;">Generar Registro en Semillero</button>
-                    </form>
-                </div>
-            </details>
+                <!-- PASO 1: ÁRBOL MADRE VINCULADO A LA FINCA -->
+                <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
+                    <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌳 2. Registrar Árbol Semillero (Dentro de una Finca)</summary>
+                    <div style="padding: 0 15px 15px 15px;">
+                        <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ <strong>Seguridad:</strong> Coordenadas GPS encriptadas con AES-256.</p>
+                        <form id="formArbolMatriz" autocomplete="off">
+                            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Selecciona la Finca donde está el árbol:</label>
+                            <select id="arbol-finca-select" onchange="seleccionarFincaParaArbol()" required style="margin-top: 4px;">
+                                <option value="">-- Primero selecciona una Finca registrada --</option>
+                            </select>
+                            <input type="hidden" id="arbol-finca">
+                            <input type="hidden" id="arbol-vereda">
+                            <input type="hidden" id="arbol-propietario">
 
-            <!-- PASO 3 -->
-            <details style="background: #f8fbf9; margin-bottom: 16px; border-radius: 8px; border: 1px solid #d8eadd;">
-                <summary style="padding: 14px; font-weight: 600; color: #2d6a4f; cursor: pointer;">📖 3. Actualizar Plántulas en Vitrina Pública</summary>
+                            <input type="text" id="arbol-especie" placeholder="Nombre Común (Ej: Guayacán Amarillo)" required>
+                            <input type="text" id="arbol-cientifico" placeholder="Nombre Científico (Opcional)">
+                            <input type="text" id="arbol-codigo" placeholder="Código Único del Árbol (Ej: AM-GUAY-01)" required>
+                            <input type="text" id="arbol-custodio" placeholder="Custodio Bosquesino encargado del seguimiento" required>
+                            <input type="text" id="arbol-gps" placeholder="Coordenadas GPS (Ej: 6.0423, -74.9951)" required>
+                            <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero en esta Finca</button>
+                        </form>
+                    </div>
+                </details>
+
+                <!-- PASO 2: COSECHA DE SEMILLAS -->
+                <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
+                    <summary style="padding: 14px; font-weight: 600; color: #e07a5f; cursor: pointer;">🌱 3. Registrar Nueva Cosecha de Semillas (Vivero)</summary>
+                    <div style="padding: 0 15px 15px 15px;">
+                        <form id="formLote" autocomplete="off">
+                            <select id="lote-arbolMatriz" required><option value="">-- Selecciona el Árbol Madre recolectado --</option></select>
+                            <input type="number" id="lote-cantidad" placeholder="Cantidad de semillas recolectadas" min="1" required>
+                            <input type="text" id="lote-responsable" placeholder="Custodios responsables de la recolección" required>
+                            <input type="date" id="lote-fecha" required>
+                            <button type="submit" class="btn-principal" style="background: #e07a5f;">Generar Lote en Semillero</button>
+                        </form>
+                    </div>
+                </details>
+
+                <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold; margin-bottom: 16px;" onclick="abrirModalMonitoreo()">
+                    👀 Seguimiento Fenológico de Árboles por Finca
+                </button>
+            </div>
+
+            <!-- BLOQUE PÚBLICO DE VITRINA (Visible para Admin, Custodio y Fundador) -->
+            <details style="background: #f8fbf9; margin-bottom: 16px; border-radius: 8px; border: 1px solid #d8eadd;" open>
+                <summary style="padding: 14px; font-weight: 600; color: #2d6a4f; cursor: pointer;">📖 Actualizar Fotografías y Reportes de la Vitrina Pública</summary>
                 <div style="padding: 0 15px 15px 15px;">
                     <form id="formEspecie" autocomplete="off">
                         <select id="esp-nombre-select" required><option value="">-- Selecciona una Especie en Vivero --</option></select>
                         <input type="url" id="esp-imagen" placeholder="URL de la fotografía para el público" required>
-                        <textarea id="esp-caracteristicas" placeholder="Características botánicas..."></textarea>
+                        <textarea id="esp-caracteristicas" placeholder="Características botánicas, usos e historia para el público..."></textarea>
                         <button type="submit" class="btn-principal" style="background: #40916c;">Actualizar Vitrina Pública</button>
                     </form>
                 </div>
             </details>
-
-            <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalMonitoreo()">
-                👀 Seguimiento Fenológico de Mis Árboles Semilleros
-            </button>
         </div>
 
         <!-- =======================================================
@@ -845,6 +874,11 @@ let esGestor = false;
 window.especiesGlobal = []; 
 window.lotesGlobal = []; 
 window.arbolesMatrizGlobal = [];
+window.fincasGlobal = [];
+function tieneAccesoCampo() {
+    const rol = localStorage.getItem('rolUsuario') || '';
+    return (rol === 'Fundador' || rol === 'Custodio');
+}
 let especieActualId = null; 
 let especieSeleccionadaMicrositio = null;
 let especieInventarioActiva = null;
@@ -1207,18 +1241,11 @@ async function cargarCatalogo() {
         window.especiesGlobal = await resEspecies.json(); 
         window.lotesGlobal = await resLotes.json();
         
-        if (esGestor) {
+        if (tieneAccesoCampo()) {
             const resArboles = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
             if (resArboles.ok) { window.arbolesMatrizGlobal = await resArboles.json(); }
-            if (selLoteArbol) {
-                selLoteArbol.innerHTML = '<option value="">-- Selecciona el Árbol Madre --</option>';
-                window.arbolesMatrizGlobal.forEach(a => selLoteArbol.innerHTML += `<option value="${a._id}">${a.codigoArbol} - ${a.nombreComun} (${a.veredaSector})</option>`);
-            }
-            if (selVitrina) {
-                selVitrina.innerHTML = '<option value="">-- Selecciona Especie --</option>';
-                window.especiesGlobal.forEach(e => selVitrina.innerHTML += `<option value="${e._id}">${e.nombreComun}</option>`);
-            }
-        }
+    // ...
+}
         
         if (lista) {
             lista.innerHTML = '';
@@ -1229,8 +1256,7 @@ async function cargarCatalogo() {
                 let activas = 0;
                 misLotes.forEach(l => { if (l.estadoActual !== 'Sembrada' && l.estadoActual !== 'Semillero' && l.estadoActual !== 'Germinación') { activas += l.cantidadActual; } });
                 let img = especie.imagenUrl ? `<img src="${especie.imagenUrl}" class="img-arbol">` : `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
-                const btnGest = esGestor ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionInventario('${especie._id}')">⚙ Gestionar Inventario</button>` : '';
-
+                const btnGest = tieneAccesoCampo() ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionInventario('${especie._id}')">⚙ Gestionar Inventario</button>` : '';
                 lista.innerHTML += `
                     <li class="item-planta">
                         ${img}
@@ -1378,11 +1404,79 @@ function actualizarDashboard() {
     document.getElementById('stat-cosecha').innerText = arbolesCosecha;
 }
 
+async function cargarFincas() {
+    if (!tieneAccesoCampo()) return;
+    try {
+        const res = await fetch(`${hostUrl}/api/fincas`, { headers: obtenerCabecerasSeguras() });
+        if (!res.ok) return;
+        window.fincasGlobal = await res.json();
+        
+        const selFinca = document.getElementById('arbol-finca-select');
+        if (selFinca) {
+            selFinca.innerHTML = '<option value="">-- Selecciona la Finca donde está el árbol --</option>';
+            window.fincasGlobal.forEach(f => {
+                selFinca.innerHTML += `<option value="${f._id}">${f.nombreFinca} — Vereda ${f.vereda} (Dueño: ${f.propietario})</option>`;
+            });
+        }
+
+        const resumen = document.getElementById('lista-fincas-resumen');
+        if (resumen) {
+            resumen.innerHTML = window.fincasGlobal.length 
+                ? `✅ <b>${window.fincasGlobal.length} fincas registradas:</b> ` + window.fincasGlobal.map(f => `${f.nombreFinca} (${f.vereda} - ${f.propietario})`).join(' • ')
+                : 'Aún no hay fincas registradas. Registra la primera arriba.';
+        }
+    } catch (e) { console.log(e); }
+}
+
+function seleccionarFincaParaArbol() {
+    const id = document.getElementById('arbol-finca-select').value;
+    const finca = window.fincasGlobal.find(f => f._id === id);
+    if (finca) {
+        document.getElementById('arbol-finca').value = finca.nombreFinca;
+        document.getElementById('arbol-vereda').value = finca.vereda;
+        document.getElementById('arbol-propietario').value = finca.propietario;
+    }
+}
+
+document.getElementById('formFinca')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const datos = {
+        nombreFinca: document.getElementById('finca-nombre').value,
+        vereda: document.getElementById('finca-vereda').value,
+        propietario: document.getElementById('finca-propietario').value,
+        contactoPropietario: document.getElementById('finca-contacto').value,
+        observacionesBosque: document.getElementById('finca-obs').value
+    };
+    const res = await fetch(`${hostUrl}/api/fincas`, {
+        method: 'POST',
+        headers: obtenerCabecerasSeguras(),
+        body: JSON.stringify(datos)
+    });
+    const rta = await res.json();
+    alert(rta.mensaje || rta.error);
+    if (res.ok) {
+        document.getElementById('formFinca').reset();
+        cargarFincas();
+    }
+});
+
 document.getElementById('formArbolMatriz')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const datos = { codigoArbol: document.getElementById('arbol-codigo').value, nombreComun: document.getElementById('arbol-especie').value, nombreCientifico: document.getElementById('arbol-cientifico').value, finca: document.getElementById('arbol-finca').value, veredaSector: document.getElementById('arbol-vereda').value, custodio: document.getElementById('arbol-custodio').value, coordenadasGPS: document.getElementById('arbol-gps').value };
+    const datos = { 
+        fincaId: document.getElementById('arbol-finca-select').value,
+        finca: document.getElementById('arbol-finca').value, 
+        veredaSector: document.getElementById('arbol-vereda').value, 
+        propietarioFinca: document.getElementById('arbol-propietario').value,
+        codigoArbol: document.getElementById('arbol-codigo').value, 
+        nombreComun: document.getElementById('arbol-especie').value, 
+        nombreCientifico: document.getElementById('arbol-cientifico').value, 
+        custodio: document.getElementById('arbol-custodio').value, 
+        coordenadasGPS: document.getElementById('arbol-gps').value 
+    };
     const res = await fetch(`${hostUrl}/api/arboles-matriz`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify(datos) });
-    if (res.ok) { document.getElementById('formArbolMatriz').reset(); alert((await res.json()).mensaje); cargarCatalogo(); }
+    const rta = await res.json();
+    alert(rta.mensaje || rta.error);
+    if (res.ok) { document.getElementById('formArbolMatriz').reset(); cargarCatalogo(); }
 });
 
 document.getElementById('formLote')?.addEventListener('submit', async (e) => {
@@ -1530,9 +1624,10 @@ async function cargarTablaUsuarios() {
                     </td>
                     <td style="padding: 10px 8px;">
                         <select onchange="cambiarRolUsuario('${u._id}', this.value)" style="margin: 0 !important; padding: 6px 8px !important; font-size: 12px !important; border-radius: 6px; border: 1px solid #ccc; width: auto !important;">
-                            <option value="Vigía" ${u.rol === 'Vigía' ? 'selected' : ''}>Vigía</option>
-                            <option value="Custodio" ${u.rol === 'Custodio' ? 'selected' : ''}>Custodio</option>
-                            <option value="Fundador" ${u.rol === 'Fundador' ? 'selected' : ''}>Fundador</option>
+                            <option value="Vigía" ${u.rol === 'Vigía' ? 'selected' : ''}>Vigía (Comunidad)</option>
+                            <option value="Custodio" ${u.rol === 'Custodio' ? 'selected' : ''}>Custodio (Campo y Vivero)</option>
+                            <option value="Admin" ${u.rol === 'Admin' ? 'selected' : ''}>Admin (Solo Sección Pública)</option>
+                            <option value="Fundador" ${u.rol === 'Fundador' ? 'selected' : ''}>Fundador (Total)</option>
                         </select>
                     </td>
                     <td style="padding: 10px 8px; text-align: center;">
@@ -1976,22 +2071,22 @@ window.onload = function() {
 
         // AQUÍ VA EL CONTROL DE PERMISOS CORRECTO
         if (esGestor) {
-            // 1. Le muestra el engranaje a Fundadores y Custodios
-            document.getElementById('btn-nav-admin').classList.remove('oculto');
-            
-            // 2. Le muestra la pestaña de Gobernanza SOLO al Fundador
-            if (rol === 'Fundador' || rol === 'Admin') {
-                const btnGob = document.getElementById('btn-tab-gobernanza');
-                if (btnGob) btnGob.classList.remove('oculto');
-                cargarPostulacionesPendientes();
-                cargarTablaUsuarios();
-            }
-        } else {
-            // 3. Lo que ven los Vigías
-            document.getElementById('btn-nav-admin').classList.add('oculto');
-            document.getElementById('btn-nav-postular').classList.remove('oculto');
-            document.getElementById('bannerPostulacionAlianza').classList.remove('oculto');
-        }
+          document.getElementById('btn-nav-admin').classList.remove('oculto');
+
+          // Si es Admin público, ocultamos el motor cerrado de Fincas, Árboles Madre y Lotes
+          if (rol === 'Admin' && email !== 'bosquesinos') {
+              document.getElementById('bloque-motor-cerrado')?.classList.add('oculto');
+          } else {
+              cargarFincas();
+          }
+
+          if (rol === 'Fundador' || email === 'bosquesinos') {
+              const btnGob = document.getElementById('btn-tab-gobernanza');
+              if (btnGob) btnGob.classList.remove('oculto');
+              cargarPostulacionesPendientes();
+              cargarTablaUsuarios();
+          }
+      }
 
         cargarCatalogo();
         cargarCronicasTerritorio();
