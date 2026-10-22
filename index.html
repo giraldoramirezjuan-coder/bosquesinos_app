@@ -536,7 +536,7 @@
                         <input type="text" id="arbol-vereda" placeholder="Vereda o Sector" required>
                         <input type="text" id="arbol-custodio" placeholder="Campesino Custodio" required>
                         <input type="text" id="arbol-gps" placeholder="Coordenadas GPS (Ej: 6.0423, -74.9951)" required>
-                        <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero (Protegido)</button>
+                        <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero </button>
                     </form>
                 </div>
             </details>
@@ -596,7 +596,7 @@
                     <button type="button" onclick="cargarTablaUsuarios()" style="width: max-content !important; margin: 0; padding: 5px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #8a5a00; background: white; color: #8a5a00; cursor: pointer;">🔄 Actualizar lista</button>
                 </div>
                 <p style="font-size: 12px; color: #666; margin-top: 0; margin-bottom: 12px;">
-                    Cambia el rango de cualquier miembro entre <b>Vigía</b> (visitante con cuenta), <b>Custodio</b> (guardián con acceso al vivero) o <b>Fundador</b> (administrador total), o cámbiale la clave con el botón 🔑.
+                    Cambia el rango de cualquier miembro entre <b>Vigía</b>, <b>Custodio</b> (guardián con acceso al vivero) o <b>Fundador</b>, o cámbiale la clave con el botón 🔑.
                 </p>
                 <div id="contenedor-tabla-usuarios" style="overflow-x: auto;">
                     Cargando usuarios registrados...
@@ -1273,8 +1273,8 @@ function abrirGestionInventario(especieId) {
         return;
     }
 
-    let htmlSemillero = '<h4 style="color:#e07a5f; border-bottom: 2px solid #e07a5f; padding-bottom:5px; margin-top:0;">🌰 1. En Semillero (Germinación)</h4>';
-    let htmlVivero = '<h4 style="color:#2d6a4f; border-bottom: 2px solid #2d6a4f; padding-bottom:5px; margin-top:20px;">🌱 2. En Vivero (En Bolsa)</h4>';
+    let htmlSemillero = '<h4 style="color:#e07a5f; border-bottom: 2px solid #e07a5f; padding-bottom:5px; margin-top:0;">🌰 1. En Semillero </h4>';
+    let htmlVivero = '<h4 style="color:#2d6a4f; border-bottom: 2px solid #2d6a4f; padding-bottom:5px; margin-top:20px;">🌱 2. En Vivero </h4>';
     let htmlSembrados = '<h4 style="color:#1b4332; border-bottom: 2px solid #1b4332; padding-bottom:5px; margin-top:20px;">⛰️ 3. Sembrados en Montaña</h4>';
     
     let cSem = 0, cViv = 0, cSemb = 0;
