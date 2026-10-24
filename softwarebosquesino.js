@@ -588,8 +588,18 @@ app.post('/api/olvide-password', async (req, res) => {
         await usuario.save();
 
         const transporter = nodemailer.createTransport({
-            service: 'Gmail',
-            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // Usa SSL directo en el puerto 465
+            auth: { 
+                user: process.env.EMAIL_USER, 
+                pass: process.env.EMAIL_PASS 
+            },
+            tls: {
+                rejectUnauthorized: false
+            },
+            family: 4, // Fuerza IPv4 para que Render no se quede colgado buscando IPv6
+            connectionTimeout: 10000 // Si en 10 seg no conecta, avisa de una vez
         });
 
         await transporter.sendMail({
