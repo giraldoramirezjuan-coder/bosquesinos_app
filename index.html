@@ -186,7 +186,6 @@
       </p>
     </div>
     <!-- CAJITA PARA ANIMAR A LA COMUNIDAD A ESCRIBIR -->
-    <!-- CAJITA PARA ANIMAR A LA COMUNIDAD A ESCRIBIR (Oculta para visitantes) -->
     <div id="caja-invitacion-escribir" class="oculto" style="background: #ffffff; border: 1px dashed #74c69d; padding: 12px 16px; border-radius: 10px; text-align: left; max-width: 320px;">
       <strong style="color: #0d4a29; font-size: 0.9rem; display: block; margin-bottom: 4px;">🌿 ¿Estuviste en una siembra o en la plaza?</strong>
       <span style="font-size: 0.82rem; color: #52796f; display: block; margin-bottom: 8px;">Anímate a dejar el recuerdo con tus propias palabras. Tenemos una guía de 3 pregunticas para ayudarte.</span>
@@ -511,70 +510,70 @@
                 🌱 1. Operación Vivero y Campo
             </button>
             <button type="button" id="btn-tab-gobernanza" class="btn-classic-secondary btn-suave oculto" style="width: max-content !important; padding: 10px 22px; border-radius: 25px; border: 2px solid #8a5a00; color: #8a5a00; background: #fffdf5; font-weight: bold; margin: 0;" onclick="cambiarTabAdmin('gobernanza')">
-                👑 2. Gobernanza y Roles (Fundador)
+                👑 2. Gobernanza y Roles 
             </button>
         </div>
 
         <!-- =======================================================
              PESTAÑA 1: OPERACIÓN CAMPO, VIVERO Y VITRINA
              ======================================================= -->
-        <div id="subpanel-vivero">
+       <div id="subpanel-vivero">
             
-            <!-- BLOQUE EXCLUSIVO MOTOR CERRADO (Solo Custodios y Fundador; Oculto para Admin público) -->
+            <!-- BLOQUE EXCLUSIVO MOTOR DE CAMPO -->
             <div id="bloque-motor-cerrado">
                 <p style="font-size: 13px; color: #52796f; text-align: center; margin-top: 0; margin-bottom: 18px;">
-                    Flujo de campo: Registra primero la Finca y su dueño, vincula allí los Árboles Madre y haz seguimiento a las semillas en vivero.
+                    Registra primero el predio, vincula allí los árboles semilleros y lleva el control de semillas en el vivero.
                 </p>
 
-                <!-- PASO 0: REGISTRAR FINCA Y DUEÑO -->
+                <!-- PASO 1: FINCA -->
                 <details style="background: #f4f9f5; margin-bottom: 12px; border-radius: 8px; border: 1px solid #95d5b2;">
-                    <summary style="padding: 14px; font-weight: 600; color: #0d4a29; cursor: pointer;">🏡 1. Registrar Finca / Predio (Vereda y Dueño)</summary>
+                    <summary style="padding: 14px; font-weight: 600; color: #0d4a29; cursor: pointer;">🏡 1. Registrar Finca o Predio</summary>
                     <div style="padding: 0 15px 15px 15px;">
                         <p style="font-size: 12px; color: #354f52; margin-bottom: 10px;">
-                            Registra las fincas donde hay bosque nativo para que los Custodios puedan hacerles seguimiento sin que el propietario tenga que manejar la plataforma.
+                            Inscribe las fincas con bosque nativo para que los custodios hagan seguimiento sin que el dueño tenga que usar la página.
                         </p>
                         <form id="formFinca" autocomplete="off">
-                            <input type="text" id="finca-nombre" placeholder="Nombre de la Finca o Predio (Ej: Finca La Esperanza)" required>
-                            <input type="text" id="finca-vereda" placeholder="Vereda o Sector (Ej: Vereda La Linda)" required>
-                            <input type="text" id="finca-propietario" placeholder="Nombre del Dueño / Familia Propietaria" required>
-                            <input type="text" id="finca-contacto" placeholder="Teléfono o contacto del dueño (Opcional)">
-                            <textarea id="finca-obs" placeholder="Notas del bosque (Ej: Bosque húmedo con nacimientos y árboles de abarco...)" style="min-height: 60px;"></textarea>
-                            <button type="submit" class="btn-principal" style="background: #0d4a29;">Guardar Finca en el Directorio</button>
+                            <input type="text" id="finca-nombre" placeholder="Nombre de la finca o predio" required>
+                            <input type="text" id="finca-vereda" placeholder="Vereda o sector" required>
+                            <input type="text" id="finca-propietario" placeholder="Nombre del dueño o familia" required>
+                            <input type="text" id="finca-contacto" placeholder="Teléfono de contacto opcional">
+                            <textarea id="finca-obs" placeholder="Notas sobre el bosque, nacimientos de agua o especies presentes..." style="min-height: 60px;"></textarea>
+                            <button type="submit" class="btn-principal" style="background: #0d4a29;">Guardar Finca</button>
                         </form>
                         <div id="lista-fincas-resumen" style="margin-top: 12px; font-size: 12px; color: #2d6a4f;"></div>
                     </div>
                 </details>
 
-                <!-- PASO 1: ÁRBOL MADRE VINCULADO A LA FINCA -->
+                <!-- PASO 2: ÁRBOL SEMILLERO -->
                 <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
-                    <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌳 2. Registrar Árbol Semillero (Dentro de una Finca)</summary>
+                    <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌳 2. Registrar Árbol Semillero</summary>
                     <div style="padding: 0 15px 15px 15px;">
-                        <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ <strong>Seguridad:</strong> Coordenadas GPS encriptadas con AES-256.</p>
+                        <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ Ubicación GPS protegida con encriptación AES-256.</p>
                         <form id="formArbolMatriz" autocomplete="off">
-                            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Selecciona la Finca donde está el árbol:</label>
+                            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Finca donde se encuentra el árbol:</label>
                             <select id="arbol-finca-select" onchange="seleccionarFincaParaArbol()" required style="margin-top: 4px;">
-                                <option value="">-- Primero selecciona una Finca registrada --</option>
+                                <option value="">-- Selecciona una finca registrada --</option>
                             </select>
                             <input type="hidden" id="arbol-finca">
                             <input type="hidden" id="arbol-vereda">
                             <input type="hidden" id="arbol-propietario">
 
-                            <input type="text" id="arbol-especie" placeholder="Nombre Común (Ej: Guayacán Amarillo)" required>
-                            <input type="text" id="arbol-cientifico" placeholder="Nombre Científico (Opcional)">
-                            <input type="text" id="arbol-codigo" placeholder="Código Único del Árbol (Ej: AM-GUAY-01)" required>
-                            <input type="text" id="arbol-custodio" placeholder="Custodio Bosquesino encargado del seguimiento" required>
-                            <input type="text" id="arbol-gps" placeholder="Coordenadas GPS (Ej: 6.0423, -74.9951)" required>
-                            <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero en esta Finca</button>
+                            <input type="text" id="arbol-especie" placeholder="Nombre común de la especie" required>
+                            <input type="text" id="arbol-cientifico" placeholder="Nombre científico opcional">
+                            <input type="text" id="arbol-codigo" placeholder="Código único del árbol, ej: AM-GUAY-01" required>
+                            <input type="text" id="arbol-custodio" placeholder="Custodio encargado del seguimiento" required>
+                            <input type="text" id="arbol-gps" placeholder="Coordenadas GPS, ej: 6.0423, -74.9951" required>
+                            <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero</button>
                         </form>
                     </div>
                 </details>
 
-                <!-- PASO 2: COSECHA DE SEMILLAS -->
+                <!-- PASO 3: COSECHA DE SEMILLAS -->
                 <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
-                    <summary style="padding: 14px; font-weight: 600; color: #e07a5f; cursor: pointer;">🌱 3. Registrar Nueva Cosecha de Semillas (Vivero)</summary>
+                    <summary style="padding: 14px; font-weight: 600; color: #e07a5f; cursor: pointer;">🌱 3. Registrar Nueva Cosecha de Semillas</summary>
                     <div style="padding: 0 15px 15px 15px;">
                         <form id="formLote" autocomplete="off">
-                            <select id="lote-arbolMatriz" required><option value="">-- Selecciona el Árbol Madre recolectado --</option></select>
+                            <select id="lote-arbolMatriz" required><option value="">-- Selecciona el árbol semillero recolectado --</option></select>
                             <input type="number" id="lote-cantidad" placeholder="Cantidad de semillas recolectadas" min="1" required>
                             <input type="text" id="lote-responsable" placeholder="Custodios responsables de la recolección" required>
                             <input type="date" id="lote-fecha" required>
@@ -584,19 +583,22 @@
                 </details>
 
                 <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold; margin-bottom: 16px;" onclick="abrirModalMonitoreo()">
-                    👀 Seguimiento Fenológico de Árboles por Finca
+                    👀 Seguimiento Fenológico de Árboles
                 </button>
             </div>
 
-            <!-- BLOQUE PÚBLICO DE VITRINA (Visible para Admin, Custodio y Fundador) -->
+            <!-- BLOQUE PÚBLICO DE VITRINA (DINÁMICO: PERMITE ELEGIR O CREAR ESPECIE) -->
             <details style="background: #f8fbf9; margin-bottom: 16px; border-radius: 8px; border: 1px solid #d8eadd;" open>
                 <summary style="padding: 14px; font-weight: 600; color: #2d6a4f; cursor: pointer;">📖 Actualizar Fotografías y Reportes de la Vitrina Pública</summary>
                 <div style="padding: 0 15px 15px 15px;">
                     <form id="formEspecie" autocomplete="off">
-                        <select id="esp-nombre-select" required><option value="">-- Selecciona una Especie en Vivero --</option></select>
-                        <input type="url" id="esp-imagen" placeholder="URL de la fotografía para el público" required>
-                        <textarea id="esp-caracteristicas" placeholder="Características botánicas, usos e historia para el público..."></textarea>
-                        <button type="submit" class="btn-principal" style="background: #40916c;">Actualizar Vitrina Pública</button>
+                        <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Elige una especie de la lista:</label>
+                        <select id="esp-nombre-select" required style="margin-top: 4px;">
+                            <option value="">-- Selecciona una especie de la lista --</option>
+                        </select>
+                        <input type="url" id="esp-imagen" placeholder="Enlace URL de la fotografía para el público" required>
+                        <textarea id="esp-caracteristicas" placeholder="Características botánicas, usos e historia para el público..." style="min-height: 90px;"></textarea>
+                        <button type="submit" class="btn-principal" style="background: #40916c;">Guardar en Vitrina Pública</button>
                     </form>
                 </div>
             </details>
@@ -625,7 +627,7 @@
                     <button type="button" onclick="cargarTablaUsuarios()" style="width: max-content !important; margin: 0; padding: 5px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #8a5a00; background: white; color: #8a5a00; cursor: pointer;">🔄 Actualizar lista</button>
                 </div>
                 <p style="font-size: 12px; color: #666; margin-top: 0; margin-bottom: 12px;">
-                    Cambia el rango de cualquier miembro entre <b>Vigía</b>, <b>Custodio</b> (guardián con acceso al vivero) o <b>Fundador</b>, o cámbiale la clave con el botón 🔑.
+                    Cambia el rango de cualquier miembro entre <b>Vigía</b>, <b>Custodio</b> o <b>Fundador</b>, o cámbiale la clave con el botón 🔑.
                 </p>
                 <div id="contenedor-tabla-usuarios" style="overflow-x: auto;">
                     Cargando usuarios registrados...
@@ -672,7 +674,7 @@
         <div id="cajaEstadoPostulacion" style="padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; display: none;"></div>
 
         <form id="formPostularCustodio" autocomplete="off">
-            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">📍 Vereda o Corregimiento (San Luis):</label>
+            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">📍 Vereda o Corregimiento :</label>
             <input type="text" id="post-vereda" placeholder="Ej: Vereda El Prodigio, La Cristalina, Manizales..." required style="width: 100%; padding: 10px; margin-top: 4px; margin-bottom: 12px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box;">
 
             <label style="font-size: 12px; font-weight: bold; color: #1b4332;">📐 Tamaño aproximado del predio o área a custodiar:</label>
@@ -738,11 +740,67 @@
 
 <!-- MODALES DE GESTIÓN DE LOTES -->
 <div id="modalGestionLotes" class="modal oculto"><div class="modal-contenido" style="max-width: 600px;"><span class="cerrar-modal" onclick="document.getElementById('modalGestionLotes').classList.add('oculto')">&times;</span><h3 id="nombreEspecieLotes"></h3><div id="contenedorLotesActivos"></div></div></div>
-<div id="modalAvanzarLote" class="modal oculto"><div class="modal-contenido" style="max-width: 400px; text-align: center;"><span class="cerrar-modal" onclick="document.getElementById('modalAvanzarLote').classList.add('oculto')">&times;</span><form id="formAvanzar"><input type="hidden" id="avanzar-loteId"><select id="avanzar-estado"><option value="Semillero">Semillero</option><option value="Vivero">Vivero</option><option value="Lista para transplante">Transplante</option><option value="Sembrada">Sembrada</option></select><input type="number" id="avanzar-cantidad"><input type="text" id="avanzar-obs" placeholder="Obs"><button type="submit" class="btn-principal">Avanzar</button></form></div></div>
-<div id="modalRetiroLote" class="modal oculto"><div class="modal-contenido" style="max-width: 400px;"><span class="cerrar-modal" onclick="document.getElementById('modalRetiroLote').classList.add('oculto')">&times;</span><form id="formRetirarLote"><input type="hidden" id="retirar-loteId"><input type="number" id="retirar-loteCantidad"><input type="text" id="retirar-loteMotivo"><button type="submit" class="btn-classic-danger">Retirar</button></form></div></div>
-<div id="btnCarrito" class="carrito-flotante oculto" onclick="document.getElementById('modalCarrito').classList.remove('oculto')">🌱 Mi lista <span id="contadorCarrito">0</span></div>
-<div id="modalCarrito" class="modal oculto"><div class="modal-contenido" style="max-width: 450px;"><span class="cerrar-modal" onclick="document.getElementById('modalCarrito').classList.add('oculto')">&times;</span><ul id="listaCarrito" class="lista-carrito"></ul><button class="btn-classic-primary" onclick="enviarWhatsApp()">Enviar WhatsApp</button></div></div>
+<div id="modalAvanzarLote" class="modal oculto">
+    <div class="modal-contenido" style="max-width: 400px; text-align: left;">
+        <span class="cerrar-modal" onclick="document.getElementById('modalAvanzarLote').classList.add('oculto')">&times;</span>
+        <h3 style="color: #1b4332; margin-top: 0;">🌱 Actualizar Estado del Lote</h3>
+        <form id="formAvanzar">
+            <input type="hidden" id="avanzar-loteId">
+            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Etapa actual:</label>
+            <select id="avanzar-estado" required>
+                <option value="Vivero">En Vivero</option>
+                <option value="Lista para transplante">Lista para transplante</option>
+                <option value="Sembrada">Sembrada en montaña</option>
+            </select>
 
+            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Tamaño de bolsa:</label>
+            <select id="avanzar-bolsa">
+                <option value="Bolsa Pequeña">Bolsa Pequeña</option>
+                <option value="Bolsa Mediana">Bolsa Mediana</option>
+                <option value="Bolsa Grande">Bolsa Grande</option>
+            </select>
+
+            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Altura aproximada en cm:</label>
+            <input type="number" id="avanzar-altura" placeholder="Ej: 25" min="1">
+
+            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Cantidad de plántulas que pasan:</label>
+            <input type="number" id="avanzar-cantidad" placeholder="Cantidad" min="1" required>
+
+            <input type="text" id="avanzar-obs" placeholder="Observaciones del lote">
+            <button type="submit" class="btn-principal" style="background: #2d6a4f; width: 100%;">Guardar Avance</button>
+        </form>
+    </div>
+</div>
+<div id="modalRetiroLote" class="modal oculto"><div class="modal-contenido" style="max-width: 400px;"><span class="cerrar-modal" onclick="document.getElementById('modalRetiroLote').classList.add('oculto')">&times;</span><form id="formRetirarLote"><input type="hidden" id="retirar-loteId"><input type="number" id="retirar-loteCantidad"><input type="text" id="retirar-loteMotivo"><button type="submit" class="btn-classic-danger">Retirar</button></form></div></div>
+<div id="btnCarrito" class="carrito-flotante oculto" onclick="abrirModalCarrito()">🌱 Mi lista <span id="contadorCarrito">0</span></div>
+
+<div id="modalCarrito" class="modal oculto">
+    <div class="modal-contenido" style="max-width: 460px; text-align: left;">
+        <span class="cerrar-modal" onclick="document.getElementById('modalCarrito').classList.add('oculto')">&times;</span>
+        <h3 style="color: #1b4332; margin: 0 0 12px 0;">🌱 Tu Solicitud de Plántulas</h3>
+        
+        <ul id="listaCarrito" class="lista-carrito" style="list-style: none; padding: 0; margin: 0 0 14px 0;"></ul>
+
+        <div style="background: #f4f9f5; padding: 10px; border-radius: 8px; border: 1px dashed #74c69d; margin-bottom: 12px;">
+            <label style="font-size: 12px; font-weight: bold; color: #1b4332; display: block; margin-bottom: 6px;">➕ Agregar otra especie al pedido:</label>
+            <div style="display: flex; gap: 8px;">
+                <select id="select-agregar-carrito" style="flex: 1; margin: 0 !important; padding: 8px !important; font-size: 13px !important;">
+                    <option value="">-- Elige una especie --</option>
+                </select>
+                <button type="button" onclick="agregarEspecieDesdeSelectCarrito()" style="width: max-content !important; margin: 0 !important; padding: 8px 14px !important; background: #2d6a4f; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Añadir</button>
+            </div>
+        </div>
+
+        <p style="font-size: 12.5px; color: #5c4718; background: #fffdf5; border-left: 3px solid #e09f3e; padding: 8px 10px; border-radius: 4px; margin: 0 0 14px 0;">
+            Nota: El pedido puede demorar un poco en ser respondido mientras estamos en campo.
+        </p>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn-classic-secondary" style="flex: 1; margin: 0;" onclick="document.getElementById('modalCarrito').classList.add('oculto'); cambiarVista('vista-catalogo');">📖 Seguir explorando</button>
+            <button type="button" class="btn-classic-primary" style="flex: 1; margin: 0; background: #0d4a29; color: white;" onclick="enviarWhatsApp()">Enviar WhatsApp</button>
+        </div>
+    </div>
+</div>
 <!-- MODAL EDITAR ÁRBOL -->
 <div id="modalEditarArbol" class="modal oculto" style="z-index: 10010 !important;">
     <div class="modal-contenido" style="max-width: 450px;">
@@ -883,7 +941,43 @@ let especieActualId = null;
 let especieSeleccionadaMicrositio = null;
 let especieInventarioActiva = null;
 let carrito = [];
+const ESPECIES_FIJAS_SAN_LUIS = [
+    { nombre: 'Abarco', cientifico: 'Cariniana pyriformis' },
+    { nombre: 'Tagua', cientifico: 'Phytelephas macrocarpa' },
+    { nombre: 'Caimo', cientifico: 'Pouteria caimito' },
+    { nombre: 'Soto', cientifico: 'Virola sebifera' },
+    { nombre: 'Almendrón', cientifico: 'Dipteryx oleifera' },
+    { nombre: 'Algarrobo', cientifico: 'Hymenaea courbaril' },
+    { nombre: 'Magnolio / Molinillo', cientifico: 'Magnolia' },
+    { nombre: 'Guayacán Amarillo', cientifico: 'Handroanthus chrysanthus' },
+    { nombre: 'Cedro', cientifico: 'Cedrela odorata' },
+    { nombre: 'Laurel', cientifico: 'Cordia alliodora' }
+];
 
+function poblarSelectoresDeEspecies() {
+    const selVitrina = document.getElementById('esp-nombre-select');
+    const selCarrito = document.getElementById('select-agregar-carrito');
+
+    // Unimos las fijas con cualquier otra que ya esté en la base de datos sin repetir
+    const mapaNombres = new Map();
+    ESPECIES_FIJAS_SAN_LUIS.forEach(e => mapaNombres.set(e.nombre, e.cientifico));
+    (window.especiesGlobal || []).forEach(e => {
+        if (!mapaNombres.has(e.nombreComun)) mapaNombres.set(e.nombreComun, e.nombreCientifico || '');
+    });
+
+    if (selVitrina) {
+        selVitrina.innerHTML = '<option value="">-- Selecciona una especie de la lista --</option>';
+        mapaNombres.forEach((cient, nom) => {
+            selVitrina.innerHTML += `<option value="${nom}" data-cientifico="${cient}">${nom}</option>`;
+        });
+    }
+    if (selCarrito) {
+        selCarrito.innerHTML = '<option value="">-- Elige una especie --</option>';
+        mapaNombres.forEach((cient, nom) => {
+            selCarrito.innerHTML += `<option value="${nom}">${nom}</option>`;
+        });
+    }
+}
 const CRONICAS_BASE_LOCAL = [
     {
         _id: 'base-septiembre-parque',
@@ -1241,11 +1335,17 @@ async function cargarCatalogo() {
         window.especiesGlobal = await resEspecies.json(); 
         window.lotesGlobal = await resLotes.json();
         
+        poblarSelectoresDeEspecies();
+
         if (tieneAccesoCampo()) {
             const resArboles = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
             if (resArboles.ok) { window.arbolesMatrizGlobal = await resArboles.json(); }
-    // ...
-}
+            if (selLoteArbol) {
+                selLoteArbol.innerHTML = '<option value="">-- Selecciona el árbol semillero --</option>';
+                window.arbolesMatrizGlobal.forEach(a => selLoteArbol.innerHTML += `<option value="${a._id}">${a.codigoArbol} - ${a.nombreComun} • ${a.veredaSector}</option>`);
+            }
+        }
+
         
         if (lista) {
             lista.innerHTML = '';
@@ -1254,9 +1354,24 @@ async function cargarCatalogo() {
             window.especiesGlobal.forEach(especie => {
                 const misLotes = window.lotesGlobal.filter(l => (l.arbolMatrizId && l.arbolMatrizId.nombreComun === especie.nombreComun) || (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id)));
                 let activas = 0;
-                misLotes.forEach(l => { if (l.estadoActual !== 'Sembrada' && l.estadoActual !== 'Semillero' && l.estadoActual !== 'Germinación') { activas += l.cantidadActual; } });
+                let alturas = [];
+                misLotes.forEach(l => { 
+                    if (l.estadoActual !== 'Sembrada' && l.estadoActual !== 'Semillero' && l.estadoActual !== 'Germinación') { 
+                        activas += l.cantidadActual; 
+                        if (l.alturaCm && l.alturaCm > 0) alturas.push(l.alturaCm);
+                    } 
+                });
+
+                let textoAltura = '';
+                if (alturas.length > 0) {
+                    const minH = Math.min(...alturas);
+                    const maxH = Math.max(...alturas);
+                    textoAltura = minH === maxH ? ` • Altura aprox: ${minH} cm` : ` • Alturas: ${minH} a ${maxH} cm`;
+                }
+
                 let img = especie.imagenUrl ? `<img src="${especie.imagenUrl}" class="img-arbol">` : `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
                 const btnGest = tieneAccesoCampo() ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionInventario('${especie._id}')">⚙ Gestionar Inventario</button>` : '';
+
                 lista.innerHTML += `
                     <li class="item-planta">
                         ${img}
@@ -1264,7 +1379,10 @@ async function cargarCatalogo() {
                             <h3 style="margin-bottom:2px;">${especie.nombreComun}</h3> 
                             <i style="color:#52796f; font-size:13px;">${especie.nombreCientifico || ''}</i>
                             <p style="margin-top:8px;">${(especie.caracteristicas || 'Especie nativa custodiada en San Luis.').substring(0, 75)}...</p>
-                            <div class="estadisticas" style="margin-top: 10px; margin-bottom: 10px;"><span>Plántulas Disponibles</span><strong style="font-size: 16px;">${activas} uds.</strong></div>
+                            <div class="estadisticas" style="margin-top: 10px; margin-bottom: 10px;">
+                                <span>Disponibles${textoAltura}</span>
+                                <strong style="font-size: 16px;">${activas} uds.</strong>
+                            </div>
                             <div class="acciones-tarjeta">
                                 <button class="btn-classic-primary" style="width: 100%;" onclick="abrirMicrositio('${especie._id}')">Conocer especie</button>
                                 ${btnGest}
@@ -1479,18 +1597,103 @@ document.getElementById('formArbolMatriz')?.addEventListener('submit', async (e)
     if (res.ok) { document.getElementById('formArbolMatriz').reset(); cargarCatalogo(); }
 });
 
-document.getElementById('formLote')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const res = await fetch(`${hostUrl}/api/lotes`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ arbolMatrizId: document.getElementById('lote-arbolMatriz').value, cantidadInicial: parseInt(document.getElementById('lote-cantidad').value), origen: { responsableRecoleccion: document.getElementById('lote-responsable').value, fechaRecoleccion: document.getElementById('lote-fecha').value } }) });
-    if (res.ok) { document.getElementById('formLote').reset(); alert('Registro generado.'); cargarCatalogo(); }
+document.getElementById('esp-nombre-select')?.addEventListener('change', function() {
+    const existente = (window.especiesGlobal || []).find(e => e.nombreComun === this.value);
+    document.getElementById('esp-imagen').value = existente ? (existente.imagenUrl || '') : '';
+    document.getElementById('esp-caracteristicas').value = existente ? (existente.caracteristicas || '') : '';
 });
 
 document.getElementById('formEspecie')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const id = document.getElementById('esp-nombre-select').value;
-    const res = await fetch(`${hostUrl}/api/especies/${id}`, { method: 'PUT', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ imagenUrl: document.getElementById('esp-imagen').value, caracteristicas: document.getElementById('esp-caracteristicas').value }) });
+    const sel = document.getElementById('esp-nombre-select');
+    const nombreComun = sel.value;
+    const nombreCientifico = sel.options[sel.selectedIndex]?.getAttribute('data-cientifico') || '';
+    const res = await fetch(`${hostUrl}/api/especies-vitrina`, { 
+        method: 'PUT', 
+        headers: obtenerCabecerasSeguras(), 
+        body: JSON.stringify({ 
+            nombreComun, 
+            nombreCientifico,
+            imagenUrl: document.getElementById('esp-imagen').value, 
+            caracteristicas: document.getElementById('esp-caracteristicas').value 
+        }) 
+    });
     if (res.ok) { document.getElementById('formEspecie').reset(); alert('Vitrina actualizada.'); cargarCatalogo(); }
 });
+
+document.getElementById('formAvanzar')?.addEventListener('submit', async (e) => { 
+    e.preventDefault(); 
+    await fetch(`${hostUrl}/api/lotes/avanzar`, { 
+        method: 'POST', 
+        headers: obtenerCabecerasSeguras(), 
+        body: JSON.stringify({ 
+            loteId: document.getElementById('avanzar-loteId').value, 
+            nuevoEstado: document.getElementById('avanzar-estado').value, 
+            tamanoBolsa: document.getElementById('avanzar-bolsa').value,
+            alturaCm: document.getElementById('avanzar-altura').value,
+            cantidadSuperviviente: document.getElementById('avanzar-cantidad').value, 
+            observaciones: document.getElementById('avanzar-obs').value 
+        }) 
+    }); 
+    document.getElementById('modalAvanzarLote').classList.add('oculto'); 
+    await cargarCatalogo(); 
+    abrirGestionInventario(especieInventarioActiva);
+});
+
+function abrirModalCarrito() {
+    poblarSelectoresDeEspecies();
+    actUI();
+    document.getElementById('modalCarrito').classList.remove('oculto');
+}
+
+function adquirirEjemplar() { 
+    let i = carrito.find(x => x.n === especieSeleccionadaMicrositio); 
+    if (i) i.c++; else carrito.push({ n: especieSeleccionadaMicrositio, c: 1 }); 
+    document.getElementById('modalDetalleEspecie').classList.add('oculto');
+    abrirModalCarrito(); 
+}
+
+function agregarEspecieDesdeSelectCarrito() {
+    const sel = document.getElementById('select-agregar-carrito');
+    if (!sel.value) return;
+    let i = carrito.find(x => x.n === sel.value);
+    if (i) i.c++; else carrito.push({ n: sel.value, c: 1 });
+    sel.value = '';
+    actUI();
+}
+
+function cambiarCantCarrito(idx, cant) {
+    const num = parseInt(cant);
+    if (isNaN(num) || num <= 0) carrito.splice(idx, 1);
+    else carrito[idx].c = num;
+    actUI();
+}
+
+function actUI() { 
+    document.getElementById('listaCarrito').innerHTML = carrito.map((i, idx) => `
+        <li style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee;">
+            <span>🌿 <b>${i.n}</b></span>
+            <div style="display:flex; align-items:center; gap:6px;">
+                <input type="number" min="1" value="${i.c}" onchange="cambiarCantCarrito(${idx}, this.value)" style="width:60px !important; padding:4px !important; margin:0 !important; text-align:center;">
+                <span style="font-size:12px;">uds</span>
+                <button type="button" onclick="cambiarCantCarrito(${idx}, 0)" style="background:none; border:none; color:#cf222e; cursor:pointer; width:auto !important; padding:4px !important; margin:0 !important;">✖</button>
+            </div>
+        </li>`).join(''); 
+    const total = carrito.reduce((acc, i) => acc + i.c, 0);
+    const spanCont = document.getElementById('contadorCarrito');
+    if (spanCont) spanCont.innerText = total;
+    document.getElementById('btnCarrito').className = carrito.length ? 'carrito-flotante' : 'oculto'; 
+}
+
+function enviarWhatsApp() { 
+    if (!carrito.length) return;
+    window.open(`https://wa.me/573105632387?text=Hola Bosquesinos, me interesa adquirir estos ejemplares: ` + carrito.map(i => `${i.c}x ${i.n}`).join(', '), '_blank'); 
+}
+
+function seguirExplorandoCatalogo() {
+    document.getElementById('modalCarrito').classList.add('oculto');
+    cambiarVista('vista-catalogo');
+}
 
 async function abrirModalPostulacion() {
     document.getElementById('modalPostulacionCustodio').classList.remove('oculto');
@@ -1531,16 +1734,6 @@ async function abrirModalPostulacion() {
         }
     } catch (error) { cajaEstado.style.display = 'none'; }
 }
-
-document.getElementById('formPostularCustodio')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const datos = { vereda: document.getElementById('post-vereda').value, tamañoPredio: document.getElementById('post-tamano').value, tipoBosque: document.getElementById('post-bosque').value };
-    try {
-        const res = await fetch(`${hostUrl}/api/postular-custodio`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify(datos) });
-        const data = await res.json();
-        if (res.ok) { alert(data.mensaje || '¡Postulación enviada con éxito!'); abrirModalPostulacion(); } else { alert(data.error || 'No se pudo enviar la postulación.'); }
-    } catch (error) { alert('Error de conexión al enviar la postulación.'); }
-});
 
 async function cargarPostulacionesPendientes() {
     const cont = document.getElementById('listaPostulacionesPendientes');
@@ -1683,6 +1876,16 @@ async function resetearClaveRapido(identificador) {
     alert(data.mensaje || data.error);
 }
 
+document.getElementById('formPostularCustodio')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const datos = { vereda: document.getElementById('post-vereda').value, tamañoPredio: document.getElementById('post-tamano').value, tipoBosque: document.getElementById('post-bosque').value };
+    try {
+        const res = await fetch(`${hostUrl}/api/postular-custodio`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify(datos) });
+        const data = await res.json();
+        if (res.ok) { alert(data.mensaje || '¡Postulación enviada con éxito!'); abrirModalPostulacion(); } else { alert(data.error || 'No se pudo enviar la postulación.'); }
+    } catch (error) { alert('Error de conexión al enviar la postulación.'); }
+});
+
 document.getElementById('formRegistrarAsociado')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const res = await fetch(`${hostUrl}/api/registrar-asociado`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ email: document.getElementById('asociado-email').value, password: document.getElementById('asociado-password').value }) });
@@ -1790,12 +1993,6 @@ document.getElementById('formAportarSaber')?.addEventListener('submit', async (e
 function prepAvanzar(id) { document.getElementById('avanzar-loteId').value = id; document.getElementById('modalAvanzarLote').classList.remove('oculto'); }
 function prepRetirar(id) { document.getElementById('retirar-loteId').value = id; document.getElementById('modalRetiroLote').classList.remove('oculto'); }
 
-document.getElementById('formAvanzar')?.addEventListener('submit', async (e) => { 
-    e.preventDefault(); 
-    await fetch(`${hostUrl}/api/lotes/avanzar`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ loteId: document.getElementById('avanzar-loteId').value, nuevoEstado: document.getElementById('avanzar-estado').value, cantidadSuperviviente: document.getElementById('avanzar-cantidad').value, observaciones: document.getElementById('avanzar-obs').value }) }); 
-    document.getElementById('modalAvanzarLote').classList.add('oculto'); await cargarCatalogo(); abrirGestionInventario(especieInventarioActiva);
-});
-
 document.getElementById('formRetirarLote')?.addEventListener('submit', async (e) => { 
     e.preventDefault(); 
     await fetch(`${hostUrl}/api/lotes/retirar`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ loteId: document.getElementById('retirar-loteId').value, cantidadRetirar: document.getElementById('retirar-loteCantidad').value, motivo: document.getElementById('retirar-loteMotivo').value }) }); 
@@ -1803,15 +2000,6 @@ document.getElementById('formRetirarLote')?.addEventListener('submit', async (e)
 });
 
 function apadrinarArbol() { document.getElementById('modalDetalleEspecie').classList.add('oculto'); cambiarVista('vista-apadrinar'); }
-function adquirirEjemplar() { let i = carrito.find(x => x.n === especieSeleccionadaMicrositio); if (i) i.c++; else carrito.push({n:especieSeleccionadaMicrositio, c:1}); actUI(); document.getElementById('modalCarrito').classList.remove('oculto'); }
-function actUI() { 
-    document.getElementById('listaCarrito').innerHTML = carrito.map(i => `<li>${i.n} - ${i.c} uds</li>`).join(''); 
-    const totalUnidades = carrito.reduce((acc, i) => acc + i.c, 0);
-    const spanCont = document.getElementById('contadorCarrito');
-    if (spanCont) spanCont.innerText = totalUnidades;
-    document.getElementById('btnCarrito').className = carrito.length ? 'carrito-flotante' : 'oculto'; 
-}
-function enviarWhatsApp() { window.open(`https://wa.me/573105632387?text=Interés en: ` + carrito.map(i => `${i.c}x ${i.n}`).join(', '), '_blank'); }
 
 function cambiarMicrositio(idActual, idDestino) {
     document.getElementById(idActual).classList.add('oculto');
@@ -2071,22 +2259,25 @@ window.onload = function() {
 
         // AQUÍ VA EL CONTROL DE PERMISOS CORRECTO
         if (esGestor) {
-          document.getElementById('btn-nav-admin').classList.remove('oculto');
+            document.getElementById('btn-nav-admin').classList.remove('oculto');
 
-          // Si es Admin público, ocultamos el motor cerrado de Fincas, Árboles Madre y Lotes
-          if (rol === 'Admin' && email !== 'bosquesinos') {
-              document.getElementById('bloque-motor-cerrado')?.classList.add('oculto');
-          } else {
-              cargarFincas();
-          }
+            if (rol === 'Admin' && email !== 'bosquesinos') {
+                document.getElementById('bloque-motor-cerrado')?.classList.add('oculto');
+            } else {
+                cargarFincas();
+            }
 
-          if (rol === 'Fundador' || email === 'bosquesinos') {
-              const btnGob = document.getElementById('btn-tab-gobernanza');
-              if (btnGob) btnGob.classList.remove('oculto');
-              cargarPostulacionesPendientes();
-              cargarTablaUsuarios();
-          }
-      }
+            if (rol === 'Fundador' || email === 'bosquesinos') {
+                const btnGob = document.getElementById('btn-tab-gobernanza');
+                if (btnGob) btnGob.classList.remove('oculto');
+                cargarPostulacionesPendientes();
+                cargarTablaUsuarios();
+            }
+        } else {
+            document.getElementById('btn-nav-admin').classList.add('oculto');
+            document.getElementById('btn-nav-postular').classList.remove('oculto');
+            document.getElementById('bannerPostulacionAlianza').classList.remove('oculto');
+        }
 
         cargarCatalogo();
         cargarCronicasTerritorio();

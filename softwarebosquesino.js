@@ -107,10 +107,14 @@ const loteSchema = new mongoose.Schema({
     cantidadInicial: { type: Number, required: true }, 
     cantidadActual: { type: Number, required: true },  
     estadoActual: { type: String, default: 'Semillero' },
+    tamanoBolsa: { type: String, default: 'Sin bolsa' }, // Pequeña, Mediana, Grande
+    alturaCm: { type: Number, default: 0 }, // Altura aproximada en cm
     historial: [{
         fechaEvento: { type: Date, default: Date.now },
         estadoAlcanzado: { type: String },
         cantidadSuperviviente: { type: Number },
+        tamanoBolsa: { type: String, default: '' },
+        alturaCm: { type: Number, default: 0 },
         observaciones: { type: String },
         responsable: { type: String } 
     }]
@@ -359,10 +363,20 @@ app.post('/api/lotes/avanzar', verificarAcceso, soloMotorCampo, async (req, res)
         const cant = Number(req.body.cantidadSuperviviente);
         lote.estadoActual = req.body.nuevoEstado;
         lote.cantidadActual = cant;
-        lote.historial.push({ estadoAlcanzado: req.body.nuevoEstado, cantidadSuperviviente: cant, observaciones: req.body.observaciones, responsable: req.usuarioActual });
+        if (req.body.tamanoBolsa) lote.tamanoBolsa = req.body.tamanoBolsa;
+        if (req.body.alturaCm !== undefined) lote.alturaCm = Number(req.body.alturaCm) || 0;
+
+        lote.historial.push({ 
+            estadoAlcanzado: req.body.nuevoEstado, 
+            cantidadSuperviviente: cant, 
+            tamanoBolsa: lote.tamanoBolsa,
+            alturaCm: lote.alturaCm,
+            observaciones: req.body.observaciones, 
+            responsable: req.usuarioActual 
+        });
         await lote.save();
-        res.json({ mensaje: `Lote avanzado a ${req.body.nuevoEstado}.` });
-    } catch (error) { res.status(500).json({ error: 'Error al avanzar' }); }
+        res.json({ mensaje: `Lote actualizado a ${req.body.nuevoEstado}.` });
+    } catch (error) { res.status(500).json({ error: 'Error al avanzar lote' }); }
 });
 
 app.post('/api/lotes/retirar', verificarAcceso, soloMotorCampo, async (req, res) => {
@@ -398,6 +412,24 @@ app.get('/api/lotes', async (req, res) => {
     try { res.json(await Lote.find().populate('arbolMatrizId')); } catch (error) { res.status(500).json({ error: 'Error al obtener lotes' }); }
 });
 
+app.put('/api/especies-vitrina', verificarAcceso, soloGestoresPublicos, async (req, res) => {
+    try {
+        const { nombreComun, nombreCientifico, imagenUrl, caracteristicas } = req.body;
+        if (!nombreComun) return res.status(400).json({ error: 'Selecciona una especie.' });
+
+        let especie = await Especie.findOne({ nombreComun: String(nombreComun).trim() });
+        if (!especie) {
+            especie = new Especie({ nombreComun: String(nombreComun).trim() });
+        }
+        if (nombreCientifico) especie.nombreCientifico = nombreCientifico;
+        if (imagenUrl) especie.imagenUrl = imagenUrl;
+        if (caracteristicas) especie.caracteristicas = caracteristicas;
+
+        await especie.save();
+        res.json({ mensaje: `Ficha pública de ${especie.nombreComun} actualizada.`, especie });
+    } catch (error) { res.status(500).json({ error: 'Error al actualizar vitrina' }); }
+});
+
 app.put('/api/especies/:id', verificarAcceso, soloGestoresPublicos, async (req, res) => {
     try {
         const especie = await Especie.findById(req.params.id);
@@ -406,8 +438,12 @@ app.put('/api/especies/:id', verificarAcceso, soloGestoresPublicos, async (req, 
         if (req.body.nuevoSaber && req.body.nuevoSaber.autor) {
             especie.saberes.push({ autor: req.body.nuevoSaber.autor, descripcion: req.body.nuevoSaber.descripcion, fechaAporte: new Date() });
         }
+        if (nombreCientifico) especie.nombreCientifico = nombreCientifico;
+        if (imagenUrl) especie.imagenUrl = imagenUrl;
+        if (caracteristicas) especie.caracteristicas = caracteristicas;
+
         await especie.save();
-        res.json({ mensaje: 'Vitrina pública actualizada', especie });
+        res.json({ mensaje: `Ficha pública de ${especie.nombreComun} actualizada.`, especie });
     } catch (error) { res.status(500).json({ error: 'Error al actualizar vitrina' }); }
 });
 
