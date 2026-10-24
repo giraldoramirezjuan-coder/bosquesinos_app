@@ -627,7 +627,7 @@
                     <button type="button" onclick="cargarTablaUsuarios()" style="width: max-content !important; margin: 0; padding: 5px 12px; font-size: 12px; border-radius: 6px; border: 1px solid #8a5a00; background: white; color: #8a5a00; cursor: pointer;">🔄 Actualizar lista</button>
                 </div>
                 <p style="font-size: 12px; color: #666; margin-top: 0; margin-bottom: 12px;">
-                    Cambia el rango de cualquier miembro entre <b>Vigía</b>, <b>Custodio</b> o <b>Fundador</b>, o cámbiale la clave con el botón 🔑.
+                    Cambia el rango de cualquier miembro entre <b>Vigía</b>, <b>Custodio</b> o <b>Fundador</b>.
                 </p>
                 <div id="contenedor-tabla-usuarios" style="overflow-x: auto;">
                     Cargando usuarios registrados...
@@ -866,24 +866,34 @@
     </div>
 </div>
 
-<!-- 3. RECUPERAR CONTRASEÑA -->
+<!-- 3. RECUPERAR CONTRASEÑA POR CORREO -->
 <div id="modalOlvidePassword" class="modal oculto" style="z-index: 10010 !important;">
     <div class="modal-contenido" style="max-width: 400px; padding: 40px 30px; border-radius: 12px; text-align: center;">
         <span class="cerrar-modal" onclick="document.getElementById('modalOlvidePassword').classList.add('oculto')">&times;</span>
         <h2 style="color: var(--color-brand-forest); margin-top: 0; font-family: serif; font-size: 22px;">Recuperar Acceso</h2>
-        <p style="color: #666; font-size: 13px; margin-bottom: 20px;">Te enviaremos un código a tu correo para restablecer tu contraseña.</p>
         
-        <form autocomplete="off" onsubmit="event.preventDefault(); solicitarRecuperacion();">
+        <!-- PASO 1: SOLICITAR CÓDIGO AL CORREO -->
+        <form id="formSolicitarCodigo" autocomplete="off" onsubmit="event.preventDefault(); solicitarRecuperacion();">
+            <p style="color: #666; font-size: 13px; margin-bottom: 20px;">Te enviaremos un código de 6 dígitos a tu correo registrado para restablecer tu clave de forma privada.</p>
             <input type="email" id="rec-email" placeholder="Tu Correo Electrónico" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
-            <button type="submit" class="btn-principal btn-suave" style="width: 100%; padding: 12px; font-size: 15px; background: var(--color-accent-sun); color: var(--color-text-primary); border: none; border-radius: 6px;">Enviar Código</button>
+            <button type="submit" id="btnEnviarCodigoRec" class="btn-principal btn-suave" style="width: 100%; padding: 12px; font-size: 15px; background: var(--color-accent-sun); color: var(--color-text-primary); border: none; border-radius: 6px;">Enviar Código al Correo</button>
+        </form>
+
+        <!-- PASO 2: INGRESAR CÓDIGO DE 6 DÍGITOS Y NUEVA CLAVE -->
+        <form id="formConfirmarCodigo" class="oculto" autocomplete="off" onsubmit="event.preventDefault(); confirmarNuevaPassword();">
+            <p style="color: #1b4332; font-size: 13px; margin-bottom: 15px; background: #e9f5ed; padding: 10px; border-radius: 6px;">
+                📩 Revisa tu bandeja de entrada o spam e ingresa el código de 6 dígitos.
+            </p>
+            <input type="text" id="rec-codigo" placeholder="Código de 6 dígitos" required style="width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; text-align: center; font-weight: bold; letter-spacing: 3px;">
+            <input type="password" id="rec-nueva-pass" placeholder="Escribe tu nueva contraseña" minlength="6" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
+            <button type="submit" class="btn-principal btn-suave" style="width: 100%; padding: 12px; font-size: 15px; background: var(--color-brand-forest); color: white; border: none; border-radius: 6px;">Actualizar Contraseña</button>
         </form>
         
         <div style="margin-top: 20px;">
-            <span style="font-size: 13px; color: var(--color-brand-forest); cursor: pointer; text-decoration: underline;" onclick="cambiarMicrositio('modalOlvidePassword', 'modalLoginClasico')">Volver al inicio de sesión</span>
+            <span style="font-size: 13px; color: var(--color-brand-forest); cursor: pointer; text-decoration: underline;" onclick="volverAlLoginDesdeRecuperacion()">Volver al inicio de sesión</span>
         </div>
     </div>
 </div>
-
 <!-- CAJA 5: LEGAL -->
 <section id="vista-legal" class="oculto" style="padding: 60px 20px; max-width: 900px; margin: 0 auto; min-height: 80vh; color: var(--color-text-primary);">
     <div style="background: var(--color-surface-white); padding: 50px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); text-align: left;">
@@ -1817,16 +1827,11 @@ async function cargarTablaUsuarios() {
                     </td>
                     <td style="padding: 10px 8px;">
                         <select onchange="cambiarRolUsuario('${u._id}', this.value)" style="margin: 0 !important; padding: 6px 8px !important; font-size: 12px !important; border-radius: 6px; border: 1px solid #ccc; width: auto !important;">
-                            <option value="Vigía" ${u.rol === 'Vigía' ? 'selected' : ''}>Vigía (Comunidad)</option>
-                            <option value="Custodio" ${u.rol === 'Custodio' ? 'selected' : ''}>Custodio (Campo y Vivero)</option>
-                            <option value="Admin" ${u.rol === 'Admin' ? 'selected' : ''}>Admin (Solo Sección Pública)</option>
-                            <option value="Fundador" ${u.rol === 'Fundador' ? 'selected' : ''}>Fundador (Total)</option>
+                            <option value="Vigía" ${u.rol === 'Vigía' ? 'selected' : ''}>Vigía</option>
+                            <option value="Custodio" ${u.rol === 'Custodio' ? 'selected' : ''}>Custodio</option>
+                            <option value="Admin" ${u.rol === 'Admin' ? 'selected' : ''}>Admin</option>
+                            <option value="Fundador" ${u.rol === 'Fundador' ? 'selected' : ''}>Fundador</option>
                         </select>
-                    </td>
-                    <td style="padding: 10px 8px; text-align: center;">
-                        <button type="button" onclick="resetearClaveRapido('${u.email}')" style="width: max-content !important; margin: 0; padding: 5px 10px; font-size: 12px; border-radius: 6px; border: 1px solid #c15539; background: #fffaf8; color: #c15539; cursor: pointer;" title="Cambiar contraseña">
-                            🔑 Clave
-                        </button>
                     </td>
                 </tr>`;
         }).join('');
@@ -1837,8 +1842,7 @@ async function cargarTablaUsuarios() {
                     <tr style="background: #f4efe0; color: #5c4308; font-size: 12px;">
                         <th style="padding: 10px 8px;">Usuario / Correo</th>
                         <th style="padding: 10px 8px;">Rol Actual</th>
-                        <th style="padding: 10px 8px;">Cambiar Rol</th>
-                        <th style="padding: 10px 8px; text-align: center;">Soporte</th>
+                        <th style="padding: 10px 8px;">Asignar Rol</th>
                     </tr>
                 </thead>
                 <tbody>${filas}</tbody>
@@ -1864,17 +1868,6 @@ async function cambiarRolUsuario(userId, nuevoRol) {
     }
 }
 
-async function resetearClaveRapido(identificador) {
-    const nuevaPassword = prompt(`🔑 Escribe la nueva contraseña para "${identificador}":`);
-    if (!nuevaPassword || !nuevaPassword.trim()) return;
-    const res = await fetch(`${hostUrl}/api/fundador-reset-password`, {
-        method: 'PUT',
-        headers: obtenerCabecerasSeguras(),
-        body: JSON.stringify({ identificador, nuevaPassword: nuevaPassword.trim() })
-    });
-    const data = await res.json();
-    alert(data.mensaje || data.error);
-}
 
 document.getElementById('formPostularCustodio')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -2033,8 +2026,56 @@ async function procesarRegistroPublico() {
 
 async function solicitarRecuperacion() {
     const email = document.getElementById('rec-email').value.trim();
-    const texto = `Hola Fundador de Bosquesinos, olvidé mi contraseña para mi usuario/correo: ${email}. ¿Me ayudas a restablecerla?`;
-    window.open(`https://wa.me/573226575786?text=${encodeURIComponent(texto)}`, '_blank');
+    const btn = document.getElementById('btnEnviarCodigoRec');
+    btn.disabled = true;
+    btn.innerText = 'Enviando código...';
+
+    try {
+        const res = await fetch(`${hostUrl}/api/olvide-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        alert(data.mensaje || data.error);
+        if (res.ok) {
+            document.getElementById('formSolicitarCodigo').classList.add('oculto');
+            document.getElementById('formConfirmarCodigo').classList.remove('oculto');
+        }
+    } catch (error) {
+        alert('Error de conexión con el servidor.');
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Enviar Código al Correo';
+    }
+}
+
+async function confirmarNuevaPassword() {
+    const token = document.getElementById('rec-codigo').value.trim();
+    const nuevaPassword = document.getElementById('rec-nueva-pass').value;
+
+    try {
+        const res = await fetch(`${hostUrl}/api/reset-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, nuevaPassword })
+        });
+        const data = await res.json();
+        alert(data.mensaje || data.error);
+        if (res.ok) {
+            document.getElementById('formConfirmarCodigo').reset();
+            document.getElementById('formSolicitarCodigo').reset();
+            volverAlLoginDesdeRecuperacion();
+        }
+    } catch (error) {
+        alert('Error al actualizar la contraseña.');
+    }
+}
+
+function volverAlLoginDesdeRecuperacion() {
+    document.getElementById('formSolicitarCodigo').classList.remove('oculto');
+    document.getElementById('formConfirmarCodigo').classList.add('oculto');
+    cambiarMicrositio('modalOlvidePassword', 'modalLoginClasico');
 }
 
 function toggleAdmin() { 

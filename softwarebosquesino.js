@@ -574,6 +574,64 @@ app.post('/api/registro-publico', async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al registrar la cuenta.' }); }
 });
 
+app.post('/api/olvide-password', async (req, res) => {
+    try {
+        if (!nodemailer) return res.status(503).json({ error: 'El servicio de correo no está instalado en el servidor.' });
+        const emailLimpio = String(req.body.email || '').trim();
+        const usuario = await User.findOne({ email: emailLimpio });
+        if (!usuario) return res.status(404).json({ error: 'No hay ningún usuario registrado con ese correo.' });
+
+        // Generar código de 6 dígitos y guardar su hash por 15 minutos
+        const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
+        usuario.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        usuario.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+        await usuario.save();
+
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+        });
+
+        await transporter.sendMail({
+            from: `"Sistema Bosquesinos San Luis" <${process.env.EMAIL_USER}>`,
+            to: usuario.email,
+            subject: 'Código de Recuperación - Asociación Bosquesinos',
+            text: `Hola,\n\nHas solicitado restablecer tu contraseña en la plataforma Bosquesinos.\n\nTu código de seguridad de 6 dígitos es: ${resetToken}\n\nEste código vence en 15 minutos. Si no solicitaste este cambio, ignora este correo.`
+        });
+
+        res.json({ mensaje: 'Código de 6 dígitos enviado a tu correo electrónico.' });
+    } catch (error) { 
+        console.error('Error enviando correo:', error);
+        res.status(500).json({ error: 'No se pudo enviar el correo. Verifica la configuración del servidor.' }); 
+    }
+});
+
+app.post('/api/reset-password', async (req, res) => {
+    try {
+        const codigo = String(req.body.token || '').trim();
+        const nuevaPassword = String(req.body.nuevaPassword || '');
+        if (nuevaPassword.length < 6) {
+            return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
+        }
+
+        const resetPasswordToken = crypto.createHash('sha256').update(codigo).digest('hex');
+        const usuario = await User.findOne({
+            resetPasswordToken,
+            resetPasswordExpire: { $gt: Date.now() }
+        });
+        if (!usuario) return res.status(400).json({ error: 'El código es inválido o ya expiró.' });
+
+        usuario.password = await bcrypt.hash(nuevaPassword, 10);
+        usuario.resetPasswordToken = undefined;
+        usuario.resetPasswordExpire = undefined;
+        await usuario.save();
+
+        res.json({ mensaje: '¡Contraseña actualizada con éxito! Ya puedes iniciar sesión.' });
+    } catch (error) { 
+        res.status(500).json({ error: 'Error al actualizar la contraseña.' }); 
+    }
+});
+
 app.get('/api/mi-perfil', verificarAcceso, async (req, res) => {
     try {
         const usuario = await User.findOne({ email: req.usuarioActual }, '-password');
@@ -651,17 +709,6 @@ app.post('/api/registrar-asociado', verificarAcceso, soloFundador, async (req, r
         await new User({ email: String(req.body.email).trim(), password: passwordEncriptada, rol: rolAsignado }).save();
         res.status(201).json({ mensaje: `${rolAsignado} registrado con éxito.` });
     } catch (error) { res.status(400).json({ error: 'Error al registrar' }); }
-});
-
-app.put('/api/fundador-reset-password', verificarAcceso, soloFundador, async (req, res) => {
-    try {
-        const { identificador, nuevaPassword } = req.body;
-        const usuario = await User.findOne({ email: String(identificador).trim() });
-        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado.' });
-        const passwordEncriptada = await bcrypt.hash(String(nuevaPassword), 10);
-        await User.updateOne({ _id: usuario._id }, { $set: { password: passwordEncriptada } });
-        res.json({ mensaje: `¡Contraseña de ${usuario.email} restablecida!` });
-    } catch (error) { res.status(500).json({ error: 'Error al cambiar la contraseña.' }); }
 });
 
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
