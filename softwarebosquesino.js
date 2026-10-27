@@ -14,11 +14,21 @@ try {
 
 const app = express();
 app.use(cors());         
-app.use(express.json()); 
+app.use(express.json({ limit: '1mb' })); 
+app.use(express.urlencoded({ limit: '1mb', extended: true }));
+
+// Evitar que descarguen el código del backend o el package.json desde el navegador
+app.use((req, res, next) => {
+    const archivosProtegidos = ['/softwarebosquesino.js', '/package.json', '/package-lock.json', '/.env'];
+    if (archivosProtegidos.includes(req.path.toLowerCase())) {
+        return res.status(403).send('Acceso denegado');
+    }
+    next();
+});
 app.use(express.static(__dirname));
 
 // --- CONFIGURACIÓN DE SEGURIDAD AES-256 ---
-const CLAVE_SECRETA = process.env.JWT_SECRET || 'bosquesinos_secreto_seguro_2026';
+const CLAVE_SECRETA = process.env.JWT_SECRET 
 const ENCRYPTION_KEY = crypto.scryptSync(CLAVE_SECRETA, 'salt_bosquesinos', 32);
 const ALGORITMO = 'aes-256-cbc';
 
@@ -179,7 +189,8 @@ async function crearUsuarioAdmin() {
   try {
     const usuarioExiste = await User.findOne({ email: 'bosquesinos' });
     if (!usuarioExiste) {
-      const passwordEncriptada = await bcrypt.hash('bosquesinas', 10);
+      const passInicial = process.env.ADMIN_INITIAL_PASS || crypto.randomBytes(16).toString('hex');
+        const passwordEncriptada = await bcrypt.hash(passInicial, 10);
       await new User({ email: 'bosquesinos', password: passwordEncriptada, rol: 'Fundador' }).save();
     } else if (usuarioExiste.rol !== 'Fundador') {
       await User.updateOne({ email: 'bosquesinos' }, { $set: { rol: 'Fundador' } });
@@ -438,10 +449,6 @@ app.put('/api/especies/:id', verificarAcceso, soloGestoresPublicos, async (req, 
         if (req.body.nuevoSaber && req.body.nuevoSaber.autor) {
             especie.saberes.push({ autor: req.body.nuevoSaber.autor, descripcion: req.body.nuevoSaber.descripcion, fechaAporte: new Date() });
         }
-        if (nombreCientifico) especie.nombreCientifico = nombreCientifico;
-        if (imagenUrl) especie.imagenUrl = imagenUrl;
-        if (caracteristicas) especie.caracteristicas = caracteristicas;
-
         await especie.save();
         res.json({ mensaje: `Ficha pública de ${especie.nombreComun} actualizada.`, especie });
     } catch (error) { res.status(500).json({ error: 'Error al actualizar vitrina' }); }
@@ -590,16 +597,13 @@ app.post('/api/olvide-password', async (req, res) => {
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 465,
-            secure: true, // Usa SSL directo en el puerto 465
+            secure: true,
             auth: { 
                 user: process.env.EMAIL_USER, 
                 pass: process.env.EMAIL_PASS 
             },
-            tls: {
-                rejectUnauthorized: false
-            },
-            family: 4, // Fuerza IPv4 para que Render no se quede colgado buscando IPv6
-            connectionTimeout: 10000 // Si en 10 seg no conecta, avisa de una vez
+            family: 4,
+            connectionTimeout: 10000
         });
 
         await transporter.sendMail({
