@@ -933,7 +933,7 @@
 <script>
 const hostUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
     ? 'http://localhost:3000' 
-    : 'https://bosquesinos-sanluis.onrender.com';
+    : window.location.origin;
 
 let categoriaTerritorioActual = 'campo-mesa';
 let listaCronicasGlobal = [];
@@ -1884,15 +1884,6 @@ document.getElementById('formRegistrarAsociado')?.addEventListener('submit', asy
     const res = await fetch(`${hostUrl}/api/registrar-asociado`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ email: document.getElementById('asociado-email').value, password: document.getElementById('asociado-password').value }) });
     const data = await res.json();
     if (res.ok) { document.getElementById('formRegistrarAsociado').reset(); alert(data.mensaje); } else { alert(data.error || 'Error al registrar Custodio'); }
-});
-
-document.getElementById('formAdminResetPassword')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const identificador = document.getElementById('reset-usuario-target').value;
-    const nuevaPassword = document.getElementById('reset-nueva-clave').value;
-    const res = await fetch(`${hostUrl}/api/fundador-reset-password`, { method: 'PUT', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ identificador, nuevaPassword }) });
-    const data = await res.json();
-    if (res.ok) { document.getElementById('formAdminResetPassword').reset(); alert(data.mensaje); } else { alert(data.error || 'Error al actualizar contraseña'); }
 });
 
 async function abrirModalMonitoreo() {

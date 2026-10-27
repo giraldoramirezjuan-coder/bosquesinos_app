@@ -583,9 +583,10 @@ app.post('/api/registro-publico', async (req, res) => {
 
 app.post('/api/olvide-password', async (req, res) => {
     try {
-        if (!nodemailer) return res.status(503).json({ error: 'El servicio de correo no está instalado en el servidor.' });
-        const emailLimpio = String(req.body.email || '').trim();
-        const usuario = await User.findOne({ email: emailLimpio });
+        const emailLimpio = String(req.body.email || '').trim().toLowerCase();
+        const usuario = await User.findOne({ 
+            email: { $regex: new RegExp(`^${emailLimpio}$`, 'i') } 
+        });
         if (!usuario) return res.status(404).json({ error: 'No hay ningún usuario registrado con ese correo.' });
 
         // Generar código de 6 dígitos y guardar su hash por 15 minutos
@@ -594,14 +595,33 @@ app.post('/api/olvide-password', async (req, res) => {
         usuario.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
         await usuario.save();
 
+        const textoCorreo = `Hola,\n\nHas solicitado restablecer tu contraseña en la plataforma Bosquesinos.\n\nTu código de seguridad de 6 dígitos es: ${resetToken}\n\nEste código vence en 15 minutos. Si no solicitaste este cambio, ignora este correo.`;
+
+        // 1. Envío por HTTPS (Google Apps Script) -> NUNCA es bloqueado por Render Free
+        const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
+        if (scriptUrl) {
+            const rta = await fetch(scriptUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    secreto: "bosquesinos_correo_2026",
+                    to: usuario.email,
+                    subject: 'Código de Recuperación - Asociación Bosquesinos',
+                    text: textoCorreo
+                })
+            });
+            const resultado = await rta.json();
+            if (!resultado.ok) throw new Error(resultado.error || 'Error en puente de correo');
+            return res.json({ mensaje: 'Código de 6 dígitos enviado a tu correo electrónico.' });
+        }
+
+        // 2. Respaldo por Nodemailer (Para pruebas en localhost)
+        if (!nodemailer) return res.status(503).json({ error: 'Falta configurar GOOGLE_SCRIPT_URL en Render.' });
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 465,
             secure: true,
-            auth: { 
-                user: process.env.EMAIL_USER, 
-                pass: process.env.EMAIL_PASS 
-            },
+            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
             family: 4,
             connectionTimeout: 10000
         });
@@ -610,7 +630,7 @@ app.post('/api/olvide-password', async (req, res) => {
             from: `"Sistema Bosquesinos San Luis" <${process.env.EMAIL_USER}>`,
             to: usuario.email,
             subject: 'Código de Recuperación - Asociación Bosquesinos',
-            text: `Hola,\n\nHas solicitado restablecer tu contraseña en la plataforma Bosquesinos.\n\nTu código de seguridad de 6 dígitos es: ${resetToken}\n\nEste código vence en 15 minutos. Si no solicitaste este cambio, ignora este correo.`
+            text: textoCorreo
         });
 
         res.json({ mensaje: 'Código de 6 dígitos enviado a tu correo electrónico.' });
