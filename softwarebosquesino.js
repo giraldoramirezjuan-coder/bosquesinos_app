@@ -108,17 +108,18 @@ const ArbolMatriz = mongoose.model('ArbolMatriz', arbolMatrizSchema);
 // FASE 2: Lote de Semillas y Vivero
 const loteSchema = new mongoose.Schema({
     codigoLote: { type: String, required: true, unique: true }, 
-    arbolMatrizId: { type: mongoose.Schema.Types.ObjectId, ref: 'ArbolMatriz', required: true },
+    arbolMatrizId: { type: mongoose.Schema.Types.ObjectId, ref: 'ArbolMatriz' }, // <-- Ya NO es requerido
+    especieNombre: { type: String, default: '' }, // <-- Enlace directo a la especie
     registradoPor: { type: String, required: true },
     origen: {
-        responsableRecoleccion: { type: String, required: true },
-        fechaRecoleccion: { type: Date, required: true }
+        responsableRecoleccion: { type: String, default: 'Inventario Base' },
+        fechaRecoleccion: { type: Date, default: Date.now }
     },
     cantidadInicial: { type: Number, required: true }, 
     cantidadActual: { type: Number, required: true },  
     estadoActual: { type: String, default: 'Semillero' },
-    tamanoBolsa: { type: String, default: 'Sin bolsa' }, // Pequeña, Mediana, Grande
-    alturaCm: { type: Number, default: 0 }, // Altura aproximada en cm
+    tamanoBolsa: { type: String, default: 'Sin bolsa' },
+    alturaCm: { type: Number, default: 0 },
     historial: [{
         fechaEvento: { type: Date, default: Date.now },
         estadoAlcanzado: { type: String },
@@ -421,6 +422,34 @@ app.get('/api/especies', async (req, res) => {
   
 app.get('/api/lotes', async (req, res) => {
     try { res.json(await Lote.find().populate('arbolMatrizId')); } catch (error) { res.status(500).json({ error: 'Error al obtener lotes' }); }
+});
+
+app.post('/api/lotes-base', verificarAcceso, soloMotorCampo, async (req, res) => {
+    try {
+        const { especieNombre, cantidad, tamanoBolsa } = req.body;
+        const codigoLote = `INV-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        
+        // Si la especie no existe en la vitrina, la crea sola
+        let especie = await Especie.findOne({ nombreComun: String(especieNombre).trim() });
+        if (!especie) {
+            especie = new Especie({ nombreComun: String(especieNombre).trim() });
+            await especie.save();
+        }
+
+        const nuevoLote = new Lote({
+            codigoLote, 
+            especieNombre: especie.nombreComun,
+            registradoPor: req.usuarioActual,
+            origen: { responsableRecoleccion: 'Inventario Base', fechaRecoleccion: new Date() },
+            cantidadInicial: Number(cantidad), 
+            cantidadActual: Number(cantidad), 
+            estadoActual: 'Vivero',
+            tamanoBolsa: tamanoBolsa,
+            historial: [{ estadoAlcanzado: 'Vivero', cantidadSuperviviente: Number(cantidad), tamanoBolsa, observaciones: 'Ingreso directo de inventario sin origen', responsable: req.usuarioActual }]
+        });
+        await nuevoLote.save();
+        res.status(201).json({ mensaje: `Ingresaron ${cantidad} plántulas de ${especieNombre} al vivero.` });
+    } catch (error) { res.status(400).json({ error: 'Error al registrar inventario' }); }
 });
 
 app.put('/api/especies-vitrina', verificarAcceso, soloGestoresPublicos, async (req, res) => {

@@ -581,7 +581,27 @@
                         </form>
                     </div>
                 </details>
-
+                <details style="background: #fffcf0; margin-bottom: 12px; border-radius: 8px; border: 1px solid #f4e08b;" open>
+                    <summary style="padding: 14px; font-weight: 600; color: #8a5a00; cursor: pointer;">📦 Ingreso Rápido al Vivero (Inventario Base)</summary>
+                    <div style="padding: 0 15px 15px 15px;">
+                        <p style="font-size: 11.5px; color: #666; margin-bottom: 10px;">Ingresa plántulas que ya tienes en el vivero sin necesidad de conocer su árbol madre.</p>
+                        <form id="formInventarioBase" autocomplete="off">
+                            <select id="inv-especie" required style="width: 100%; margin-bottom: 10px; padding: 10px;">
+                                <option value="">-- Elige la especie --</option>
+                            </select>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <input type="number" id="inv-cantidad" placeholder="Cantidad de maticas" min="1" required style="padding: 10px;">
+                                <select id="inv-bolsa" required style="padding: 10px;">
+                                    <option value="Bolsa Pequeña">Bolsa Pequeña</option>
+                                    <option value="Bolsa Mediana">Bolsa Mediana</option>
+                                    <option value="Bolsa Grande">Bolsa Grande</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-principal" style="background: #8a5a00; width: 100%;">Agregar al Vivero</button>
+                        </form>
+                    </div>
+                </details>
+                
                 <button type="button" class="btn-classic-secondary" style="width: 100%; padding: 12px; font-size: 14px; border: 2px solid #2d6a4f; color: #1b4332; font-weight: bold; margin-bottom: 16px;" onclick="abrirModalMonitoreo()">
                     👀 Seguimiento Fenológico de Árboles
                 </button>
@@ -965,10 +985,15 @@ const ESPECIES_FIJAS_SAN_LUIS = [
 ];
 
 function poblarSelectoresDeEspecies() {
+    const selInv = document.getElementById('inv-especie');
+    if (selInv) {
+        selInv.innerHTML = '<option value="">-- Elige la especie --</option>';
+        mapaNombres.forEach((cient, nom) => { selInv.innerHTML += `<option value="${nom}">${nom}</option>`; });
+    }
     const selVitrina = document.getElementById('esp-nombre-select');
     const selCarrito = document.getElementById('select-agregar-carrito');
 
-    // Unimos las fijas con cualquier otra que ya esté en la base de datos sin repetir
+        // Unimos las fijas con cualquier otra que ya esté en la base de datos sin repetir
     const mapaNombres = new Map();
     ESPECIES_FIJAS_SAN_LUIS.forEach(e => mapaNombres.set(e.nombre, e.cientifico));
     (window.especiesGlobal || []).forEach(e => {
@@ -1362,43 +1387,45 @@ async function cargarCatalogo() {
             if (window.especiesGlobal.length === 0) { lista.innerHTML = '<p style="text-align:center; width:100%;">No hay especies aún.</p>'; actualizarDashboard(); return; }
 
             window.especiesGlobal.forEach(especie => {
-                const misLotes = window.lotesGlobal.filter(l => (l.arbolMatrizId && l.arbolMatrizId.nombreComun === especie.nombreComun) || (l.especieId && (l.especieId === especie._id || l.especieId._id === especie._id)));
-                let activas = 0;
-                let alturas = [];
-                misLotes.forEach(l => { 
-                    if (l.estadoActual !== 'Sembrada' && l.estadoActual !== 'Semillero' && l.estadoActual !== 'Germinación') { 
-                        activas += l.cantidadActual; 
-                        if (l.alturaCm && l.alturaCm > 0) alturas.push(l.alturaCm);
-                    } 
-                });
+            const misLotes = window.lotesGlobal.filter(l => (l.arbolMatrizId && l.arbolMatrizId.nombreComun === especie.nombreComun) || l.especieNombre === especie.nombreComun);
+            let activas = 0, p = 0, m = 0, g = 0;
+            
+            misLotes.forEach(l => { 
+                if (l.estadoActual === 'Vivero' || l.estadoActual === 'Lista para transplante') { 
+                    activas += l.cantidadActual; 
+                    if(l.tamanoBolsa === 'Bolsa Pequeña') p += l.cantidadActual;
+                    else if(l.tamanoBolsa === 'Bolsa Mediana') m += l.cantidadActual;
+                    else if(l.tamanoBolsa === 'Bolsa Grande') g += l.cantidadActual;
+                    else p += l.cantidadActual; // Por defecto si no tiene bolsa
+                } 
+            });
 
-                let textoAltura = '';
-                if (alturas.length > 0) {
-                    const minH = Math.min(...alturas);
-                    const maxH = Math.max(...alturas);
-                    textoAltura = minH === maxH ? ` • Altura aprox: ${minH} cm` : ` • Alturas: ${minH} a ${maxH} cm`;
-                }
+            let img = especie.imagenUrl ? `<img src="${especie.imagenUrl}" class="img-arbol">` : `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
+            const btnGest = tieneAccesoCampo() ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionInventario('${especie._id}')">⚙ Gestionar Inventario</button>` : '';
 
-                let img = especie.imagenUrl ? `<img src="${especie.imagenUrl}" class="img-arbol">` : `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;">🌱 Sin foto</div>`;
-                const btnGest = tieneAccesoCampo() ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionInventario('${especie._id}')">⚙ Gestionar Inventario</button>` : '';
-
-                lista.innerHTML += `
-                    <li class="item-planta">
-                        ${img}
-                        <div class="info-arbol">
-                            <h3 style="margin-bottom:2px;">${especie.nombreComun}</h3> 
-                            <i style="color:#52796f; font-size:13px;">${especie.nombreCientifico || ''}</i>
-                            <p style="margin-top:8px;">${(especie.caracteristicas || 'Especie nativa custodiada en San Luis.').substring(0, 75)}...</p>
-                            <div class="estadisticas" style="margin-top: 10px; margin-bottom: 10px;">
-                                <span>Disponibles${textoAltura}</span>
-                                <strong style="font-size: 16px;">${activas} uds.</strong>
-                            </div>
-                            <div class="acciones-tarjeta">
-                                <button class="btn-classic-primary" style="width: 100%;" onclick="abrirMicrositio('${especie._id}')">Conocer especie</button>
-                                ${btnGest}
+            lista.innerHTML += `
+                <li class="item-planta">
+                    ${img}
+                    <div class="info-arbol">
+                        <h3 style="margin-bottom:2px;">${especie.nombreComun}</h3> 
+                        <i style="color:#52796f; font-size:13px;">${especie.nombreCientifico || ''}</i>
+                        <p style="margin-top:8px;">${(especie.caracteristicas || 'Especie nativa custodiada en San Luis.').substring(0, 75)}...</p>
+                        
+                        <div class="estadisticas" style="margin-top: 10px; margin-bottom: 10px;">
+                            <strong style="font-size: 16px; color: #1b4332;">${activas} uds en vivero</strong>
+                            <div style="font-size: 11.5px; color: #52796f; margin-top: 6px; display: flex; justify-content: space-between; background: #f2f8f4; padding: 6px; border-radius: 6px; border: 1px solid #dce8e0;">
+                                <span>🌱 Peq: <b>${p}</b></span>
+                                <span>🌿 Med: <b>${m}</b></span>
+                                <span>🌳 Gde: <b>${g}</b></span>
                             </div>
                         </div>
-                    </li>`;
+
+                        <div class="acciones-tarjeta">
+                            <button class="btn-classic-primary" style="width: 100%;" onclick="abrirMicrositio('${especie._id}')">Conocer especie</button>
+                            ${btnGest}
+                        </div>
+                    </div>
+                </li>`;
             });
         }
         actualizarDashboard();
@@ -1648,6 +1675,19 @@ document.getElementById('formAvanzar')?.addEventListener('submit', async (e) => 
     document.getElementById('modalAvanzarLote').classList.add('oculto'); 
     await cargarCatalogo(); 
     abrirGestionInventario(especieInventarioActiva);
+});
+
+document.getElementById('formInventarioBase')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const datos = { 
+        especieNombre: document.getElementById('inv-especie').value,
+        cantidad: document.getElementById('inv-cantidad').value,
+        tamanoBolsa: document.getElementById('inv-bolsa').value
+    };
+    const res = await fetch(`${hostUrl}/api/lotes-base`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify(datos) });
+    const rta = await res.json();
+    alert(rta.mensaje || rta.error);
+    if (res.ok) { document.getElementById('formInventarioBase').reset(); cargarCatalogo(); }
 });
 
 function abrirModalCarrito() {
