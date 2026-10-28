@@ -595,48 +595,51 @@ app.post('/api/olvide-password', async (req, res) => {
         usuario.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
         await usuario.save();
 
-        const textoCorreo = `Hola,\n\nHas solicitado restablecer tu contraseña en la plataforma Bosquesinos.\n\nTu código de seguridad de 6 dígitos es: ${resetToken}\n\nEste código vence en 15 minutos. Si no solicitaste este cambio, ignora este correo.`;
-
-        // 1. Envío por HTTPS (Google Apps Script) -> NUNCA es bloqueado por Render Free
-        const scriptUrl = process.env.GOOGLE_SCRIPT_URL;
-        if (scriptUrl) {
-            const rta = await fetch(scriptUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    secreto: "bosquesinos_correo_2026",
-                    to: usuario.email,
-                    subject: 'Código de Recuperación - Asociación Bosquesinos',
-                    text: textoCorreo
-                })
-            });
-            const resultado = await rta.json();
-            if (!resultado.ok) throw new Error(resultado.error || 'Error en puente de correo');
-            return res.json({ mensaje: 'Código de 6 dígitos enviado a tu correo electrónico.' });
+        const scriptUrl = (process.env.GOOGLE_SCRIPT_URL || '').trim();
+        if (!scriptUrl) {
+            return res.status(500).json({ error: 'Falta la variable GOOGLE_SCRIPT_URL en el panel Environment de Render.' });
         }
 
-        // 2. Respaldo por Nodemailer (Para pruebas en localhost)
-        if (!nodemailer) return res.status(503).json({ error: 'Falta configurar GOOGLE_SCRIPT_URL en Render.' });
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
-            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-            family: 4,
-            connectionTimeout: 10000
+        const textoCorreo = `Hola,\n\nHas solicitado restablecer tu contraseña en la plataforma Bosquesinos.\n\nTu código de seguridad de 6 dígitos es: ${resetToken}\n\nEste código vence en 15 minutos. Si no solicitaste este cambio, ignora este correo.`;
+
+        // Usamos text/plain para evitar bloqueos CORS/302 en Google Apps Script
+        const rta = await fetch(scriptUrl, {
+            method: 'POST',
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+                secreto: "bosquesinos_correo_2026",
+                to: usuario.email,
+                subject: 'Código de Recuperación - Asociación Bosquesinos',
+                text: textoCorreo
+            })
         });
 
-        await transporter.sendMail({
-            from: `"Sistema Bosquesinos San Luis" <${process.env.EMAIL_USER}>`,
-            to: usuario.email,
-            subject: 'Código de Recuperación - Asociación Bosquesinos',
-            text: textoCorreo
-        });
+        const textoRespuesta = await rta.text();
+        
+        // Si Google devuelve HTML de login es porque falta poner "Cualquier usuario (Anyone)"
+        if (textoRespuesta.includes('<!DOCTYPE html>') || textoRespuesta.includes('<html')) {
+            console.error('Google pidió inicio de sesión. Revisa permisos del script.');
+            return res.status(500).json({ error: 'El script de Google tiene acceso restringido. Cámbialo a "Cualquier usuario (Anyone)" en Implementar.' });
+        }
+
+        let resultado = {};
+        try {
+            resultado = JSON.parse(textoRespuesta);
+        } catch (e) {
+            // Si no es JSON pero el status fue 200, el correo igual salió
+            if (rta.ok) return res.json({ mensaje: 'Código de 6 dígitos enviado a tu correo electrónico.' });
+            throw new Error('Respuesta inesperada de Google: ' + textoRespuesta.substring(0, 100));
+        }
+
+        if (resultado.ok === false) {
+            throw new Error(resultado.error || 'Error interno en el script de Google');
+        }
 
         res.json({ mensaje: 'Código de 6 dígitos enviado a tu correo electrónico.' });
     } catch (error) { 
         console.error('Error enviando correo:', error);
-        res.status(500).json({ error: 'No se pudo enviar el correo. Verifica la configuración del servidor.' }); 
+        res.status(500).json({ error: 'Fallo al enviar: ' + error.message }); 
     }
 });
 
