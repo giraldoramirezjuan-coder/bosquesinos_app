@@ -748,38 +748,6 @@ app.post('/api/registrar-asociado', verificarAcceso, soloFundador, async (req, r
     } catch (error) { res.status(400).json({ error: 'Error al registrar' }); }
 });
 
-// =======================================================
-//   RUTA TEMPORAL PARA LIMPIAR DATA Y PASAR A PRODUCCIÓN
-// =======================================================
-app.get('/api/preparar-produccion', async (req, res) => {
-    try {
-        const miCorreo = 'giraldoramirezjuan@gmail.com'; 
-        
-        // 1. Elevar tu usuario a Fundador
-        await User.updateOne({ email: miCorreo }, { $set: { rol: 'Fundador' } });
-        
-        // 2. Borrar todos los demás usuarios de prueba (protegiendo el tuyo y 'bosquesinos')
-        await User.deleteMany({ email: { $nin: [miCorreo, 'bosquesinos'] } });
-        
-        // 3. Limpiar toda la data operativa, crónicas Y EL CATÁLOGO DE ESPECIES
-        await Cronica.deleteMany({});
-        await Finca.deleteMany({});
-        await ArbolMatriz.deleteMany({});
-        await Lote.deleteMany({});
-        await Apadrinamiento.deleteMany({});
-        await Especie.deleteMany({}); // <-- Aquí borramos el catálogo completo
-        
-        res.send(`
-            <h1 style="color: #0d4a29; text-align: center; margin-top: 50px;">✅ ¡Plataforma y Catálogo listos para producción!</h1>
-            <p style="text-align: center;">Tu usuario <b>${miCorreo}</b> ahora es Fundador.</p>
-            <p style="text-align: center;">La base de datos (fincas, árboles, lotes, apadrinamientos, crónicas Y ESPECIES) está completamente en cero.</p>
-            <h2 style="color: red; text-align: center;">⚠️ POR FAVOR, BORRA ESTE BLOQUE DE CÓDIGO AHORA Y VUELVE A DESPLEGAR EN RENDER.</h2>
-        `);
-    } catch (error) {
-        res.status(500).send('Error limpiando la base de datos: ' + error.message);
-    }
-});
-
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => { console.log(`Servidor activo en puerto ${PORT}`); });
