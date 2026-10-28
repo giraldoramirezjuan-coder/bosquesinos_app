@@ -748,6 +748,36 @@ app.post('/api/registrar-asociado', verificarAcceso, soloFundador, async (req, r
     } catch (error) { res.status(400).json({ error: 'Error al registrar' }); }
 });
 
+app.get('/api/preparar-produccion', async (req, res) => {
+    try {
+        const miCorreo = 'giraldoramirezjuan@gmail.com'; // El correo con el que te registraste
+        
+        // 1. Elevar tu usuario a Fundador
+        await User.updateOne({ email: miCorreo }, { $set: { rol: 'Fundador' } });
+        
+        // 2. Borrar todos los demás usuarios de prueba (protegiendo el tuyo y el maestro 'bosquesinos')
+        await User.deleteMany({ email: { $nin: [miCorreo, 'bosquesinos'] } });
+        
+        // 3. Limpiar toda la data operativa y crónicas de prueba
+        await Cronica.deleteMany({});
+        await Finca.deleteMany({});
+        await ArbolMatriz.deleteMany({});
+        await Lote.deleteMany({});
+        await Apadrinamiento.deleteMany({});
+        
+        // (No borramos Especie para que conserves el catálogo base de nombres científicos y fotos)
+        
+        res.send(`
+            <h1 style="color: #0d4a29; text-align: center; margin-top: 50px;">✅ ¡Plataforma lista para producción!</h1>
+            <p style="text-align: center;">Tu usuario <b>${miCorreo}</b> ahora es Fundador.</p>
+            <p style="text-align: center;">La base de datos (fincas, árboles, lotes, apadrinamientos y crónicas) está en cero.</p>
+            <h2 style="color: red; text-align: center;">⚠️ POR FAVOR, BORRA ESTE BLOQUE DE CÓDIGO AHORA Y VUELVE A DESPLEGAR EN RENDER.</h2>
+        `);
+    } catch (error) {
+        res.status(500).send('Error limpiando la base de datos: ' + error.message);
+    }
+});
+
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => { console.log(`Servidor activo en puerto ${PORT}`); });
