@@ -110,6 +110,9 @@
         <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-gente')">
             🤝 Alianza Bosquesina
         </button>
+        <button id="btn-nav-custodios" class="btn-classic-secondary btn-suave oculto" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; background: #eef5f0; border-color: #1b4332; color: #1b4332; font-weight: bold;" onclick="cambiarVista('vista-custodios')">
+            🌳 Sabia y Custodios
+        </button>
         <button id="btn-nav-postular" class="btn-classic-secondary btn-suave oculto" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; background: #e9f5ed; border-color: #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalPostulacion()">
             🌱 Postular a Custodio
         </button>
@@ -499,6 +502,72 @@
     </div>
 </section>
 
+<!-- LISTA PREDICTIVA GLOBAL DE ESPECIES (Permite escribir y autocompletar) -->
+<datalist id="datalist-especies"></datalist>
+
+<!-- === CAJA 3.5: APARTADO PRIVADO /CUSTODIOS  === -->
+<section id="vista-custodios" class="oculto" style="padding: 40px 20px; max-width: 1150px; margin: 0 auto; min-height: 80vh;">
+    <div style="text-align: center; margin-bottom: 28px;">
+        <span class="badge-rol">🔒 Espacio Interno Bosquesinos </span>
+        <h2 style="color: #1b4332; font-size: 32px; margin: 10px 0 8px 0; font-family: Georgia, serif;">Sabia Bosquesina: Fuente Semillera y Custodios</h2>
+        <p style="color: #52796f; max-width: 720px; margin: 0 auto;">
+            Memoria viva del trabajo de campo en San Luis. Consulta y filtra los árboles madre seleccionados por especie, custodio, diámetro (DAP) y estado fenológico.
+        </p>
+    </div>
+
+    <!-- TARJETAS DE RESUMEN -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 25px;">
+        <div style="background: white; padding: 18px; border-radius: 12px; border: 1px solid #d8eadd; text-align: center;">
+            <span style="font-size: 28px; font-weight: bold; color: #0d4a29;" id="cust-total-arboles">0</span>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #52796f; font-weight: bold;">🌳 Árboles Semilleros</p>
+        </div>
+        <div style="background: white; padding: 18px; border-radius: 12px; border: 1px solid #d8eadd; text-align: center;">
+            <span style="font-size: 28px; font-weight: bold; color: #2d6a4f;" id="cust-total-especies">0</span>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #52796f; font-weight: bold;">🌿 Especies Nativas</p>
+        </div>
+        <div style="background: white; padding: 18px; border-radius: 12px; border: 1px solid #d8eadd; text-align: center;">
+            <span style="font-size: 28px; font-weight: bold; color: #b55016;" id="cust-total-custodios">0</span>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #52796f; font-weight: bold;">🥾 Custodios / Grupos</p>
+        </div>
+    </div>
+
+    <!-- BUSCADORES Y FILTROS -->
+    <div style="background: #f4f9f5; padding: 16px; border-radius: 12px; border: 1px solid #95d5b2; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+        <input type="text" id="filtro-cust-especie" list="datalist-especies" oninput="filtrarTablaCustodios()" placeholder="🔍 Escribe especie (ej: Caimo, Soto...)" style="margin: 0 !important; background: white;">
+        <select id="filtro-cust-estudiante" onchange="filtrarTablaCustodios()" style="margin: 0 !important; background: white;">
+            <option value="">👤 Todos los Custodios / Estudiantes</option>
+        </select>
+        <button type="button" class="btn-classic-secondary" style="margin: 0 !important;" onclick="document.getElementById('filtro-cust-especie').value=''; document.getElementById('filtro-cust-estudiante').value=''; filtrarTablaCustodios();">
+            🔄 Mostrar todos
+        </button>
+    </div>
+
+    <!-- RESUMEN POR ESPECIE (PÍLDORAS RÁPIDAS) -->
+    <div id="resumen-especies-custodios" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 16px;"></div>
+
+    <!-- TABLA ESTILO EXCEL MV26 -->
+    <div style="background: white; border-radius: 12px; border: 1px solid #dce8e0; overflow-x: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+            <thead>
+                <tr style="background: #1b4332; color: white;">
+                    <th style="padding: 12px 10px;">Contador</th>
+                    <th style="padding: 12px 10px;">No. Árbol</th>
+                    <th style="padding: 12px 10px;">Custodio / Estudiante</th>
+                    <th style="padding: 12px 10px;">N. Local (Especie)</th>
+                    <th style="padding: 12px 10px;">N. Científico</th>
+                    <th style="padding: 12px 10px;">DAP (cm)</th>
+                    <th style="padding: 12px 10px; text-align: center;">Flores</th>
+                    <th style="padding: 12px 10px; text-align: center;">Frutos</th>
+                    <th style="padding: 12px 10px; text-align: center;">Rebrote</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-arboles-custodios">
+                <tr><td colspan="9" style="padding: 25px; text-align: center; color: #666;">Cargando fuente semillera...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
 <!-- === CAJA 4: PANEL DE CONTROL DIVIDIDO (OPERACIÓN VS GOBERNANZA) === -->
 <section id="panelAdmin" class="oculto" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
     <div class="tarjeta-admin" style="max-width: 850px; margin: 0 auto;">
@@ -544,25 +613,77 @@
                     </div>
                 </details>
 
-                <!-- PASO 2: ÁRBOL SEMILLERO -->
+                <!-- PASO 2: ÁRBOL SEMILLERO (FORMATO PLANILLA EXCEL MV26) -->
                 <details style="background: #f8fbf9; margin-bottom: 12px; border-radius: 8px; border: 1px solid #d8eadd;">
-                    <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌳 2. Registrar Árbol Semillero</summary>
+                    <summary style="padding: 14px; font-weight: 600; color: #1b4332; cursor: pointer;">🌳 2. Registrar Árbol Semillero (Formato Campo MV26)</summary>
                     <div style="padding: 0 15px 15px 15px;">
-                        <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ Ubicación GPS protegida con encriptación AES-256.</p>
+                        <p style="font-size: 11.5px; color: #52796f; margin-bottom: 10px;">🛡️ Estructura idéntica a la planilla de campo. Escribe la especie para ver sugerencias y autocompletar el nombre científico.</p>
                         <form id="formArbolMatriz" autocomplete="off">
-                            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Finca donde se encuentra el árbol:</label>
-                            <select id="arbol-finca-select" onchange="seleccionarFincaParaArbol()" required style="margin-top: 4px;">
-                                <option value="">-- Selecciona una finca registrada --</option>
+                            <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Finca o Predio (Opcional si está en concertación):</label>
+                            <select id="arbol-finca-select" onchange="seleccionarFincaParaArbol()" style="margin-top: 4px;">
+                                <option value="">-- Predio en concertación / Seleccionar finca --</option>
                             </select>
                             <input type="hidden" id="arbol-finca">
                             <input type="hidden" id="arbol-vereda">
                             <input type="hidden" id="arbol-propietario">
 
-                            <input type="text" id="arbol-especie" placeholder="Nombre común de la especie" required>
-                            <input type="text" id="arbol-cientifico" placeholder="Nombre científico opcional">
-                            <input type="text" id="arbol-codigo" placeholder="Código único del árbol, ej: AM-GUAY-01" required>
-                            <input type="text" id="arbol-custodio" placeholder="Custodio encargado del seguimiento" required>
-                            <input type="text" id="arbol-gps" placeholder="Coordenadas GPS, ej: 6.0423, -74.9951" required>
+                            <!-- FILA 1: CONTADOR, NO. ÁRBOL Y CUSTODIO -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px;">
+                                <div>
+                                    <label style="font-size: 11px; font-weight: bold; color: #1b4332;">Contador:</label>
+                                    <input type="number" id="arbol-contador" placeholder="Ej: 182" required>
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; font-weight: bold; color: #1b4332;">No. Árbol:</label>
+                                    <input type="number" id="arbol-numero" placeholder="Ej: 1" required>
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; font-weight: bold; color: #1b4332;">Estudiante / Custodio:</label>
+                                    <input type="text" id="arbol-custodio" placeholder="Ej: José García" required>
+                                </div>
+                            </div>
+
+                            <!-- FILA 2: ESPECIE (BUSCADOR), CIENTÍFICO Y DAP -->
+                            <div style="display: grid; grid-template-columns: 1.5fr 1.5fr 1fr; gap: 10px;">
+                                <div>
+                                    <label style="font-size: 11px; font-weight: bold; color: #1b4332;">N. Local (Escribe para buscar):</label>
+                                    <input type="text" id="arbol-especie" list="datalist-especies" oninput="autocompletarCientifico(this.value, 'arbol-cientifico')" placeholder="Ej: Caimo..." required>
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; font-weight: bold; color: #1b4332;">N. Científico:</label>
+                                    <input type="text" id="arbol-cientifico" placeholder="Se llena solo o edítalo">
+                                </div>
+                                <div>
+                                    <label style="font-size: 11px; font-weight: bold; color: #1b4332;">DAP (cm):</label>
+                                    <input type="number" step="0.01" id="arbol-dap" placeholder="Ej: 40.43" required>
+                                </div>
+                            </div>
+
+                            <!-- FILA 3: FENOLOGÍA (0: Inexistente, 1: Inicio, 2: Abundante) -->
+                            <div style="background: #eef5f0; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                                <label style="font-size: 11.5px; font-weight: bold; color: #0d4a29; display: block; margin-bottom: 6px;">
+                                    🌼 Fenología Inicial (0: Inexistente • 1: Inicio • 2: Abundante)
+                                </label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <label style="font-size: 11px;">Flores:</label>
+                                        <select id="arbol-flores" style="margin-bottom:0 !important;"><option value="0">0 - Inexistente</option><option value="1">1 - Inicio</option><option value="2">2 - Abundante</option></select>
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 11px;">Frutos:</label>
+                                        <select id="arbol-frutos" style="margin-bottom:0 !important;"><option value="0">0 - Inexistente</option><option value="1">1 - Inicio</option><option value="2">2 - Abundante</option></select>
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 11px;">Rebrote:</label>
+                                        <select id="arbol-rebrote" style="margin-bottom:0 !important;"><option value="0">0 - Inexistente</option><option value="1">1 - Inicio</option><option value="2">2 - Abundante</option></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="text" id="arbol-codigo" placeholder="Código opcional (se autogenera si lo dejas vacío)">
+                                <input type="text" id="arbol-gps" placeholder="Coordenadas GPS opcionales (Encriptadas AES-256)">
+                            </div>
                             <button type="submit" class="btn-principal" style="background: #1b4332;">Guardar Árbol Semillero</button>
                         </form>
                     </div>
@@ -586,7 +707,7 @@
                     <div style="padding: 0 15px 15px 15px;">
                         <p style="font-size: 11.5px; color: #666; margin-bottom: 10px;">Ingresa plántulas que ya tienes en el vivero sin necesidad de conocer su árbol madre.</p>
                         <form id="formInventarioBase" autocomplete="off">
-                            <select id="inv-especie" required style="width: 100%; margin-bottom: 10px; padding: 10px;">
+                            <input type="text" id="inv-especie" list="datalist-especies" placeholder="🔍 Escribe y elige la especie (ej: Caimo...)" required style="width: 100%; margin-bottom: 10px; padding: 10px;">
                                 <option value="">-- Elige la especie --</option>
                             </select>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
@@ -613,7 +734,7 @@
                 <div style="padding: 0 15px 15px 15px;">
                     <form id="formEspecie" autocomplete="off">
                         <label style="font-size: 12px; font-weight: bold; color: #1b4332;">Elige una especie de la lista:</label>
-                        <select id="esp-nombre-select" required style="margin-top: 4px;">
+                        <input type="text" id="esp-nombre-select" list="datalist-especies" placeholder="🔍 Escribe o elige una especie de la lista..." required style="margin-top: 4px;">
                             <option value="">-- Selecciona una especie de la lista --</option>
                         </select>
                         <input type="url" id="esp-imagen" placeholder="Enlace URL de la fotografía para el público" required>
@@ -804,7 +925,7 @@
         <div style="background: #f4f9f5; padding: 10px; border-radius: 8px; border: 1px dashed #74c69d; margin-bottom: 12px;">
             <label style="font-size: 12px; font-weight: bold; color: #1b4332; display: block; margin-bottom: 6px;">➕ Agregar otra especie al pedido:</label>
             <div style="display: flex; gap: 8px;">
-                <select id="select-agregar-carrito" style="flex: 1; margin: 0 !important; padding: 8px !important; font-size: 13px !important;">
+                <input type="text" id="select-agregar-carrito" list="datalist-especies" placeholder="🔍 Escribe especie..." style="flex: 1; margin: 0 !important; padding: 8px !important; font-size: 13px !important;">
                     <option value="">-- Elige una especie --</option>
                 </select>
                 <button type="button" onclick="agregarEspecieDesdeSelectCarrito()" style="width: max-content !important; margin: 0 !important; padding: 8px 14px !important; background: #2d6a4f; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Añadir</button>
@@ -971,46 +1092,34 @@ let especieActualId = null;
 let especieSeleccionadaMicrositio = null;
 let especieInventarioActiva = null;
 let carrito = [];
-const ESPECIES_FIJAS_SAN_LUIS = [
-    { nombre: 'Abarco', cientifico: 'Cariniana pyriformis' },
-    { nombre: 'Tagua', cientifico: 'Phytelephas macrocarpa' },
-    { nombre: 'Caimo', cientifico: 'Pouteria caimito' },
-    { nombre: 'Soto', cientifico: 'Virola sebifera' },
-    { nombre: 'Almendrón', cientifico: 'Dipteryx oleifera' },
-    { nombre: 'Algarrobo', cientifico: 'Hymenaea courbaril' },
-    { nombre: 'Magnolio / Molinillo', cientifico: 'Magnolia' },
-    { nombre: 'Guayacán Amarillo', cientifico: 'Handroanthus chrysanthus' },
-    { nombre: 'Cedro', cientifico: 'Cedrela odorata' },
-    { nombre: 'Laurel', cientifico: 'Cordia alliodora' }
-];
+const ESPECIES_FIJAS_SAN_LUIS = [{"nombre": "Abarco", "cientifico": "Cariniana pyriformis"}, {"nombre": "Aceite maría", "cientifico": "Calophyllum sp"}, {"nombre": "Aceitillo", "cientifico": "Symphonia globulifera"}, {"nombre": "Algarrobillo", "cientifico": "Hymenaea sp."}, {"nombre": "Algarrobo", "cientifico": "Hymenaea courbaril"}, {"nombre": "Alma negra", "cientifico": "Magnolia sp."}, {"nombre": "Almendrón", "cientifico": "Caryocar sp."}, {"nombre": "Anime", "cientifico": "Protium sp"}, {"nombre": "Arenillo", "cientifico": "sp"}, {"nombre": "Avinge", "cientifico": "Licania sp"}, {"nombre": "Avinge corozo", "cientifico": "Licania sp"}, {"nombre": "Avinge culofierro", "cientifico": "Licania sp"}, {"nombre": "Baile pájaro", "cientifico": "Casearia arborea"}, {"nombre": "Caimo", "cientifico": "Pouteria sp"}, {"nombre": "Caimo castaño", "cientifico": "Pouteria sp"}, {"nombre": "Caimo naranjuelo", "cientifico": "Pouteria sp"}, {"nombre": "Caimo peludo", "cientifico": "Pouteria sp"}, {"nombre": "Caimo toronjo", "cientifico": "Pouteria sp"}, {"nombre": "Canelo", "cientifico": "Ocotea sp."}, {"nombre": "Cariaño", "cientifico": "Trattinnickia sp"}, {"nombre": "Cedrillo", "cientifico": "Simarouba amara"}, {"nombre": "Cedro", "cientifico": "Cedrela odorata"}, {"nombre": "Cedro rojo", "cientifico": "sp"}, {"nombre": "Ceiba cartagena", "cientifico": "Spirotheca rosea"}, {"nombre": "Chaquiro", "cientifico": "Podocarpus guatemalensis"}, {"nombre": "Chocho", "cientifico": "Ormosia sp."}, {"nombre": "Chocho rojo", "cientifico": "Ormosia sp."}, {"nombre": "Coco", "cientifico": "LECYTHIDACEAE"}, {"nombre": "Coco cabuyo", "cientifico": "Lecythis"}, {"nombre": "Coco cazuelo", "cientifico": "Lecythis"}, {"nombre": "Coco cristal", "cientifico": "Lecythis"}, {"nombre": "Coco hediondo", "cientifico": "Lecythis"}, {"nombre": "Coco mula muerta", "cientifico": "Gustabia"}, {"nombre": "Coco n.n", "cientifico": "LECYTHIDACEAE"}, {"nombre": "Coco rojo", "cientifico": "Lecythis"}, {"nombre": "Coco sabaleto", "cientifico": "Lecythis"}, {"nombre": "Combo n.n", "cientifico": "sp."}, {"nombre": "Comino", "cientifico": "Aniba sp"}, {"nombre": "Dormilón", "cientifico": "Vochisia sp."}, {"nombre": "Dormilón papelillo", "cientifico": "Vochisia sp."}, {"nombre": "Fresno cebollo", "cientifico": "Tapirira sp."}, {"nombre": "Guayacán amarillo", "cientifico": "Handroanthus chrysanthus"}, {"nombre": "Guáimaro", "cientifico": "Brosimun sp."}, {"nombre": "Guáimaro blanco", "cientifico": "Brosimun sp"}, {"nombre": "Guáimaro rosado", "cientifico": "Brosimun sp"}, {"nombre": "Laurel amarillo", "cientifico": "Ocotea sp."}, {"nombre": "Laurel bobo", "cientifico": "Nectandra sp."}, {"nombre": "Laurel indio viejo", "cientifico": "Ocotea sp."}, {"nombre": "Laurel pelusa", "cientifico": "Nectandra sp"}, {"nombre": "Majagua", "cientifico": "Guatteria cestrifolia"}, {"nombre": "Melcocho blanco", "cientifico": "sp."}, {"nombre": "Melcocho colorado", "cientifico": "sp."}, {"nombre": "Mulamuerta", "cientifico": "Gustavia sp."}, {"nombre": "N.n arenillo", "cientifico": "N.N Arenillo"}, {"nombre": "N.n carne fiambre", "cientifico": "sp."}, {"nombre": "N.n copachí", "cientifico": "N.N Copachí"}, {"nombre": "N.n kimakí", "cientifico": "N.N Kimakí"}, {"nombre": "N.n melcocho", "cientifico": "N.N Melcocho"}, {"nombre": "N.n nogal", "cientifico": "N.N Nogal"}, {"nombre": "Sande", "cientifico": "Brosimum sp."}, {"nombre": "Sarzo mocoso", "cientifico": "Phithecellobium sp."}, {"nombre": "Sota", "cientifico": "Virola sp"}, {"nombre": "Sota sangretoro", "cientifico": "Virola sp"}, {"nombre": "Sota tirasucio", "cientifico": "Virola sp"}, {"nombre": "Soto", "cientifico": "Iryanthera sp"}, {"nombre": "Soto macho", "cientifico": "Iryanthera sp"}, {"nombre": "Soto orejamula", "cientifico": "Iryanthera sp"}, {"nombre": "Soto turmo", "cientifico": "Iryanthera sp"}, {"nombre": "Tagua", "cientifico": "Phytelephas macrocarpa"}, {"nombre": "Turmo", "cientifico": "Aptandra tubicina"}, {"nombre": "Turmo naranjo", "cientifico": "Aptandra tubicina"}, {"nombre": "Zaino", "cientifico": "Maprounea guianensis"}];
+
+window.mapaEspeciesCientifico = new Map();
 
 function poblarSelectoresDeEspecies() {
-    const selInv = document.getElementById('inv-especie');
-    if (selInv) {
-        selInv.innerHTML = '<option value="">-- Elige la especie --</option>';
-        mapaNombres.forEach((cient, nom) => { selInv.innerHTML += `<option value="${nom}">${nom}</option>`; });
-    }
-    const selVitrina = document.getElementById('esp-nombre-select');
-    const selCarrito = document.getElementById('select-agregar-carrito');
-
-        // Unimos las fijas con cualquier otra que ya esté en la base de datos sin repetir
-    const mapaNombres = new Map();
-    ESPECIES_FIJAS_SAN_LUIS.forEach(e => mapaNombres.set(e.nombre, e.cientifico));
+    window.mapaEspeciesCientifico.clear();
+    ESPECIES_FIJAS_SAN_LUIS.forEach(e => window.mapaEspeciesCientifico.set(e.nombre, e.cientifico));
     (window.especiesGlobal || []).forEach(e => {
-        if (!mapaNombres.has(e.nombreComun)) mapaNombres.set(e.nombreComun, e.nombreCientifico || '');
+        if (!window.mapaEspeciesCientifico.has(e.nombreComun)) {
+            window.mapaEspeciesCientifico.set(e.nombreComun, e.nombreCientifico || '');
+        }
     });
 
-    if (selVitrina) {
-        selVitrina.innerHTML = '<option value="">-- Selecciona una especie de la lista --</option>';
-        mapaNombres.forEach((cient, nom) => {
-            selVitrina.innerHTML += `<option value="${nom}" data-cientifico="${cient}">${nom}</option>`;
+    const dList = document.getElementById('datalist-especies');
+    if (dList) {
+        let opciones = '';
+        window.mapaEspeciesCientifico.forEach((cient, nom) => {
+            opciones += `<option value="${nom}">${cient ? cient : 'Especie nativa'}</option>`;
         });
+        dList.innerHTML = opciones;
     }
-    if (selCarrito) {
-        selCarrito.innerHTML = '<option value="">-- Elige una especie --</option>';
-        mapaNombres.forEach((cient, nom) => {
-            selCarrito.innerHTML += `<option value="${nom}">${nom}</option>`;
-        });
+}
+
+function autocompletarCientifico(nombreElegido, idInputDestino) {
+    const limpio = String(nombreElegido || '').trim();
+    const inputDest = document.getElementById(idInputDestino);
+    if (inputDest && window.mapaEspeciesCientifico.has(limpio)) {
+        inputDest.value = window.mapaEspeciesCientifico.get(limpio);
     }
 }
 const CRONICAS_BASE_LOCAL = [
@@ -1617,21 +1726,30 @@ document.getElementById('formFinca')?.addEventListener('submit', async (e) => {
 
 document.getElementById('formArbolMatriz')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const contador = document.getElementById('arbol-contador').value;
+    const numeroArbol = document.getElementById('arbol-numero').value;
+    const codigoManual = document.getElementById('arbol-codigo').value.trim();
     const datos = { 
         fincaId: document.getElementById('arbol-finca-select').value,
-        finca: document.getElementById('arbol-finca').value, 
-        veredaSector: document.getElementById('arbol-vereda').value, 
+        finca: document.getElementById('arbol-finca').value || 'Predio Custodiado', 
+        veredaSector: document.getElementById('arbol-vereda').value || 'San Luis', 
         propietarioFinca: document.getElementById('arbol-propietario').value,
-        codigoArbol: document.getElementById('arbol-codigo').value, 
-        nombreComun: document.getElementById('arbol-especie').value, 
-        nombreCientifico: document.getElementById('arbol-cientifico').value, 
-        custodio: document.getElementById('arbol-custodio').value, 
+        contador: contador,
+        numeroArbol: numeroArbol,
+        codigoArbol: codigoManual || `MV26-${contador}-A${numeroArbol}`, 
+        nombreComun: document.getElementById('arbol-especie').value.trim(), 
+        nombreCientifico: document.getElementById('arbol-cientifico').value.trim(), 
+        dap: document.getElementById('arbol-dap').value,
+        flores: document.getElementById('arbol-flores').value,
+        frutos: document.getElementById('arbol-frutos').value,
+        rebrote: document.getElementById('arbol-rebrote').value,
+        custodio: document.getElementById('arbol-custodio').value.trim(), 
         coordenadasGPS: document.getElementById('arbol-gps').value 
     };
     const res = await fetch(`${hostUrl}/api/arboles-matriz`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify(datos) });
     const rta = await res.json();
     alert(rta.mensaje || rta.error);
-    if (res.ok) { document.getElementById('formArbolMatriz').reset(); cargarCatalogo(); }
+    if (res.ok) { document.getElementById('formArbolMatriz').reset(); cargarCatalogo(); cargarVistaCustodios(); }
 });
 
 document.getElementById('esp-nombre-select')?.addEventListener('change', function() {
@@ -1642,9 +1760,8 @@ document.getElementById('esp-nombre-select')?.addEventListener('change', functio
 
 document.getElementById('formEspecie')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const sel = document.getElementById('esp-nombre-select');
-    const nombreComun = sel.value;
-    const nombreCientifico = sel.options[sel.selectedIndex]?.getAttribute('data-cientifico') || '';
+    const nombreComun = document.getElementById('esp-nombre-select').value.trim();
+    const nombreCientifico = window.mapaEspeciesCientifico.get(nombreComun) || '';
     const res = await fetch(`${hostUrl}/api/especies-vitrina`, { 
         method: 'PUT', 
         headers: obtenerCabecerasSeguras(), 
@@ -2303,6 +2420,75 @@ async function eliminarCertificadoPadrino(id) {
     if (res.ok) cargarApadrinamientos();
 }
 
+async function cargarVistaCustodios() {
+    if (!sesionIniciada) return;
+    try {
+        const res = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
+        if (res.ok) {
+            window.arbolesMatrizGlobal = await res.json();
+            
+            // Llenar selector de Custodios/Estudiantes únicos
+            const selEst = document.getElementById('filtro-cust-estudiante');
+            if (selEst) {
+                const custodiosUnicos = [...new Set(window.arbolesMatrizGlobal.map(a => a.custodio).filter(Boolean))].sort();
+                selEst.innerHTML = '<option value="">👤 Todos los Custodios / Estudiantes (' + custodiosUnicos.length + ')</option>';
+                custodiosUnicos.forEach(c => selEst.innerHTML += `<option value="${c}">${c}</option>`);
+            }
+            filtrarTablaCustodios();
+        }
+    } catch (e) { console.log(e); }
+}
+
+function filtrarTablaCustodios() {
+    const qEsp = (document.getElementById('filtro-cust-especie')?.value || '').trim().toLowerCase();
+    const qEst = (document.getElementById('filtro-cust-estudiante')?.value || '').trim();
+    const lista = (window.arbolesMatrizGlobal || []).filter(a => {
+        const coincideEsp = !qEsp || (a.nombreComun && a.nombreComun.toLowerCase().includes(qEsp)) || (a.nombreCientifico && a.nombreCientifico.toLowerCase().includes(qEsp));
+        const coincideEst = !qEst || a.custodio === qEst;
+        return coincideEsp && coincideEst;
+    });
+
+    // Actualizar contadores superiores
+    const espUnicas = new Set(lista.map(a => a.nombreComun));
+    const custUnicos = new Set(lista.map(a => a.custodio));
+    if (document.getElementById('cust-total-arboles')) document.getElementById('cust-total-arboles').innerText = lista.length;
+    if (document.getElementById('cust-total-especies')) document.getElementById('cust-total-especies').innerText = espUnicas.size;
+    if (document.getElementById('cust-total-custodios')) document.getElementById('cust-total-custodios').innerText = custUnicos.size;
+
+    // Píldoras de conteo por especie
+    const conteoPorEsp = {};
+    lista.forEach(a => { conteoPorEsp[a.nombreComun] = (conteoPorEsp[a.nombreComun] || 0) + 1; });
+    const divResumen = document.getElementById('resumen-especies-custodios');
+    if (divResumen) {
+        divResumen.innerHTML = Object.entries(conteoPorEsp)
+            .sort((a, b) => b[1] - a[1])
+            .map(([nom, cant]) => `<span onclick="document.getElementById('filtro-cust-especie').value='${nom}'; filtrarTablaCustodios();" style="cursor:pointer; white-space:nowrap; background:#e9f5ed; color:#1b4332; border:1px solid #74c69d; padding:5px 12px; border-radius:16px; font-size:12px; font-weight:bold;">${nom}: ${cant}</span>`)
+            .join('');
+    }
+
+    // Dibujar filas de la tabla estilo Excel
+    const tbody = document.getElementById('tbody-arboles-custodios');
+    if (!tbody) return;
+    if (lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="padding: 25px; text-align: center; color: #666;">No hay árboles que coincidan con el filtro.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = lista.map(a => `
+        <tr style="border-bottom: 1px solid #eef4f0;">
+            <td style="padding: 10px; font-weight: bold; color: #52796f;">${a.contador || '-'}</td>
+            <td style="padding: 10px;">${a.numeroArbol || '-'}</td>
+            <td style="padding: 10px; font-weight: 600; color: #1b4332;">${a.custodio || '-'}</td>
+            <td style="padding: 10px; font-weight: bold; color: #0d4a29;">${a.nombreComun}</td>
+            <td style="padding: 10px; font-style: italic; color: #52796f;">${a.nombreCientifico || '-'}</td>
+            <td style="padding: 10px;">${a.dap ? a.dap + ' cm' : '-'}</td>
+            <td style="padding: 10px; text-align: center;">${a.flores ?? 0}</td>
+            <td style="padding: 10px; text-align: center; font-weight: bold; color: ${a.frutos > 0 ? '#c86428' : '#666'};">${a.frutos ?? 0}</td>
+            <td style="padding: 10px; text-align: center;">${a.rebrote ?? 0}</td>
+        </tr>
+    `).join('');
+}
+
 window.onload = function() { 
     const token = localStorage.getItem('tokenAdmin');
     const rol = localStorage.getItem('rolUsuario');
@@ -2312,6 +2498,10 @@ window.onload = function() {
     if (token) { 
         sesionIniciada = true;
         esGestor = (rol === 'Fundador' || rol === 'Custodio' || rol === 'Admin');
+
+        document.getElementById('btn-nav-custodios')?.classList.remove('oculto');
+        cargarVistaCustodios();
+        if (window.location.pathname === '/custodios') sessionStorage.setItem('vistaActivaBosquesinos', 'vista-custodios');
 
         const btnLogin = document.getElementById('btn-nav-login');
         if (btnLogin) btnLogin.classList.add('oculto');
@@ -2370,7 +2560,7 @@ function cambiarVista(idVistaDestino) {
     }
     sessionStorage.setItem('vistaActivaBosquesinos', idVistaDestino);
 
-    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin', 'vista-legal', 'vista-territorio', 'vista-apadrinar'];
+    const vistas = ['vista-inicio', 'vista-catalogo', 'vista-gente', 'panelAdmin', 'vista-legal', 'vista-territorio', 'vista-apadrinar','vista-custodios'];
     vistas.forEach(function(vista) {
         const elemento = document.getElementById(vista);
         if (elemento) { 
