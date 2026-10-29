@@ -99,7 +99,7 @@
     <!-- LADO DERECHO: BOTONES -->
     <div id="contenedor-botones-nav" style="display: flex; flex-direction: row; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
         <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-catalogo')">
-            📖 Catálogo Bosquesino
+            📖 Vivero
         </button>
         <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-territorio')">
             🌿 Territorio Vivo
@@ -108,23 +108,22 @@
             💚 Apadrinar
         </button>
         <button class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap;" onclick="cambiarVista('vista-gente')">
-            🤝 Alianza Bosquesina
+            🤝 Alianza
         </button>
         <button id="btn-nav-custodios" class="btn-classic-secondary btn-suave oculto" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; background: #eef5f0; border-color: #1b4332; color: #1b4332; font-weight: bold;" onclick="cambiarVista('vista-custodios')">
             🌳 Sabia y Custodios
         </button>
-        <button id="btn-nav-postular" class="btn-classic-secondary btn-suave oculto" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; background: #e9f5ed; border-color: #2d6a4f; color: #1b4332; font-weight: bold;" onclick="abrirModalPostulacion()">
-            🌱 Postular a Custodio
-        </button>
+       
         <span id="badge-usuario-activo" class="badge-rol oculto"></span>
         <button id="btn-nav-login" class="btn-classic-secondary btn-suave" style="width: max-content !important; margin: 0; padding: 8px 16px; font-size: 14px; white-space: nowrap; border-color: var(--color-brand-forest); color: var(--color-brand-forest); font-weight: bold;" onclick="document.getElementById('modalLoginClasico').classList.remove('oculto')">
             👤 Iniciar Sesión
         </button>
         <button id="btn-nav-admin" class="btn-classic-secondary btn-suave oculto" style="width: 40px !important; height: 40px !important; min-width: 40px !important; margin: 0; padding: 0; font-size: 18px; border-radius: 50%; border: 2px solid var(--color-brand-forest); background: #f2f8f4; color: var(--color-brand-forest); display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;" onclick="cambiarVista('panelAdmin')" title="Panel de Control Vivero">
-            ⚙️ Panel Campo
-        </button>
+            ⚙️ </button>
+        
     </div>
 </nav>
+
 
 <!-- === CAJA 1: HOME === -->
 <section id="vista-inicio" class="vista-activa" style="position: relative; width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000;">
@@ -153,156 +152,64 @@
         <p style="color: var(--color-text-muted); max-width: 700px; margin: 0 auto;">Conoce las historias de nuestras especies nativas. Cada plántula guarda una memoria campesina y el esfuerzo de recuperación de nuestros bosques.</p>
     </div>
     <ul id="listaPlantulas"></ul>
+
 </section>
 
-<!-- === CAJA 2.5: TERRITORIO VIVO BOSQUESINO (CON CLASE OCULTO CORREGIDA) === -->
-<section id="vista-territorio" class="oculto" style="max-width: 1050px; margin: 0 auto; padding: 40px 20px; min-height: 80vh;">
-  <div style="text-align: center; margin-bottom: 28px;">
-    <h1 style="color: #0d4a29; font-size: 2.2rem; margin-bottom: 10px;">Territorio Vivo Bosquesino</h1>
-    <p style="color: #4a5d52; max-width: 680px; margin: 0 auto 22px; font-size: 1.05rem;">
-      Cuidamos el agua y los árboles madre; florecemos en los bosques de San Luis.
-    </p>
-
-    <!-- BOTONES DE NAVEGACIÓN COMPACTOS Y MONTAÑEROS -->
-    <div style="display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap;">
-      <button id="tab-campo-mesa" onclick="cambiarCategoriaTerritorio('campo-mesa')" 
-              style="width: max-content !important; padding: 12px 26px; border-radius: 30px; border: 2px solid #0d4a29; background: #0d4a29; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; margin: 0;">
-        🌱 Del Campo a la Mesa "Mercados Campesinos" 
-      </button>
-      <button id="tab-salidas-bosque" onclick="cambiarCategoriaTerritorio('salidas-bosque')" 
-              style="width: max-content !important; padding: 12px 26px; border-radius: 30px; border: 2px solid #0d4a29; background: white; color: #0d4a29; font-weight: bold; cursor: pointer; font-size: 1rem; margin: 0;">
-        🥾 Salidas al Bosque 
-      </button>
-      <button id="btn-abrir-editor-cronica" class="oculto" onclick="accionBotonPublicar()" 
-              style="width: max-content !important; padding: 12px 24px; border-radius: 30px; border: none; background: #c86428; color: white; font-weight: bold; cursor: pointer; font-size: 0.98rem; margin: 0; box-shadow: 0 4px 12px rgba(200,100,40,0.25);">
-        ✍️ Contar una Historia 
-      </button>
-    </div>
-  </div>
-
-  <!-- BANNER DESCRIPTIVO DINÁMICO SEGÚN LA PESTAÑA -->
-  <div id="banner-categoria-territorio" style="background: #f2f8f4; border-left: 5px solid #0d4a29; padding: 18px 22px; border-radius: 10px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-    <div style="flex: 1; min-width: 260px;">
-      <h3 id="titulo-banner-territorio" style="margin: 0 0 6px 0; color: #0d4a29;">🌱 Del Campo a la Mesa</h3>
-      <p id="desc-banner-territorio" style="margin: 0; color: #3b4d43;">
-        Semillas vivas, cosechas limpias y la palabra de quienes cuidan el territorio. 
-      </p>
-    </div>
-    <!-- CAJITA PARA ANIMAR A LA COMUNIDAD A ESCRIBIR -->
-    <div id="caja-invitacion-escribir" class="oculto" style="background: #ffffff; border: 1px dashed #74c69d; padding: 12px 16px; border-radius: 10px; text-align: left; max-width: 320px;">
-      <strong style="color: #0d4a29; font-size: 0.9rem; display: block; margin-bottom: 4px;">🌿 ¿Estuviste en una siembra o en la plaza?</strong>
-      <span style="font-size: 0.82rem; color: #52796f; display: block; margin-bottom: 8px;">Anímate a dejar el recuerdo con tus propias palabras. Tenemos una guía de 3 pregunticas para ayudarte.</span>
-      <button type="button" onclick="accionBotonPublicar()" style="width: max-content !important; background: #e9f5ed; color: #0d4a29; border: 1px solid #0d4a29; padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: bold; cursor: pointer; margin: 0;">
-        ✨ Escribir mi relato 
-      </button>
-    </div>
-  </div>
-
-  <!-- =========================================================
-       EDITOR ESTILO FORO SA-MP CON MODO GUIADO Y VISTA PREVIA
-       ========================================================= -->
-  <div id="panel-editor-cronica" style="display: none; background: #ffffff; border: 2px solid #d4e3da; border-radius: 14px; padding: 24px; margin-bottom: 35px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-      <h2 id="titulo-modal-editor" style="margin: 0; color: #0d4a29;">✍️ Armar Cuentos Bosquesinos</h2>
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button type="button" onclick="toggleAsistenteRapidito()" style="width: max-content !important; margin: 0; background: #fff4ec; color: #b85418; border: 1px solid #e0a882; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600;">
-          🪄 Armar con 3 preguntas (Fácil)
+<section id="vista-territorio" class="oculto" style="padding: 30px 16px; max-width: 640px; margin: 0 auto;">
+    
+    <!-- 1. INFO INICIAL + BOTÓN SIMPLE PARA PUBLICAR -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="color: #1b4332; font-size: 28px; margin: 0 0 6px 0; font-family: Georgia, serif;">Plaza Campesina</h2>
+        <p style="color: #52796f; font-size: 14px; margin: 0 0 14px 0;">
+            Comparte fotos del campo, cosechas y semillas con la comunidad.
+        </p>
+        <button onclick="abrirCreadorPost()" style="width: auto; background: #0d4a29; color: white; border: none; padding: 10px 22px; border-radius: 20px; font-weight: bold; font-size: 14px;">
+            ➕ Crear publicación
         </button>
-        <button type="button" onclick="toggleManualReportero()" style="width: max-content !important; margin: 0; background: #eef5f0; color: #0d4a29; border: 1px solid #0d4a29; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600;">
-          📖 Consejos para publicar
-        </button>
-      </div>
     </div>
 
-    <!-- ASISTENTE DE 3 PREGUNTAS PARA QUE LA GENTE SE ANIME A PUBLICAR SIN MIEDO -->
-    <div id="caja-asistente-rapido" style="display: none; background: #fffaf5; border: 2px solid #f3d4be; border-radius: 10px; padding: 16px; margin-bottom: 18px;">
-      <h4 style="margin: 0 0 8px 0; color: #b85418;">🪄 Responde estas 3 preguntas como si se lo contaras a un vecino y nosotros te armamos el formato:</h4>
-      <div style="display: grid; gap: 10px;">
-        <input type="text" id="asist-p1" placeholder="1. ¿A qué vereda o lugar fueron, cómo estaba el clima y quiénes estuvieron?" style="margin: 0 !important; padding: 10px !important;">
-        <input type="text" id="asist-p2" placeholder="2. ¿Qué hicieron en la jornada? (Ej: sembramos abarco, charlamos en el parque...)" style="margin: 0 !important; padding: 10px !important;">
-        <input type="text" id="asist-p3" placeholder="3. ¿Qué enseñanza, frase bonita o anécdota les dejó el día?" style="margin: 0 !important; padding: 10px !important;">
-        <input type="text" id="asist-foto" placeholder="Opcional: Puedes poner aquí el link URL de una foto de ese día" style="margin: 0 !important; padding: 10px !important;">
-        <button type="button" onclick="generarDesdeAsistente()" style="width: max-content !important; background: #c86428; color: white; border: none; padding: 9px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 0;">
-          ✨ Pasar mis respuestas al editor
-        </button>
-      </div>
+    <!-- 2. CAJA OCULTA DE PUBLICACIÓN (SE ABRE AL TOCAR EL BOTÓN) -->
+    <div id="caja-crear-post" class="oculto" style="background: white; border-radius: 14px; border: 1px solid #cce3d4; padding: 16px; margin-bottom: 20px;">
+        <form id="formMuroCampesino" autocomplete="off">
+            <!-- Subir una o varias fotos -->
+            <label for="muro-fotos-input" style="display: block; text-align: center; background: #f4f9f5; border: 1px dashed #2d6a4f; color: #0d4a29; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 10px;">
+                📷 Elegir una o varias fotos
+            </label>
+            <input type="file" id="muro-fotos-input" accept="image/*" multiple style="display: none;" onchange="procesarVariasFotos(event)">
+            
+            <!-- Previsualización en cuadrícula -->
+            <div id="preview-fotos-grid" style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 10px;"></div>
+
+            <!-- Descripción y Etiqueta opcionales -->
+            <textarea id="muro-contenido" rows="2" placeholder="Escribe una descripción opcional..."></textarea>
+            
+            <select id="muro-categoria" style="background: #f8fbf9; color: #1b4332;">
+                <option value="">🏷️ Agregar etiqueta opcional</option>
+                <option value="🍅 Cosecha">🍅 Cosecha</option>
+                <option value="🌱 Semillas">🌱 Semillas</option>
+                <option value="🌳 Bosque">🌳 Bosque</option>
+                <option value="🤝 Minga">🤝 Minga</option>
+            </select>
+
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn-principal" style="flex: 2;">Publicar</button>
+                <button type="button" class="btn-classic-secondary" style="flex: 1; width: auto;" onclick="document.getElementById('caja-crear-post').classList.add('oculto')">Cancelar</button>
+            </div>
+        </form>
     </div>
 
-    <!-- MANUAL DESPLEGABLE PARA CUALQUIER BOSQUESINO CURIOSO -->
-    <div id="caja-manual-reportero" style="display: none; background: #f9fbf9; border: 1px dashed #7ba68c; border-radius: 10px; padding: 16px; margin-bottom: 18px; font-size: 0.93rem; color: #2c3e35;">
-      <h4 style="margin-top: 0; color: #0d4a29;">🌲 ¿Cómo armar un cuento que dé gusto leer?</h4>
-      <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-        <li><strong>Habla con confianza:</strong> Cuenta cómo estaba el clima, qué vereda visitaron y qué compartieron.</li>
-        <li><strong>Unifica las fotos del mismo día:</strong> Si tienes 2 o 3 fotos de la misma jornada, mételas todas en este mismo relato usando el botón <strong>[📷 Insertar Foto]</strong>.</li>
-        <li><strong>Usa la barra de botones:</strong> Pon <strong>[H Subtítulo]</strong> para separar momentos y <strong>[💬 Resaltar Saber]</strong> para destacar una enseñanza campesina.</li>
-      </ul>
+    <!-- 3. FILTROS EN PÍLDORAS PEQUEÑAS -->
+    <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px;">
+        <button onclick="filtrarMuro('TODOS')" style="width: auto; padding: 6px 12px; border-radius: 16px; border: 1px solid #cce3d4; background: white; font-size: 12.5px;">🌎 Todo</button>
+        <button onclick="filtrarMuro('Cosecha')" style="width: auto; padding: 6px 12px; border-radius: 16px; border: 1px solid #cce3d4; background: white; font-size: 12.5px;">🍅 Cosechas</button>
+        <button onclick="filtrarMuro('Semillas')" style="width: auto; padding: 6px 12px; border-radius: 16px; border: 1px solid #cce3d4; background: white; font-size: 12.5px;">🌱 Semillas</button>
+        <button onclick="filtrarMuro('Bosque')" style="width: auto; padding: 6px 12px; border-radius: 16px; border: 1px solid #cce3d4; background: white; font-size: 12.5px;">🌳 Bosque</button>
     </div>
 
-    <input type="hidden" id="cronica-id-edicion" value="">
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 14px;">
-      <div>
-        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">¿A dónde va esta historia?</label>
-        <select id="cronica-categoria" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
-          <option value="campo-mesa">🌱 Del Campo a la Mesa</option>
-          <option value="salidas-bosque">🥾 Salidas al Bosque</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Lugar y Mes (Etiqueta superior)</label>
-        <input type="text" id="cronica-etiqueta" oninput="actualizarVistaPrevia()" placeholder="Ej: 📍 Parque de San Luis • Septiembre 2026" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
-      </div>
-    </div>
-
-    <div style="margin-bottom: 14px;">
-      <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Título de el cuento </label>
-      <input type="text" id="cronica-titulo" oninput="actualizarVistaPrevia()" placeholder="Ej: Septiembre en el Parque: Plántulas, semillas y saberes de nuestra tierra" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px; font-size: 1rem;">
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 14px;">
-      <div>
-        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Resumen corto </label>
-        <input type="text" id="cronica-resumen" oninput="actualizarVistaPrevia()" placeholder="Una frase que invite a leer la historia completa..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
-      </div>
-      <div>
-        <label style="font-weight: bold; font-size: 0.9rem; color: #2c3e35;">Foto principal de portada (Opcional)</label>
-        <input type="text" id="cronica-portada" oninput="actualizarVistaPrevia()" placeholder="Pega el enlace (https://...) de la foto principal" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px;">
-      </div>
-    </div>
-
-    <!-- BARRA DE COMANDOS ESTILO FORO SA-MP -->
-    <div style="background: #eef5f0; padding: 8px 10px; border-radius: 8px 8px 0 0; border: 1px solid #c5d9cc; border-bottom: none; display: flex; gap: 8px; flex-wrap: wrap;">
-      <button type="button" onclick="insertarTag('[b]', '[/b]')" style="width: max-content !important; margin: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; color: #1b4332; cursor: pointer; font-weight: bold;">B Negrita</button>
-      <button type="button" onclick="insertarTag('[titulo]', '[/titulo]')" style="width: max-content !important; margin: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; color: #0d4a29; cursor: pointer; font-weight: bold;">H Subtítulo de Momento</button>
-      <button type="button" onclick="insertarFotoTag()" style="width: max-content !important; margin: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; color: #1b4332; cursor: pointer;">📷 Insertar Foto en el relato</button>
-      <button type="button" onclick="insertarTag('[cita]', '[/cita]')" style="width: max-content !important; margin: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid #9ab8a5; background: white; color: #1b4332; cursor: pointer;">💬 Resaltar Saber / Frase</button>
-      <button type="button" onclick="cargarPlantillaBase()" style="width: max-content !important; margin: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid #e0a882; background: #fff4ec; color: #b85418; cursor: pointer;">📋 Poner Esqueleto Ejemplo</button>
-    </div>
-
-    <!-- PANEL DIVIDIDO: ESCRIBIR A LA IZQUIERDA, VISTA PREVIA EN VIVO A LA DERECHA -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
-      <div>
-        <textarea id="cronica-contenido" rows="12" oninput="actualizarVistaPrevia()" placeholder="Escribe aquí toda la historia con tus propias palabras..." style="width: 100%; padding: 12px; border-radius: 0 0 8px 8px; border: 1px solid #c5d9cc; font-family: inherit; font-size: 0.95rem; line-height: 1.5; resize: vertical; box-sizing: border-box;"></textarea>
-      </div>
-      <div style="background: #fcfdfc; border: 1px solid #d4e3da; border-radius: 0 0 8px 8px; padding: 16px; max-height: 360px; overflow-y: auto;">
-        <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: #6c8577; margin-bottom: 10px; font-weight: bold;">
-          👁️ Vista Previa en Vivo (Así quedará publicado)
-        </div>
-        <div id="vista-previa-vivo"></div>
-      </div>
-    </div>
-
-    <div style="margin-top: 18px; display: flex; justify-content: flex-end; gap: 12px;">
-      <button type="button" onclick="toggleEditorCronica()" style="width: max-content !important; margin: 0; padding: 10px 20px; border-radius: 8px; border: 1px solid #aaa; background: white; color: #333; cursor: pointer;">Cancelar</button>
-      <button type="button" onclick="guardarCronica()" style="width: max-content !important; margin: 0; padding: 10px 24px; border-radius: 8px; border: none; background: #0d4a29; color: white; font-weight: bold; cursor: pointer;">
-        🚀 Publicar Cuento Bosquesino 
-      </button>
-    </div>
-  </div>
-
-  <!-- CONTENEDOR DONDE SE DIBUJAN LAS CRÓNICAS UNIFICADAS -->
-  <div id="contenedor-cronicas-territorio" style="display: flex; flex-direction: column; gap: 28px;"></div>
+    <!-- 4. LISTA DE PUBLICACIONES -->
+    <div id="contenedor-cronicas" style="display: flex; flex-direction: column; gap: 16px;"></div>
 </section>
+
 
 <!-- === CAJA 2.8 (INDEPENDIENTE): APADRINAMIENTO CON FLUJO NATURAL === -->
 <section id="vista-apadrinar" class="oculto" style="max-width: 1050px; margin: 0 auto; padding: 40px 20px; min-height: 80vh;">
@@ -480,7 +387,7 @@
 <!-- === CAJA 3: GENTE BOSQUESINA === -->
 <section id="vista-gente" class="oculto" style="padding: 60px 20px; background: var(--color-brand-sage-100); min-height: 80vh;">
     <div style="max-width: 700px; margin: 0 auto; text-align: center;">
-        <h2 style="color: var(--color-brand-forest); font-size: 36px;">Alianza Bosquesina</h2>
+        <p style="color: var(--color-text-primary); font-size: 18px; margin-bottom: 30px;">Buscamos aliados, educadores, voluntarios y personas apasionadas por el territorio. Si quieres dictar una charla, colaborar en el vivero o apoyar nuestra asociación, este es tu lugar.</p>
         <p style="color: var(--color-text-primary); font-size: 18px; margin-bottom: 30px;">Buscamos aliados, educadores, voluntarios y personas apasionadas por el territorio. Si quieres dictar una charla, colaborar en el vivero o apoyar nuestra asociación, este es tu lugar.</p>
         
         <!-- Tarjeta rápida para Vigías que quieran postularse desde Alianza -->
@@ -970,7 +877,7 @@
         <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Ingresa a tu cuenta para continuar</p>
         
         <form autocomplete="off" onsubmit="event.preventDefault(); procesarLoginClasico();">
-            <input type="text" id="login-email-clasico" placeholder="Correo electrónico o Usuario" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
+            <input type="text" id="login-email-clasico" placeholder="Nombre de Usuario o Correo" required>
             <input type="password" id="login-password-clasico" placeholder="Contraseña" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
             
             <div style="text-align: right; margin-bottom: 20px;">
@@ -995,10 +902,10 @@
         <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Crea tu cuenta como Vigía Bosquesino y postúlate luego como Custodio.</p>
         
         <form autocomplete="off" onsubmit="event.preventDefault(); procesarRegistroPublico();">
-            <input type="email" id="reg-email" placeholder="Tu Correo Electrónico" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
-            <input type="password" id="reg-password" placeholder="Crea una Contraseña" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dce8e0; border-radius: 6px; box-sizing: border-box; background: #f8fbf9;">
-            
-            <button type="submit" class="btn-principal btn-suave" style="width: 100%; padding: 12px; font-size: 15px; background: var(--color-brand-forest); border: none; border-radius: 6px;">Crear Cuenta</button>
+            <input type="text" id="reg-username" placeholder="Nombre de Usuario" required>
+            <input type="email" id="reg-email" placeholder="Correo opcional para recuperar clave">
+            <input type="password" id="reg-password" placeholder="Contraseña" required>
+            <button type="submit" class="btn-principal">Crear Cuenta</button>
         </form>
         
         <div style="margin-top: 20px;">
@@ -1122,344 +1029,131 @@ function autocompletarCientifico(nombreElegido, idInputDestino) {
         inputDest.value = window.mapaEspeciesCientifico.get(limpio);
     }
 }
-const CRONICAS_BASE_LOCAL = [
-    {
-        _id: 'base-septiembre-parque',
-        titulo: 'Septiembre en el Parque: Plántulas, semillas y saberes de nuestra tierra',
-        categoria: 'campo-mesa',
-        etiquetaLugarFecha: '📍 Parque Principal San Luis • Septiembre 2026',
-        resumen: 'Bajamos de las veredas al parque principal con el vivero comunitario, cosechas frescas y la historia viva detrás de cada semilla.',
-        autor: 'Equipo Bosquesinos',
-        contenido: 'Cada vez que bajamos de la montaña al parque principal, traemos mucho más que matas en bolsa: traemos el trabajo de las familias custodias y la memoria de nuestros bosques. En esta jornada de septiembre armamos mesa en el parque para conversar sin afán con la gente del pueblo.\n\n[titulo]El vivero comunitario en la plaza[/titulo]\nLlegamos temprano a acomodar los arbolitos nativos listos para adopción. Muchas familias se acercaron a preguntar cómo sembrarlos en sus solares y fincas para cuidar los nacimientos de agua.\n\n[titulo]Conversando sobre semillas y árboles madre[/titulo]\nA mitad de la mañana se armó el corrillo alrededor de la mesa. Entre vecinos y productores fuimos reconociendo las semillas de nuestros árboles maderables y frutales, recordando cuáles sirven para darle sombra al agua y cuáles alimentan a los pájaros de la cordillera.\n\n[cita]Cada arbolito que alguien se lleva en la plaza respalda directamente las caminadas de recolección en el monte y el cuidado de los viveros en las veredas.[/cita]\n\n[titulo]Cosecha limpia y alimento de verdad[/titulo]\nTambién compartimos los frutos de la tierra y preparaciones hechas en casa, demostrando que cuidar el monte y producir comida sana van de la mano.'
-    },
-    {
-        _id: 'base-octubre-bosque',
-        titulo: 'Hombro a hombro con la montaña cuidamos los arboles para ir a sembrarlos después de la lluvia',
-        categoria: 'salidas-bosque',
-        etiquetaLugarFecha: '🌧️ Montañas de San Luis • Octubre 2026',
-        resumen: 'Jornada de siembra pese a la brisa de temporada de lluvias, cuidamos los árboles a pulso para devolverle abrigo a la montaña.',
-        autor: 'Equipo Bosquesinos',
-        contenido: 'Detrás de cada plántula que germina en el vivero hay saberes, caminos y custodios protegiendo nustros arboles madre.\n\n[titulo]Subiendo la loma en canasta[/titulo]\nAunque el clima nos recibió con aguacero y viento frío, nos repartimos el peso en canastas y arrancamos el ascenso de un kilómetro por el barro liso. Cuando el terreno se pone pesado es cuando más se siente el trabajo en equipo.\n\n[cita]Sembrar en temporada de lluvias cuesta el doble en la subida, pero es la garantía de que el arbolito agarre raíz firme en su nueva tierra.[/cita]\n\nAl final de la tarde dejamos los árboles bien plantados, sabiendo que en unos años esa loma volverá a ser abrigo para el agua y los animales del cañón.'
+window.fotosMuroArray = [];
+window.publicacionesMuroGlobal = [];
+window.filtroMuroActual = 'TODOS';
+
+function abrirCreadorPost() {
+    if (!sesionIniciada) return document.getElementById('modalLoginClasico').classList.remove('oculto');
+    document.getElementById('caja-crear-post').classList.toggle('oculto');
+}
+
+function procesarVariasFotos(event) {
+    const archivos = Array.from(event.target.files).slice(0, 4); // Hasta 4 fotos por post
+    window.fotosMuroArray = [];
+    const grid = document.getElementById('preview-fotos-grid');
+    grid.innerHTML = '';
+
+    archivos.forEach(archivo => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const max = 800;
+                let w = img.width, h = img.height;
+                if (w > max) { h = Math.round((h * max) / w); w = max; }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                const base64 = canvas.toDataURL('image/jpeg', 0.75);
+                window.fotosMuroArray.push(base64);
+                grid.innerHTML += `<img src="${base64}" style="height: 75px; width: 75px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">`;
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(archivo);
+    });
+}
+
+document.getElementById('formMuroCampesino')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const contenido = document.getElementById('muro-contenido').value.trim();
+    if (!contenido && window.fotosMuroArray.length === 0) return alert('Agrega una foto o texto.');
+
+    const res = await fetch(`${hostUrl}/api/cronicas`, {
+        method: 'POST',
+        headers: obtenerCabecerasSeguras(),
+        body: JSON.stringify({
+            categoria: document.getElementById('muro-categoria').value,
+            contenido: contenido || '📸',
+            imagenes: window.fotosMuroArray
+        })
+    });
+    if (res.ok) {
+        document.getElementById('formMuroCampesino').reset();
+        document.getElementById('preview-fotos-grid').innerHTML = '';
+        document.getElementById('caja-crear-post').classList.add('oculto');
+        window.fotosMuroArray = [];
+        cargarCronicasTerritorio();
     }
-];
+});
 
-function obtenerCabecerasSeguras() {
-    const tk = localStorage.getItem('tokenAdmin') || localStorage.getItem('token') || '';
-    return { 
-        'Content-Type': 'application/json', 
-        'Authorization': 'Bearer ' + tk 
-    };
-}
+function dibujarMuroCampesino() {
+    const cont = document.getElementById('contenedor-cronicas');
+    if (!cont) return;
+    const lista = (window.publicacionesMuroGlobal || []).filter(p => 
+        window.filtroMuroActual === 'TODOS' || (p.categoria || '').includes(window.filtroMuroActual)
+    );
 
-function usuarioPuedeGestionar() {
-    const rol = localStorage.getItem('rolUsuario') || localStorage.getItem('rol') || '';
-    return (rol === 'Fundador' || rol === 'Custodio' || rol === 'Admin');
-}
-
-// 1. TRADUCTOR DE COMANDOS ESTILO FORO SA-MP (SIN REGEX COMPLEJOS)
-function formatearTextoForo(textoCrudo) {
-    if (!textoCrudo) return '';
-    let seguro = String(textoCrudo)
-        .split('&').join('&amp;')
-        .split('<').join('&lt;')
-        .split('>').join('&gt;');
-
-    seguro = seguro
-        .split('[b]').join('<strong>')
-        .split('[/b]').join('</strong>')
-        .split('[titulo]').join('<h3 style="color:#0d4a29; margin: 22px 0 8px 0; font-size: 1.25rem; border-bottom: 2px solid #e3efe7; padding-bottom: 4px;">')
-        .split('[/titulo]').join('</h3>')
-        .split('[cita]').join('<blockquote style="background:#f2f8f4; border-left: 4px solid #0d4a29; margin: 16px 0; padding: 12px 16px; border-radius: 6px; font-style: italic; color: #244232;">“')
-        .split('[/cita]').join('”</blockquote>')
-        .split('[img]').join('<div style="margin: 16px 0; text-align: center;"><img src="')
-        .split('[/img]').join('" alt="Foto de la jornada" style="max-width: 100%; max-height: 440px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 14px rgba(0,0,0,0.08);"></div>');
-
-    const bloques = seguro.split('\n\n');
-    let htmlFinal = '';
-    for (let i = 0; i < bloques.length; i++) {
-        const p = bloques[i].trim();
-        if (!p) continue;
-        if (p.indexOf('<h3') === 0 || p.indexOf('<blockquote') === 0 || p.indexOf('<div') === 0) {
-            htmlFinal += p;
-        } else {
-            htmlFinal += '<p style="line-height: 1.75; color: #36493e; margin-bottom: 14px; font-size: 1.02rem;">' + p.split('\n').join('<br>') + '</p>';
-        }
-    }
-    return htmlFinal;
-}
-
-// 2. FUNCIONES DEL EDITOR Y VISTA PREVIA
-function accionBotonPublicar() {
-    const tk = localStorage.getItem('tokenAdmin') || localStorage.getItem('token');
-    if (!tk) {
-        alert('🌿 Inicia sesión con tu cuenta Bosquesina (o regístrate gratis) para compartir una historia.');
-        document.getElementById('modalLoginClasico').classList.remove('oculto');
-        return;
-    }
-    toggleEditorCronica();
-}
-
-function toggleAsistenteRapidito() {
-    const caja = document.getElementById('caja-asistente-rapido');
-    if (!caja) return;
-    caja.style.display = (caja.style.display === 'none') ? 'block' : 'none';
-}
-
-function generarDesdeAsistente() {
-    const p1 = document.getElementById('asist-p1').value.trim();
-    const p2 = document.getElementById('asist-p2').value.trim();
-    const p3 = document.getElementById('asist-p3').value.trim();
-    const foto = document.getElementById('asist-foto').value.trim();
-
-    let armado = '';
-    if (p1) armado += p1 + '\n\n';
-    if (p2) armado += '[titulo]Lo que vivimos en la jornada[/titulo]\n' + p2 + '\n\n';
-    if (foto) armado += '[img]' + foto + '[/img]\n\n';
-    if (p3) armado += '[cita]' + p3 + '[/cita]';
-
-    document.getElementById('cronica-contenido').value = armado.trim();
-    if (!document.getElementById('cronica-resumen').value && p1) {
-        document.getElementById('cronica-resumen').value = p1.substring(0, 120);
-    }
-    actualizarVistaPrevia();
-    document.getElementById('caja-asistente-rapido').style.display = 'none';
-}
-
-function insertarTag(apertura, cierre) {
-    const area = document.getElementById('cronica-contenido');
-    if (!area) return;
-    const inicio = area.selectionStart;
-    const fin = area.selectionEnd;
-    const seleccionado = area.value.substring(inicio, fin) || 'Escribe aquí';
-    area.value = area.value.substring(0, inicio) + apertura + seleccionado + cierre + area.value.substring(fin);
-    area.focus();
-    actualizarVistaPrevia();
-}
-
-function insertarFotoTag() {
-    const url = prompt('Pega aquí el enlace (URL) de la foto de la jornada:');
-    if (!url) return;
-    const area = document.getElementById('cronica-contenido');
-    area.value += '\n\n[img]' + url.trim() + '[/img]\n\n';
-    actualizarVistaPrevia();
-}
-
-function actualizarVistaPrevia() {
-    const elTitulo = document.getElementById('cronica-titulo');
-    const elEtiqueta = document.getElementById('cronica-etiqueta');
-    const elPortada = document.getElementById('cronica-portada');
-    const elContenido = document.getElementById('cronica-contenido');
-    const elPreview = document.getElementById('vista-previa-vivo');
-    if (!elPreview) return;
-
-    const titulo = (elTitulo && elTitulo.value) ? elTitulo.value : 'Título de tu enseñanza...';
-    const etiqueta = (elEtiqueta && elEtiqueta.value) ? elEtiqueta.value : '📍 San Luis, Antioquia • 2026';
-    const portada = (elPortada && elPortada.value) ? elPortada.value.trim() : '';
-    const contenido = (elContenido && elContenido.value) ? elContenido.value : '';
-    
-    const imgPortadaHTML = portada ? '<img src="' + portada + '" style="width:100%; max-height:220px; object-fit:cover; border-radius:10px; margin-bottom:10px;">' : '';
-
-    elPreview.innerHTML = 
-        '<span style="display:inline-block; background:#e6f3eb; color:#0d4a29; padding:4px 12px; border-radius:20px; font-size:0.82rem; font-weight:bold; margin-bottom:8px;">' + etiqueta + '</span>' +
-        '<h3 style="margin: 4px 0 12px 0; color:#132a1e;">' + titulo + '</h3>' +
-        imgPortadaHTML +
-        formatearTextoForo(contenido);
-}
-
-function cargarPlantillaBase() {
-    const area = document.getElementById('cronica-contenido');
-    if (!area) return;
-    area.value = 'Cuenta aquí en un par de líneas cómo arrancó el día, con quiénes salieron y cómo estaba el clima en la vereda.\n\n[titulo]El trabajo de la jornada[/titulo]\nAquí puedes contar qué hicieron paso a paso: las plántulas que bajaron, el camino por la loma o la conversa con las familias.\n\n[img]PEGA_AQUI_EL_LINK_DE_TU_FOTO[/img]\n\n[cita]Escribe aquí una enseñanza, un saber campesino o algo especial que haya pasado ese día.[/cita]';
-    actualizarVistaPrevia();
-}
-
-function toggleManualReportero() {
-    const caja = document.getElementById('caja-manual-reportero');
-    if (!caja) return;
-    caja.style.display = (caja.style.display === 'none') ? 'block' : 'none';
-}
-
-function toggleEditorCronica(cronicaEditar) {
-    const panel = document.getElementById('panel-editor-cronica');
-    if (!panel) return;
-    if (panel.style.display === 'none' || cronicaEditar) {
-        panel.style.display = 'block';
-        const esIdTemporal = cronicaEditar && String(cronicaEditar._id).indexOf('base-') === 0;
-        document.getElementById('cronica-id-edicion').value = (cronicaEditar && !esIdTemporal) ? cronicaEditar._id : '';
-        document.getElementById('cronica-categoria').value = cronicaEditar ? cronicaEditar.categoria : categoriaTerritorioActual;
-        document.getElementById('cronica-etiqueta').value = cronicaEditar ? cronicaEditar.etiquetaLugarFecha : '';
-        document.getElementById('cronica-titulo').value = cronicaEditar ? cronicaEditar.titulo : '';
-        document.getElementById('cronica-resumen').value = cronicaEditar ? cronicaEditar.resumen : '';
-        document.getElementById('cronica-portada').value = (cronicaEditar && cronicaEditar.imagenPortada) ? cronicaEditar.imagenPortada : '';
-        document.getElementById('cronica-contenido').value = cronicaEditar ? cronicaEditar.contenido : '';
-        actualizarVistaPrevia();
-        panel.scrollIntoView({ behavior: 'smooth' });
-    } else {
-        panel.style.display = 'none';
-    }
-}
-
-// 3. CAMBIAR ENTRE "DEL CAMPO A LA MESA" Y "SALIDAS AL BOSQUE"
-function cambiarCategoriaTerritorio(cat) {
-    categoriaTerritorioActual = cat;
-    const btnCampo = document.getElementById('tab-campo-mesa');
-    const btnBosque = document.getElementById('tab-salidas-bosque');
-    const banner = document.getElementById('banner-categoria-territorio');
-    const tituloBanner = document.getElementById('titulo-banner-territorio');
-    const descBanner = document.getElementById('desc-banner-territorio');
-
-    if (cat === 'campo-mesa') {
-        if (btnCampo) { btnCampo.style.background = '#0d4a29'; btnCampo.style.color = 'white'; }
-        if (btnBosque) { btnBosque.style.background = 'white'; btnBosque.style.color = '#0d4a29'; }
-        if (banner) { banner.style.background = '#f2f8f4'; banner.style.borderLeftColor = '#0d4a29'; }
-        if (tituloBanner) { tituloBanner.style.color = '#0d4a29'; tituloBanner.innerText = '🌱 Del Campo a la Mesa'; }
-        if (descBanner) { descBanner.innerText = 'Cada vez que bajamos de las veredas, traemos la conservación a nuestro vivero comunitario, cosechas limpias y las palabras de quienes cuidan la tierra.'; }
-    } else {
-        if (btnBosque) { btnBosque.style.background = '#0d4a29'; btnBosque.style.color = 'white'; }
-        if (btnCampo) { btnCampo.style.background = 'white'; btnCampo.style.color = '#0d4a29'; }
-        if (banner) { banner.style.background = '#fdf6f0'; banner.style.borderLeftColor = '#c86428'; }
-        if (tituloBanner) { tituloBanner.style.color = '#b55016'; tituloBanner.innerText = '🥾 Salidas al Bosque'; }
-        if (descBanner) { descBanner.innerText = 'Detrás de cada arbolito en bolsa hay kilómetros de raíces, búsqueda de semillas en la montaña, monitoreo de árboles madre y siembras comunitarias.'; }
-    }
-    dibujarCronicas();
-}
-
-// 4. CARGAR Y DIBUJAR LAS CRÓNICAS
-async function cargarCronicasTerritorio() {
-    try {
-        const res = await fetch(hostUrl + '/api/cronicas');
-        if (res.ok) {
-            const datos = await res.json();
-            listaCronicasGlobal = (Array.isArray(datos) && datos.length > 0) ? datos : CRONICAS_BASE_LOCAL;
-        } else {
-            listaCronicasGlobal = CRONICAS_BASE_LOCAL;
-        }
-    } catch (e) {
-        listaCronicasGlobal = CRONICAS_BASE_LOCAL;
-    }
-    dibujarCronicas();
-}
-
-function dibujarCronicas() {
-    const contenedor = document.getElementById('contenedor-cronicas-territorio');
-    if (!contenedor) return;
-    const puedeEditar = usuarioPuedeGestionar();
-    const filtradas = listaCronicasGlobal.filter(function(c) { return c.categoria === categoriaTerritorioActual; });
-
-    if (filtradas.length === 0) {
-        contenedor.innerHTML = '<p style="text-align:center; color:#666; padding: 30px;">Aún no hay relatos en esta sección. ¡Haz clic en "Contar una Historia" para inaugurarla!</p>';
+    if (lista.length === 0) {
+        cont.innerHTML = `<p style="text-align:center; color:#52796f;">Aún no hay publicaciones aquí.</p>`;
         return;
     }
 
-    let html = '';
-    for (let i = 0; i < filtradas.length; i++) {
-        const c = filtradas[i];
-        const colorBorde = (c.categoria === 'campo-mesa') ? '#0d4a29' : '#c86428';
-        const esBase = String(c._id).indexOf('base-') === 0;
+    cont.innerHTML = lista.map(c => {
+        const r = c.reacciones || { orgullo: 0, trueque: 0, semilla: 0 };
+        const totalReacciones = (r.orgullo || 0) + (r.trueque || 0) + (r.semilla || 0);
+        const fotos = (c.imagenes && c.imagenes.length > 0) ? c.imagenes : (c.imagenUrl ? [c.imagenUrl] : []);
         
-        let botonesEdicion = '';
-        if (puedeEditar) {
-            botonesEdicion = '<div style="display: flex; gap: 8px;">' +
-                '<button onclick="prepararEdicionCronica(\'' + c._id + '\')" style="width: max-content !important; margin: 0; background:#eef5f0; color:#0d4a29; border:1px solid #0d4a29; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:0.84rem; font-weight:bold;">✏️ Editar crónica</button>' +
-                (!esBase ? '<button onclick="eliminarCronicaTerritorio(\'' + c._id + '\')" style="width: max-content !important; margin: 0; background:#fff0f0; color:#cf222e; border:1px solid #cf222e; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:0.84rem;">🗑️</button>' : '') +
-            '</div>';
-        }
+        const galeriaHtml = fotos.length > 0 ? `
+            <div style="display: grid; grid-template-columns: repeat(${fotos.length > 1 ? 2 : 1}, 1fr); gap: 6px; margin-top: 10px;">
+                ${fotos.map(f => `<img src="${f}" style="width:100%; height:${fotos.length > 1 ? '180px' : '340px'}; object-fit:cover; border-radius:10px;">`).join('')}
+            </div>` : '';
 
-        const imgPortada = c.imagenPortada ? '<img src="' + c.imagenPortada + '" alt="' + c.titulo + '" style="width:100%; max-height:360px; object-fit:cover; border-radius:12px; margin-bottom:16px;">' : '';
+        return `
+        <article style="background:white; border-radius:14px; border:1px solid #dce8e0; padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <strong style="color:#1b4332; font-size:14.5px;">👤 ${c.autor}</strong>
+                ${c.categoria ? `<span class="badge-rol">${c.categoria}</span>` : ''}
+            </div>
 
-        html += '<article style="background: #fdfbf7; border-radius: 8px; padding: 35px 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #e8e3d8; text-align: left; max-width: 800px; margin: 0 auto;">' +
-            '<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #e8e3d8; padding-bottom: 15px;">' +
-                '<span style="color: #6d5b4b; font-size: 0.85rem; font-style: italic; letter-spacing: 0.5px;">' + c.etiquetaLugarFecha + '</span>' +
-                botonesEdicion +
-            '</div>' +
-            '<h2 style="color: #2a332a; margin: 0 0 15px 0; font-size: 1.8rem; font-family: Georgia, serif; line-height: 1.3;">' + c.titulo + '</h2>' +
-            imgPortada +
-            '<p style="color: #5c665e; font-size: 1.1rem; margin-bottom: 25px; line-height: 1.6;">' + c.resumen + '</p>' +
-            '<div id="cuerpo-cronica-' + c._id + '" style="display: none; border-top: 1px dashed #d0c8b8; padding-top: 25px; margin-top: 20px; font-family: Georgia, serif;">' +
-                formatearTextoForo(c.contenido) +
-                '<div style="margin-top: 30px; text-align: right;">' +
-                    '<span style="font-size: 0.9rem; color: #8c8173; font-style: italic;"> Relato de: ' + (c.autor || 'Equipo Bosquesinos') + '</span>' +
-                '</div>' +
-            '</div>' +
-            '<div style="text-align: center; margin-top: 15px;">' +
-                '<button id="btn-leer-' + c._id + '" onclick="toggleLecturaCronica(\'' + c._id + '\')" style="background: transparent; color: #8a6a4b; border: 1px solid #8a6a4b; padding: 8px 20px; border-radius: 4px; font-size: 0.9rem; cursor: pointer; transition: 0.3s;">' +
-                    'Leer relato completo' +
-                '</button>' +
-            '</div>' +
-        '</article>';
-    }
-    contenedor.innerHTML = html;
+            ${c.contenido && c.contenido !== '📸' ? `<p style="margin:0; font-size:14.5px; color:#222;">${c.contenido}</p>` : ''}
+            ${galeriaHtml}
+
+            <!-- 3 BOTONES SIMPLES: REACCIONAR, COMENTAR Y COMUNICARSE -->
+            <div style="display:flex; gap:8px; margin-top:12px; padding-top:10px; border-top:1px solid #eef4f0; position:relative;">
+                <button onclick="document.getElementById('emojis-${c._id}').classList.toggle('oculto')" style="width:auto; flex:1; background:#f8fbf9; border:1px solid #dce8e0; border-radius:8px; padding:7px; font-size:13px;">
+                    ❤️ 🌱 🙌 ${totalReacciones}
+                </button>
+                <button onclick="document.getElementById('caja-com-${c._id}').classList.toggle('oculto')" style="width:auto; flex:1; background:#f8fbf9; border:1px solid #dce8e0; border-radius:8px; padding:7px; font-size:13px;">
+                    💬 Comentar ${(c.comentarios || []).length}
+                </button>
+                <button onclick="iniciarChatConUsuario('${c.autor}')" style="width:auto; flex:1; background:#e9f5ed; border:1px solid #74c69d; border-radius:8px; padding:7px; font-size:13px; color:#0d4a29; font-weight:bold;">
+                    ✉️ Mensaje
+                </button>
+
+                <!-- Selector flotante de Emojis al tocar Reaccionar -->
+                <div id="emojis-${c._id}" class="oculto" style="position:absolute; bottom:42px; left:0; background:white; border:1px solid #cce3d4; border-radius:20px; padding:4px 10px; box-shadow:0 4px 12px rgba(0,0,0,0.12); display:flex; gap:10px;">
+                    <span onclick="reaccionarMuro('${c._id}','orgullo')" style="cursor:pointer; font-size:18px;" title="Orgullo">🙌</span>
+                    <span onclick="reaccionarMuro('${c._id}','semilla')" style="cursor:pointer; font-size:18px;" title="Buena semilla">🌱</span>
+                    <span onclick="reaccionarMuro('${c._id}','trueque')" style="cursor:pointer; font-size:18px;" title="Me interesa">🤝</span>
+                </div>
+            </div>
+
+            <!-- Caja de comentarios desplegable -->
+            <div id="caja-com-${c._id}" class="oculto" style="margin-top:10px;">
+                ${(c.comentarios || []).map(cm => `<div style="font-size:13px; background:#f4f9f5; padding:6px 10px; border-radius:6px; margin-top:4px;"><b>${cm.autor}:</b> ${cm.texto}</div>`).join('')}
+                <div style="display:flex; gap:6px; margin-top:6px;">
+                    <input type="text" id="input-com-${c._id}" placeholder="Escribe un comentario..." style="margin:0; flex:1; padding:7px; font-size:13px;">
+                    <button onclick="comentarMuro('${c._id}')" class="btn-classic-primary" style="width:auto; padding:7px 12px;">Enviar</button>
+                </div>
+            </div>
+        </article>`;
+    }).join('');
 }
 
-function toggleLecturaCronica(id) {
-    const cuerpo = document.getElementById('cuerpo-cronica-' + id);
-    const btn = document.getElementById('btn-leer-' + id);
-    if (!cuerpo || !btn) return;
-    if (cuerpo.style.display === 'none') {
-        cuerpo.style.display = 'block';
-        btn.innerText = '🔼 Cerrar relato';
-        btn.style.background = '#f4efe6';
-        btn.style.color = '#5c4732';
-    } else {
-        cuerpo.style.display = 'none';
-        btn.innerText = 'Leer relato completo';
-        btn.style.background = 'transparent';
-        btn.style.color = '#8a6a4b';
-    }
-}
-
-function prepararEdicionCronica(id) {
-    const encontrada = listaCronicasGlobal.find(function(x) { return String(x._id) === String(id); });
-    if (encontrada) toggleEditorCronica(encontrada);
-}
-
-async function guardarCronica() {
-    const idEdicion = document.getElementById('cronica-id-edicion').value;
-    const datos = {
-        categoria: document.getElementById('cronica-categoria').value,
-        etiquetaLugarFecha: document.getElementById('cronica-etiqueta').value.trim(),
-        titulo: document.getElementById('cronica-titulo').value.trim(),
-        resumen: document.getElementById('cronica-resumen').value.trim(),
-        imagenPortada: document.getElementById('cronica-portada').value.trim(),
-        contenido: document.getElementById('cronica-contenido').value.trim()
-    };
-
-    if (!datos.titulo || !datos.etiquetaLugarFecha || !datos.resumen || !datos.contenido) {
-        alert('Por favor completa el título, el lugar/mes, el resumen y el relato.');
-        return;
-    }
-
-    const url = idEdicion ? (hostUrl + '/api/cronicas/' + idEdicion) : (hostUrl + '/api/cronicas');
-    const metodo = idEdicion ? 'PUT' : 'POST';
-
-    try {
-        const res = await fetch(url, {
-            method: metodo,
-            headers: obtenerCabecerasSeguras(),
-            body: JSON.stringify(datos)
-        });
-        const rta = await res.json();
-        alert(rta.mensaje || rta.error);
-        if (res.ok) {
-            categoriaTerritorioActual = datos.categoria;
-            toggleEditorCronica();
-            await cargarCronicasTerritorio();
-            cambiarCategoriaTerritorio(datos.categoria);
-        }
-    } catch (e) {
-        alert('Error de conexión al guardar la crónica.');
-    }
-}
-
-async function eliminarCronicaTerritorio(id) {
-    if (!confirm('¿Seguro que deseas eliminar esta crónica?')) return;
-    try {
-        const res = await fetch(hostUrl + '/api/cronicas/' + id, {
-            method: 'DELETE',
-            headers: obtenerCabecerasSeguras()
-        });
-        if (res.ok) cargarCronicasTerritorio();
-    } catch (e) { console.error(e); }
+function iniciarChatConUsuario(usuarioDestino) {
+    alert(`Próximamente: Chat directo con ${usuarioDestino}`);
 }
 
 // =========================================================
@@ -2147,29 +1841,43 @@ function cambiarMicrositio(idActual, idDestino) {
     document.getElementById(idDestino).classList.remove('oculto');
 }
 
+async function procesarRegistroPublico() {
+    const username = document.getElementById('reg-username').value;
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
+
+    const res = await fetch(`${hostUrl}/api/registro-publico`, { 
+        method: 'POST', 
+        headers: {'Content-Type':'application/json'}, 
+        body: JSON.stringify({ username, email, password }) 
+    });
+    const data = await res.json();
+    if (res.ok) { 
+        alert(data.mensaje); 
+        cambiarMicrositio('modalRegistroPublico', 'modalLoginClasico'); 
+    } else { 
+        alert(data.error); 
+    }
+}
+
 async function procesarLoginClasico() {
+    const identificador = document.getElementById('login-email-clasico').value;
+    const password = document.getElementById('login-password-clasico').value;
+
     const res = await fetch(`${hostUrl}/api/login`, { 
-        method: 'POST', headers: {'Content-Type':'application/json'}, 
-        body: JSON.stringify({ email: document.getElementById('login-email-clasico').value, password: document.getElementById('login-password-clasico').value }) 
+        method: 'POST', 
+        headers: {'Content-Type':'application/json'}, 
+        body: JSON.stringify({ identificador, password }) 
     });
     if (res.ok) { 
         const d = await res.json(); 
         localStorage.setItem('tokenAdmin', d.token); 
         localStorage.setItem('rolUsuario', d.rol); 
-        localStorage.setItem('emailUsuario', d.email); 
+        localStorage.setItem('emailUsuario', d.username);
         location.reload(); 
-    } else { alert('Credenciales incorrectas'); }
-}
-
-async function procesarRegistroPublico() {
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-password').value;
-    const res = await fetch(`${hostUrl}/api/registro-publico`, { 
-        method: 'POST', headers: {'Content-Type':'application/json'}, 
-        body: JSON.stringify({ email, password }) 
-    });
-    const data = await res.json();
-    if (res.ok) { alert(data.mensaje); cambiarMicrositio('modalRegistroPublico', 'modalLoginClasico'); } else { alert(data.error); }
+    } else { 
+        alert('Usuario o contraseña incorrectos'); 
+    }
 }
 
 async function solicitarRecuperacion() {
