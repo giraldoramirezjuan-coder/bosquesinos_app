@@ -63,7 +63,7 @@ const userSchema = new mongoose.Schema({
     resetPasswordToken: { type: String },
     resetPasswordExpire: { type: Date }
 });
-
+const User = mongoose.model('User', userSchema);
 // FASE 0: Fincas Integrales Campesinas
 const fincaSchema = new mongoose.Schema({
     nombreFinca: { type: String, required: true },
@@ -155,11 +155,10 @@ const cronicaSchema = new mongoose.Schema({
     categoria: { type: String, default: '🌱 Semillas Nativas y Criollas' },
     veredaTerritorio: { type: String, default: 'San Luis, Antioquia' },
     contactoDirecto: { type: String, default: '' },
-    contenido: { type: String, required: true },
-    imagenes: [{ type: String }], // Guarda una o varias fotos
+    contenido: { type: String, default: '' },
+    imagenes: [{ type: String }],
     imagenUrl: { type: String, default: '' },
-    usosSaberes: { type: String, default: '' }, // Para qué sirve, uso medicinal, receta o secreto de siembra
-    imagenUrl: { type: String, default: '' },
+    usosSaberes: { type: String, default: '' },
     autor: { type: String, required: true },
     rolAutor: { type: String, default: 'Científico Empírico' },
     fechaPublicacion: { type: Date, default: Date.now },
@@ -389,8 +388,16 @@ app.post('/api/arboles-matriz/:id/monitoreo', verificarAcceso, soloMotorCampo, a
     try {
         const arbol = await ArbolMatriz.findById(req.params.id);
         if (!arbol) return res.status(404).json({ error: 'Árbol no encontrado' });
+        
+        if (req.body.flores !== undefined) arbol.flores = Number(req.body.flores);
+        if (req.body.frutos !== undefined) arbol.frutos = Number(req.body.frutos);
+        if (req.body.rebrote !== undefined) arbol.rebrote = Number(req.body.rebrote);
+
         arbol.monitoreos.push({
-            estadoFenologico: req.body.estadoFenologico,
+            estadoFenologico: req.body.estadoFenologico || 'Monitoreo',
+            flores: arbol.flores,
+            frutos: arbol.frutos,
+            rebrote: arbol.rebrote,
             observaciones: req.body.observaciones,
             registrador: req.usuarioActual,
             fechaObservacion: new Date()
@@ -402,15 +409,26 @@ app.post('/api/arboles-matriz/:id/monitoreo', verificarAcceso, soloMotorCampo, a
 
 app.post('/api/lotes', verificarAcceso, soloMotorCampo, async (req, res) => {
     try {
-        const { arbolMatrizId, origen, cantidadInicial } = req.body;
+        const { arbolMatrizId, origen, cantidadInicial, tamanoBolsa } = req.body;
+        const cant = Number(cantidadInicial) || 1;
+        const bolsa = tamanoBolsa || 'Bolsa Pequeña';
         const codigoLote = `BQ-${new Date().getMonth()+1}${new Date().getFullYear().toString().slice(-2)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        
+        const arbol = await ArbolMatriz.findById(arbolMatrizId);
         const nuevoLote = new Lote({
-            codigoLote, arbolMatrizId, registradoPor: req.usuarioActual,
-            origen, cantidadInicial, cantidadActual: cantidadInicial, estadoActual: 'Semillero',
-            historial: [{ estadoAlcanzado: 'Cosecha de semilla', cantidadSuperviviente: cantidadInicial, observaciones: 'Siembra en semillero', responsable: req.usuarioActual }]
+            codigoLote,
+            arbolMatrizId,
+            especieNombre: arbol ? arbol.nombreComun : '',
+            registradoPor: req.usuarioActual,
+            origen: origen || { responsableRecoleccion: req.usuarioActual, fechaRecoleccion: new Date() },
+            cantidadInicial: cant,
+            cantidadActual: cant,
+            estadoActual: 'Vivero',
+            tamanoBolsa: bolsa,
+            historial: [{ estadoAlcanzado: 'Vivero', cantidadSuperviviente: cant, tamanoBolsa: bolsa, observaciones: 'Cosecha de árbol semillero', responsable: req.usuarioActual }]
         });
         await nuevoLote.save();
-        res.status(201).json({ mensaje: `Camada ${codigoLote} puesta en el semillero.` });
+        res.status(201).json({ mensaje: `Camada ${codigoLote} registrada en vivero.` });
     } catch (error) { res.status(400).json({ error: 'Error al crear camada' }); }
 });
 
@@ -550,16 +568,21 @@ app.get('/api/cronicas', async (req, res) => {
 // TODAS LAS CUENTAS REGISTRADAS PUEDEN PUBLICAR
 app.post('/api/cronicas', verificarAcceso, async (req, res) => {
     try {
-        const { categoria, contenido, imagenes } = req.body;
-    const nuevaPublicacion = new Cronica({
-        categoria: categoria || '',
-        contenido: String(contenido || '').trim(),
-        imagenes: Array.isArray(imagenes) ? imagenes : [],
-        autor: req.usuarioActual,
-        rolAutor: req.rol
-    });
+        const { titulo, categoria, veredaTerritorio, contactoDirecto, usosSaberes, contenido, imagenes, imagenUrl } = req.body;
+        const nuevaPublicacion = new Cronica({
+            titulo: String(titulo || '').trim(),
+            categoria: categoria || '🌱 Semillas Nativas y Criollas',
+            veredaTerritorio: String(veredaTerritorio || 'San Luis, Antioquia').trim(),
+            contactoDirecto: String(contactoDirecto || '').trim(),
+            usosSaberes: String(usosSaberes || '').trim(),
+            contenido: String(contenido || '').trim(),
+            imagenes: Array.isArray(imagenes) ? imagenes : [],
+            imagenUrl: imagenUrl || '',
+            autor: req.usuarioActual,
+            rolAutor: req.rol
+        });
         await nuevaPublicacion.save();
-        res.status(201).json({ mensaje: '¡Compartido con éxito en la Plaza de Saberes!' });
+        res.status(201).json({ mensaje: '¡Compartido con éxito en la Plaza!' });
     } catch (error) {
         res.status(400).json({ error: 'Error al publicar en el muro.' });
     }
@@ -858,11 +881,13 @@ app.put('/api/usuarios/:id/rol', verificarAcceso, soloFundador, async (req, res)
 
 app.post('/api/registrar-asociado', verificarAcceso, soloFundador, async (req, res) => {
     try {
-        const id = String(req.body.email).trim();
+        const id = String(req.body.username || req.body.email || '').trim().toLowerCase();
         if (await User.findOne({ $or: [{ email: id }, { username: id }] })) return res.status(400).json({ error: 'Ese usuario ya existe' });
         const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
         const rolAsignado = req.body.rol || 'Custodio';
-        await new User({ email: id, username: id, password: passwordEncriptada, rol: rolAsignado }).save();
+        const datos = { username: id, password: passwordEncriptada, rol: rolAsignado };
+        if (id.includes('@')) datos.email = id;
+        await new User(datos).save();
         res.status(201).json({ mensaje: `Compañero registrado como ${rolAsignado}.` });
     } catch (error) { res.status(400).json({ error: 'Error al registrar' }); }
 });
