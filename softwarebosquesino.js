@@ -207,6 +207,10 @@ const Apadrinamiento = mongoose.model('Apadrinamiento', apadrinamientoSchema);
 // --- AUTO-CREACIÓN FUNDADOR Y PUBLICACIÓN INICIAL ---
 async function crearUsuarioAdmin() {
     try {
+        // Borra índices viejos que bloqueaban el registro sin correo y aplica los nuevos
+        await User.collection.dropIndex('email_1').catch(() => {});
+        await User.syncIndexes();
+
         const usuarioExiste = await User.findOne({ username: 'bosquesinos' });
         if (!usuarioExiste) {
             const passInicial = process.env.ADMIN_INITIAL_PASS || crypto.randomBytes(16).toString('hex');

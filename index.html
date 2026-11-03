@@ -1088,6 +1088,21 @@ document.getElementById('formMuroCampesino')?.addEventListener('submit', async (
     }
 });
 
+async function cargarCronicasTerritorio() {
+    try {
+        const res = await fetch(`${hostUrl}/api/cronicas`);
+        if (res.ok) {
+            window.publicacionesMuroGlobal = await res.json();
+            dibujarMuroCampesino();
+        }
+    } catch (e) { console.log(e); }
+}
+
+function filtrarMuro(filtro) {
+    window.filtroMuroActual = filtro;
+    dibujarMuroCampesino();
+}
+
 function dibujarMuroCampesino() {
     const cont = document.getElementById('contenedor-cronicas');
     if (!cont) return;
