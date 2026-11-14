@@ -4,26 +4,66 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken'); 
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const path = require('path');
 
 const app = express();
-app.use(cors());         
+app.set('trust proxy', 1); // Render atiende detrás de un proxy: así req.ip es la IP real del visitante
+app.use(cors());
 app.use(express.json({ limit: '12mb' }));
 app.use(express.urlencoded({ limit: '12mb', extended: true }));
 
-// Proteger archivos del servidor
+// Archivos públicos: solo se sirven imágenes, hojas de estilo y JS del cliente en /js.
+// Así nunca quedan expuestos el código del servidor, package.json, README, .env ni la carpeta .git
+const EXTENSIONES_PUBLICAS = /\.(png|jpe?g|gif|webp|svg|ico|css)$/i;
+const servirEstaticos = express.static(__dirname, { dotfiles: 'ignore', index: false });
+app.use('/js', express.static(path.join(__dirname, 'public', 'js'), { dotfiles: 'ignore' }));
 app.use((req, res, next) => {
-    const archivosProtegidos = ['/softwarebosquesino.js', '/package.json', '/package-lock.json', '/.env'];
-    if (archivosProtegidos.includes(req.path.toLowerCase())) {
-        return res.status(403).send('Acceso denegado');
-    }
+    if (EXTENSIONES_PUBLICAS.test(req.path)) return servirEstaticos(req, res, next);
     next();
 });
-app.use(express.static(__dirname));
 
-// --- CONFIGURACIÓN DE SEGURIDAD AES-256 ---
-const CLAVE_SECRETA = process.env.JWT_SECRET || 'bosquesinos_semilla_secreta_2026';
-const ENCRYPTION_KEY = crypto.scryptSync(CLAVE_SECRETA, 'salt_bosquesinos', 32);
+// --- CONFIGURACIÓN DE SEGURIDAD ---
+// Clave antigua: solo se mantiene para poder seguir leyendo las coordenadas ya encriptadas.
+const CLAVE_LEGADA_COORDENADAS = 'bosquesinos_semilla_secreta_2026';
+if (!process.env.JWT_SECRET) {
+    console.warn('ADVERTENCIA: No se definió JWT_SECRET. Se usará una clave temporal y las sesiones se cerrarán al reiniciar el servidor.');
+}
+const CLAVE_SECRETA = process.env.JWT_SECRET || crypto.randomBytes(48).toString('hex');
+const ENCRYPTION_KEY = crypto.scryptSync(process.env.JWT_SECRET || CLAVE_LEGADA_COORDENADAS, 'salt_bosquesinos', 32);
 const ALGORITMO = 'aes-256-cbc';
+const ROLES_VALIDOS = ['Bosquesino', 'Custodio', 'Admin', 'Vigía'];
+
+// Limitador sencillo en memoria para frenar ataques de fuerza bruta (login y recuperación de clave)
+function limitarIntentos(maxIntentos, ventanaMs) {
+    const intentos = new Map();
+    return (req, res, next) => {
+        const ahora = Date.now();
+        if (intentos.size > 5000) {
+            for (const [k, v] of intentos.entries()) {
+                if (ahora > v.reinicio) intentos.delete(k);
+            }
+        }
+        const clave = req.ip;
+        const registro = intentos.get(clave);
+        if (!registro || ahora > registro.reinicio) {
+            intentos.set(clave, { cuenta: 1, reinicio: ahora + ventanaMs });
+            return next();
+        }
+        registro.cuenta++;
+        if (registro.cuenta > maxIntentos) {
+            return res.status(429).json({ error: 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.' });
+        }
+        next();
+    };
+}
+const limiteLogin = limitarIntentos(20, 15 * 60 * 1000);
+const limiteRegistro = limitarIntentos(10, 15 * 60 * 1000);
+const limiteRecuperacion = limitarIntentos(8, 15 * 60 * 1000);
+const limiteReacciones = limitarIntentos(60, 5 * 60 * 1000);
+
+function escaparRegex(texto) {
+    return String(texto ?? '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 function encriptarCoordenadas(texto) {
     if (!texto) return '';
@@ -51,7 +91,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     rol: { 
         type: String, 
-        enum: ['Fundador', 'Custodio', 'Admin', 'Vigía'],
+        enum: ROLES_VALIDOS,
         default: 'Vigía'
     },
     postulacionCustodio: {
@@ -141,7 +181,7 @@ const especieSchema = new mongoose.Schema({
     caracteristicas: { type: String, default: '' },
     imagenUrl: { type: String, default: '' },
     saberes: [{
-        tipoSaber: { type: String, default: '🌿 Saber Campesino' },
+        tipoSaber: { type: String, default: 'Saber Campesino' },
         descripcion: { type: String, required: true },
         autor: { type: String, required: true }, 
         fechaAporte: { type: Date, default: Date.now }
@@ -149,16 +189,26 @@ const especieSchema = new mongoose.Schema({
 });
 const Especie = mongoose.model('Especie', especieSchema);
 
-// FASE 4: Plaza de Saberes, Cosechas, Plantas Medicinales y Recetas
+// FASE 4: Red Comunitaria Campesina (Debates, Promoción e Iniciativas con Patrocinio)
 const cronicaSchema = new mongoose.Schema({
     titulo: { type: String, default: '' },
-    categoria: { type: String, default: '🌱 Semillas Nativas y Criollas' },
-    veredaTerritorio: { type: String, default: 'San Luis, Antioquia' },
+    tipoPublicacion: { type: String, enum: ['Publicación', 'Debate', 'Promoción', 'Iniciativa'], default: 'Publicación' },
+    categoria: { type: String, default: 'Semillas Nativas y Criollas' },
+    veredaTerritorio: { type: String, default: '' },
     contactoDirecto: { type: String, default: '' },
     contenido: { type: String, default: '' },
     imagenes: [{ type: String }],
     imagenUrl: { type: String, default: '' },
     usosSaberes: { type: String, default: '' },
+    metaPatrocinio: { type: Number, default: 0 },
+    recaudadoPatrocinio: { type: Number, default: 0 },
+    estadoIniciativa: { type: String, enum: ['Abierta', 'En marcha', 'Completada'], default: 'Abierta' },
+    aportes: [{
+        patrocinador: { type: String, required: true },
+        monto: { type: Number, required: true },
+        mensaje: { type: String, default: '' },
+        fecha: { type: Date, default: Date.now }
+    }],
     autor: { type: String, required: true },
     rolAutor: { type: String, default: 'Científico Empírico' },
     fechaPublicacion: { type: Date, default: Date.now },
@@ -171,7 +221,7 @@ const cronicaSchema = new mongoose.Schema({
     comentarios: [{
         autor: { type: String, required: true },
         rolAutor: { type: String, default: 'Campesino' },
-        tipoAporte: { type: String, default: '💬 Comentario / Conversa' }, // Uso medicinal, Receta, Saber ancestral, Trueque
+        tipoAporte: { type: String, default: 'Comentario / Conversa' },
         texto: { type: String, required: true },
         fecha: { type: Date, default: Date.now }
     }]
@@ -203,20 +253,23 @@ const apadrinamientoSchema = new mongoose.Schema({
 });
 const Apadrinamiento = mongoose.model('Apadrinamiento', apadrinamientoSchema);
 
-// --- AUTO-CREACIÓN FUNDADOR Y PUBLICACIÓN INICIAL ---
+// --- AUTO-CREACIÓN ROL BOSQUESINO Y PUBLICACIÓN INICIAL ---
 async function crearUsuarioAdmin() {
     try {
         // Borra índices viejos que bloqueaban el registro sin correo y aplica los nuevos
         await User.collection.dropIndex('email_1').catch(() => {});
         await User.syncIndexes();
 
+        // Migra cuentas con el rol legado 'Fundador' al nuevo rol 'Bosquesino'
+        await User.updateMany({ rol: 'Fundador' }, { $set: { rol: 'Bosquesino' } });
+
         const usuarioExiste = await User.findOne({ username: 'bosquesinos' });
         if (!usuarioExiste) {
             const passInicial = process.env.ADMIN_INITIAL_PASS || crypto.randomBytes(16).toString('hex');
             const passwordEncriptada = await bcrypt.hash(passInicial, 10);
-            await new User({ username: 'bosquesinos', password: passwordEncriptada, rol: 'Fundador' }).save();
-        } else if (usuarioExiste.rol !== 'Fundador') {
-            await User.updateOne({ username: 'bosquesinos' }, { $set: { rol: 'Fundador' } });
+            await new User({ username: 'bosquesinos', password: passwordEncriptada, rol: 'Bosquesino' }).save();
+        } else if (usuarioExiste.rol !== 'Bosquesino') {
+            await User.updateOne({ username: 'bosquesinos' }, { $set: { rol: 'Bosquesino' } });
         }
     } catch (error) { console.log('Error inicial:', error); }
 }
@@ -228,7 +281,7 @@ async function crearPublicacionesIniciales() {
             await Cronica.insertMany([
                 {
                     titulo: 'Almendrón de montaña y semillas con memoria genética de San Luis',
-                    categoria: '🌱 Semillas Nativas y Criollas',
+                    categoria: 'Semillas Nativas y Criollas',
                     veredaTerritorio: 'Veredas de San Luis, Antioquia',
                     contenido: 'Como científicos empíricos del bosque hemos aprendido que un árbol no es solo madera: detrás de cada Almendrón, Laurel o Soto hay alimento para las aves, abrigo para las quebradas y semillas con la memoria viva de nuestra tierra.',
                     usosSaberes: 'El fruto del Almendrón alimenta a la fauna silvestre en peligro y sus hojas ayudan a crear colchón de tierra fértil cerca de los nacimientos de agua.',
@@ -239,7 +292,7 @@ async function crearPublicacionesIniciales() {
                         {
                             autor: 'Sabedores del Oriente',
                             rolAutor: 'Custodio',
-                            tipoAporte: '🌙 Saber Ancestral / Secreto de Siembra',
+                            tipoAporte: 'Saber Ancestral / Secreto de Siembra',
                             texto: 'Sembrar en menguante y con las primeras lluvias garantiza que la raíz agarre fuerza antes del verano.'
                         }
                     ]
@@ -256,13 +309,14 @@ function verificarAcceso(req, res, next) {
     try {
         const decodificado = jwt.verify(headerAuth.replace('Bearer ', '').trim(), CLAVE_SECRETA);
         req.usuarioActual = decodificado.username; 
-        req.rol = (decodificado.username === 'bosquesinos') ? 'Fundador' : decodificado.rol;
+        const rolToken = decodificado.rol === 'Fundador' ? 'Bosquesino' : decodificado.rol;
+        req.rol = (decodificado.username === 'bosquesinos') ? 'Bosquesino' : rolToken;
         next(); 
     } catch (error) { return res.status(401).json({ error: 'Token inválido o expirado' }); }
 }
 
 function soloMotorCampo(req, res, next) {
-    if (req.rol === 'Fundador' || req.rol === 'Custodio') {
+    if (req.rol === 'Bosquesino' || req.rol === 'Custodio') {
         next();
     } else {
         return res.status(403).json({ error: 'Espacio para Custodios y Coordinadores de Vivero.' });
@@ -270,18 +324,18 @@ function soloMotorCampo(req, res, next) {
 }
 
 function soloGestoresPublicos(req, res, next) {
-    if (req.rol === 'Fundador' || req.rol === 'Custodio' || req.rol === 'Admin') {
+    if (req.rol === 'Bosquesino' || req.rol === 'Custodio' || req.rol === 'Admin') {
         next();
     } else {
         return res.status(403).json({ error: 'No tienes permisos para esta acción.' });
     }
 }
 
-function soloFundador(req, res, next) {
-    if (req.rol === 'Fundador') {
+function soloBosquesino(req, res, next) {
+    if (req.rol === 'Bosquesino') {
         next();
     } else {
-        return res.status(403).json({ error: 'Acción exclusiva del Coordinador Fundador.' });
+        return res.status(403).json({ error: 'Acción exclusiva del rol Bosquesino.' });
     }
 }
 
@@ -311,7 +365,7 @@ app.post('/api/fincas', verificarAcceso, soloMotorCampo, async (req, res) => {
     } catch (error) { res.status(400).json({ error: 'Error al registrar la finca' }); }
 });
 
-app.delete('/api/fincas/:id', verificarAcceso, soloFundador, async (req, res) => {
+app.delete('/api/fincas/:id', verificarAcceso, soloBosquesino, async (req, res) => {
     try {
         await Finca.findByIdAndDelete(req.params.id);
         res.json({ mensaje: 'Finca eliminada.' });
@@ -323,7 +377,11 @@ app.delete('/api/fincas/:id', verificarAcceso, soloFundador, async (req, res) =>
 // =======================================================
 app.get('/api/arboles-matriz', verificarAcceso, async (req, res) => {
     try {
-        const arboles = await ArbolMatriz.find().sort({ contador: 1, fechaSeleccion: -1 });
+        const esMotorCampo = req.rol === 'Bosquesino' || req.rol === 'Custodio';
+        const proyeccion = esMotorCampo
+            ? '-coordenadasGPSEncriptadas'
+            : '-coordenadasGPSEncriptadas -propietarioFinca -finca -fincaId';
+        const arboles = await ArbolMatriz.find({}, proyeccion).sort({ contador: 1, fechaSeleccion: -1 });
         res.json(arboles);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener árboles' });
@@ -378,9 +436,28 @@ app.post('/api/arboles-matriz', verificarAcceso, soloMotorCampo, async (req, res
 
 app.put('/api/arboles-matriz/:id', verificarAcceso, soloMotorCampo, async (req, res) => {
     try {
-        const arbolActualizado = await ArbolMatriz.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!arbolActualizado) return res.status(404).json({ error: 'Árbol no encontrado' });
-        res.json({ mensaje: 'Árbol actualizado', arbol: arbolActualizado });
+        const arbol = await ArbolMatriz.findById(req.params.id);
+        if (!arbol) return res.status(404).json({ error: 'Árbol no encontrado' });
+
+        const esAutorizado = req.rol === 'Bosquesino' ||
+            arbol.registradoPor === req.usuarioActual ||
+            (arbol.custodio && arbol.custodio.toLowerCase().includes(req.usuarioActual.toLowerCase()));
+        if (!esAutorizado) {
+            return res.status(403).json({ error: 'Solo el custodio asignado o el Coordinador puede editar este árbol.' });
+        }
+
+        const camposPermitidos = ['nombreComun', 'nombreCientifico', 'codigoArbol', 'finca', 'veredaSector', 'custodio'];
+        for (const campo of camposPermitidos) {
+            if (req.body[campo] !== undefined) {
+                arbol[campo] = String(req.body[campo]).trim();
+            }
+        }
+        if (req.body.dap !== undefined && Number.isFinite(Number(req.body.dap))) {
+            arbol.dap = Number(req.body.dap);
+        }
+
+        await arbol.save();
+        res.json({ mensaje: 'Árbol actualizado', arbol });
     } catch (error) { res.status(500).json({ error: 'Error al actualizar árbol' }); }
 });
 
@@ -435,7 +512,9 @@ app.post('/api/lotes', verificarAcceso, soloMotorCampo, async (req, res) => {
 app.post('/api/lotes/avanzar', verificarAcceso, soloMotorCampo, async (req, res) => {
     try {
         const lote = await Lote.findById(req.body.loteId);
+        if (!lote) return res.status(404).json({ error: 'Camada no encontrada' });
         const cant = Number(req.body.cantidadSuperviviente);
+        if (!Number.isFinite(cant) || cant < 0) return res.status(400).json({ error: 'Cantidad inválida' });
         lote.estadoActual = req.body.nuevoEstado;
         lote.cantidadActual = cant;
         if (req.body.tamanoBolsa) lote.tamanoBolsa = req.body.tamanoBolsa;
@@ -457,15 +536,25 @@ app.post('/api/lotes/avanzar', verificarAcceso, soloMotorCampo, async (req, res)
 app.post('/api/lotes/retirar', verificarAcceso, soloMotorCampo, async (req, res) => {
     try {
         const lote = await Lote.findById(req.body.loteId);
+        if (!lote) return res.status(404).json({ error: 'Camada no encontrada' });
         const cant = Number(req.body.cantidadRetirar);
-        lote.cantidadActual -= cant;
-        if (lote.cantidadActual <= 0) {
-            await Lote.findByIdAndDelete(req.body.loteId);
-            return res.json({ mensaje: 'Camada cerrada porque la cantidad llegó a 0' });
+        if (!Number.isFinite(cant) || cant <= 0) return res.status(400).json({ error: 'Cantidad a retirar inválida' });
+
+        lote.cantidadActual = Math.max(0, lote.cantidadActual - cant);
+        if (lote.cantidadActual === 0) {
+            lote.estadoActual = 'Sembrado / Agotado';
         }
-        lote.historial.push({ estadoAlcanzado: lote.estadoActual, cantidadSuperviviente: lote.cantidadActual, observaciones: `Salida: ${req.body.motivo}`, responsable: req.usuarioActual });
+        lote.historial.push({
+            estadoAlcanzado: lote.estadoActual,
+            cantidadSuperviviente: lote.cantidadActual,
+            observaciones: `Salida (${cant}): ${req.body.motivo || 'Sin motivo especificado'}`,
+            responsable: req.usuarioActual
+        });
         await lote.save();
-        res.json({ mensaje: `Se descontaron ${cant} arbolitos.` });
+        const msg = lote.cantidadActual === 0
+            ? 'Camada cerrada en 0 (se conserva su pasaporte e historial de trazabilidad).'
+            : `Se descontaron ${cant} arbolitos.`;
+        res.json({ mensaje: msg });
     } catch (error) { res.status(500).json({ error: 'Error al retirar' }); }
 });
 
@@ -484,7 +573,10 @@ app.get('/api/especies', async (req, res) => {
 });
   
 app.get('/api/lotes', async (req, res) => {
-    try { res.json(await Lote.find().populate('arbolMatrizId')); } catch (error) { res.status(500).json({ error: 'Error al obtener lotes' }); }
+    try {
+        const lotes = await Lote.find().populate('arbolMatrizId', 'codigoArbol nombreComun nombreCientifico veredaSector');
+        res.json(lotes);
+    } catch (error) { res.status(500).json({ error: 'Error al obtener lotes' }); }
 });
 
 app.post('/api/lotes-base', verificarAcceso, soloMotorCampo, async (req, res) => {
@@ -538,20 +630,20 @@ app.put('/api/especies/:id', verificarAcceso, async (req, res) => {
         const especie = await Especie.findById(req.params.id);
         if (!especie) return res.status(404).json({ error: 'Especie no encontrada' });
 
-        if ((req.rol === 'Fundador' || req.rol === 'Custodio' || req.rol === 'Admin')) {
+        if ((req.rol === 'Bosquesino' || req.rol === 'Custodio' || req.rol === 'Admin')) {
             if (req.body.caracteristicas) especie.caracteristicas = req.body.caracteristicas;
             if (req.body.imagenUrl) especie.imagenUrl = req.body.imagenUrl;
         }
         if (req.body.nuevoSaber && req.body.nuevoSaber.descripcion) {
             especie.saberes.push({
-                tipoSaber: req.body.nuevoSaber.tipoSaber || '🌿 Saber Campesino',
+                tipoSaber: req.body.nuevoSaber.tipoSaber || 'Saber Campesino',
                 autor: req.body.nuevoSaber.autor || req.usuarioActual,
                 descripcion: req.body.nuevoSaber.descripcion,
                 fechaAporte: new Date()
             });
         }
         await especie.save();
-        res.json({ mensaje: `¡Saber campesino guardado en ${especie.nombreComun}!`, especie });
+        res.json({ mensaje: `Saber campesino guardado en ${especie.nombreComun}.`, especie });
     } catch (error) { res.status(500).json({ error: 'Error al guardar saber' }); }
 });
 
@@ -560,7 +652,26 @@ app.put('/api/especies/:id', verificarAcceso, async (req, res) => {
 // =======================================================
 app.get('/api/cronicas', async (req, res) => {
     try {
-        const publicaciones = await Cronica.find().sort({ fechaPublicacion: -1, _id: -1 });
+        const hayPaginacion = req.query.page !== undefined || req.query.limit !== undefined;
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+        const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 10));
+
+        if (hayPaginacion) {
+            const [publicaciones, total] = await Promise.all([
+                Cronica.find().sort({ fechaPublicacion: -1, _id: -1 }).skip((page - 1) * limit).limit(limit),
+                Cronica.countDocuments()
+            ]);
+            const totalPages = Math.max(1, Math.ceil(total / limit));
+            return res.json({
+                publicaciones,
+                total,
+                page,
+                totalPages,
+                hasMore: page < totalPages
+            });
+        }
+
+        const publicaciones = await Cronica.find().sort({ fechaPublicacion: -1, _id: -1 }).limit(50);
         res.json(publicaciones);
     } catch (error) { res.status(500).json({ error: 'Error al cargar la Plaza de Saberes' }); }
 });
@@ -568,27 +679,61 @@ app.get('/api/cronicas', async (req, res) => {
 // TODAS LAS CUENTAS REGISTRADAS PUEDEN PUBLICAR
 app.post('/api/cronicas', verificarAcceso, async (req, res) => {
     try {
-        const { titulo, categoria, veredaTerritorio, contactoDirecto, usosSaberes, contenido, imagenes, imagenUrl } = req.body;
+        const { titulo, tipoPublicacion, categoria, veredaTerritorio, contactoDirecto, usosSaberes, contenido, imagenes, imagenUrl, metaPatrocinio } = req.body;
+        const tiposValidos = ['Publicación', 'Debate', 'Promoción', 'Iniciativa'];
+        const tipoFinal = tiposValidos.includes(tipoPublicacion) ? tipoPublicacion : 'Publicación';
+        const metaNum = tipoFinal === 'Iniciativa' ? Math.max(0, Number(metaPatrocinio) || 0) : 0;
+
         const nuevaPublicacion = new Cronica({
             titulo: String(titulo || '').trim(),
-            categoria: categoria || '🌱 Semillas Nativas y Criollas',
-            veredaTerritorio: String(veredaTerritorio || 'San Luis, Antioquia').trim(),
+            tipoPublicacion: tipoFinal,
+            categoria: categoria || 'Semillas Nativas y Criollas',
+            veredaTerritorio: String(veredaTerritorio || '').trim(),
             contactoDirecto: String(contactoDirecto || '').trim(),
             usosSaberes: String(usosSaberes || '').trim(),
             contenido: String(contenido || '').trim(),
             imagenes: Array.isArray(imagenes) ? imagenes : [],
             imagenUrl: imagenUrl || '',
+            metaPatrocinio: metaNum,
             autor: req.usuarioActual,
             rolAutor: req.rol
         });
         await nuevaPublicacion.save();
-        res.status(201).json({ mensaje: '¡Compartido con éxito en la Plaza!' });
+        res.status(201).json({ mensaje: 'Publicado con éxito en la Red Comunitaria.' });
     } catch (error) {
         res.status(400).json({ error: 'Error al publicar en el muro.' });
     }
 });
 
-app.post('/api/cronicas/:id/reaccionar', async (req, res) => {
+// PATROCINAR UNA INICIATIVA CAMPESINA
+app.post('/api/cronicas/:id/patrocinar', verificarAcceso, async (req, res) => {
+    try {
+        const monto = Number(req.body.monto);
+        if (!Number.isFinite(monto) || monto <= 0) {
+            return res.status(400).json({ error: 'Ingresa un monto válido mayor a 0.' });
+        }
+        const pub = await Cronica.findById(req.params.id);
+        if (!pub) return res.status(404).json({ error: 'Iniciativa no encontrada.' });
+
+        pub.aportes.push({
+            patrocinador: req.usuarioActual,
+            monto,
+            mensaje: String(req.body.mensaje || '').trim()
+        });
+        pub.recaudadoPatrocinio = (pub.recaudadoPatrocinio || 0) + monto;
+        if (pub.metaPatrocinio > 0 && pub.recaudadoPatrocinio >= pub.metaPatrocinio) {
+            pub.estadoIniciativa = 'Completada';
+        } else if (pub.recaudadoPatrocinio > 0) {
+            pub.estadoIniciativa = 'En marcha';
+        }
+        await pub.save();
+        res.status(201).json({ mensaje: 'Aporte registrado en la iniciativa.', publicacion: pub });
+    } catch (error) {
+        res.status(400).json({ error: 'Error al registrar patrocinio.' });
+    }
+});
+
+app.post('/api/cronicas/:id/reaccionar', limiteReacciones, async (req, res) => {
     try {
         const { tipo } = req.body;
         if (!['orgullo', 'trueque', 'semilla', 'saber'].includes(tipo)) {
@@ -600,6 +745,7 @@ app.post('/api/cronicas/:id/reaccionar', async (req, res) => {
             { $inc: { [campo]: 1 } },
             { new: true }
         );
+        if (!pub) return res.status(404).json({ error: 'Publicación no encontrada' });
         res.json(pub.reacciones);
     } catch (error) {
         res.status(400).json({ error: 'Error al registrar reacción' });
@@ -614,7 +760,7 @@ app.post('/api/cronicas/:id/comentarios', verificarAcceso, async (req, res) => {
         pub.comentarios.push({
             autor: req.usuarioActual,
             rolAutor: req.rol,
-            tipoAporte: String(req.body.tipoAporte || '💬 Comentario / Conversa').trim(),
+            tipoAporte: String(req.body.tipoAporte || 'Comentario / Conversa').trim(),
             texto: String(req.body.texto).trim()
         });
         await pub.save();
@@ -628,7 +774,7 @@ app.delete('/api/cronicas/:id', verificarAcceso, async (req, res) => {
     try {
         const pub = await Cronica.findById(req.params.id);
         if (!pub) return res.status(404).json({ error: 'No encontrada' });
-        if (req.rol !== 'Fundador' && req.rol !== 'Admin' && pub.autor !== req.usuarioActual) {
+        if (req.rol !== 'Bosquesino' && req.rol !== 'Admin' && pub.autor !== req.usuarioActual) {
             return res.status(403).json({ error: 'Solo quien publicó o el Coordinador puede borrar esta publicación.' });
         }
         await Cronica.findByIdAndDelete(req.params.id);
@@ -695,7 +841,7 @@ app.post('/api/apadrinamientos/:id/mantenimiento', verificarAcceso, soloGestores
 
 app.delete('/api/apadrinamientos/:id', verificarAcceso, soloGestoresPublicos, async (req, res) => {
     try {
-        if (req.rol !== 'Fundador' && req.rol !== 'Admin') return res.status(403).json({ error: 'Solo el Coordinador puede eliminar certificados.' });
+        if (req.rol !== 'Bosquesino' && req.rol !== 'Admin') return res.status(403).json({ error: 'Solo el Coordinador puede eliminar certificados.' });
         await Apadrinamiento.findByIdAndDelete(req.params.id);
         res.json({ mensaje: 'Certificado eliminado.' });
     } catch (error) { res.status(500).json({ error: 'Error al eliminar.' }); }
@@ -704,28 +850,31 @@ app.delete('/api/apadrinamientos/:id', verificarAcceso, soloGestoresPublicos, as
 // =======================================================
 //   CUENTAS Y COMUNIDAD (COMPATIBLE CON NOMBRE O CORREO)
 // =======================================================
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', limiteLogin, async (req, res) => {
     try {
         const id = String(req.body.identificador || req.body.email || '').trim().toLowerCase();
         const usuario = await User.findOne({ 
             $or: [ { username: id }, { email: id } ] 
         });
         
-        if (!usuario || !(await bcrypt.compare(String(req.body.password), usuario.password))) {
+        if (!usuario || !(await bcrypt.compare(String(req.body.password || ''), usuario.password))) {
             return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
         }
-        const rolReal = (usuario.username === 'bosquesinos') ? 'Fundador' : usuario.rol;
+        const rolBase = usuario.rol === 'Fundador' ? 'Bosquesino' : usuario.rol;
+        const rolReal = (usuario.username === 'bosquesinos') ? 'Bosquesino' : rolBase;
         const token = jwt.sign({ id: usuario._id, username: usuario.username, rol: rolReal }, CLAVE_SECRETA, { expiresIn: '12h' });
         res.json({ token, rol: rolReal, username: usuario.username });
     } catch (error) { res.status(500).json({ error: 'Error en el servidor' }); }
 });
 
-app.post('/api/registro-publico', async (req, res) => {
+app.post('/api/registro-publico', limiteRegistro, async (req, res) => {
     try {
         const username = String(req.body.username || '').trim().toLowerCase();
         const email = req.body.email ? String(req.body.email).trim().toLowerCase() : undefined;
+        const password = String(req.body.password || '');
         
         if (!username) return res.status(400).json({ error: 'Escribe un nombre de usuario.' });
+        if (password.length < 6) return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
         if (await User.findOne({ username })) {
             return res.status(400).json({ error: 'Ese nombre de usuario ya está en uso.' });
         }
@@ -733,7 +882,7 @@ app.post('/api/registro-publico', async (req, res) => {
             return res.status(400).json({ error: 'Ese correo ya está registrado.' });
         }
 
-        const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
+        const passwordEncriptada = await bcrypt.hash(password, 10);
         const nuevoUser = new User({ username, password: passwordEncriptada, rol: 'Vigía' });
         if (email) nuevoUser.email = email;
         await nuevoUser.save();
@@ -744,11 +893,12 @@ app.post('/api/registro-publico', async (req, res) => {
     }
 });
 
-app.post('/api/olvide-password', async (req, res) => {
+app.post('/api/olvide-password', limiteRecuperacion, async (req, res) => {
     try {
         const emailLimpio = String(req.body.email || '').trim().toLowerCase();
+        if (!emailLimpio) return res.status(400).json({ error: 'Ingresa un correo electrónico válido.' });
         const usuario = await User.findOne({ 
-            email: { $regex: new RegExp(`^${emailLimpio}$`, 'i') } 
+            email: { $regex: new RegExp(`^${escaparRegex(emailLimpio)}$`, 'i') } 
         });
         if (!usuario) return res.status(404).json({ error: 'No hay ningún usuario registrado con ese correo.' });
 
@@ -769,7 +919,7 @@ app.post('/api/olvide-password', async (req, res) => {
             redirect: 'follow',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({
-                secreto: "bosquesinos_correo_2026",
+                secreto: process.env.GOOGLE_SCRIPT_SECRET || "bosquesinos_correo_2026",
                 to: usuario.email,
                 subject: 'Código de Recuperación - Bosquesinos',
                 text: textoCorreo
@@ -787,7 +937,7 @@ app.post('/api/olvide-password', async (req, res) => {
     }
 });
 
-app.post('/api/reset-password', async (req, res) => {
+app.post('/api/reset-password', limiteRecuperacion, async (req, res) => {
     try {
         const codigo = String(req.body.token || '').trim();
         const nuevaPassword = String(req.body.nuevaPassword || '');
@@ -836,7 +986,7 @@ app.post('/api/postular-custodio', verificarAcceso, async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al enviar solicitud' }); }
 });
 
-app.get('/api/postulaciones-pendientes', verificarAcceso, soloFundador, async (req, res) => {
+app.get('/api/postulaciones-pendientes', verificarAcceso, soloBosquesino, async (req, res) => {
     try {
         const pendientes = await User.find({ 'postulacionCustodio.estado': 'Pendiente' }, '-password');
         res.json(pendientes);
@@ -845,7 +995,7 @@ app.get('/api/postulaciones-pendientes', verificarAcceso, soloFundador, async (r
     }
 });
 
-app.put('/api/resolver-postulacion/:id', verificarAcceso, soloFundador, async (req, res) => {
+app.put('/api/resolver-postulacion/:id', verificarAcceso, soloBosquesino, async (req, res) => {
     try {
         const { decision } = req.body;
         const usuario = await User.findById(req.params.id);
@@ -857,7 +1007,7 @@ app.put('/api/resolver-postulacion/:id', verificarAcceso, soloFundador, async (r
     } catch (error) { res.status(500).json({ error: 'Error al actualizar solicitud' }); }
 });
 
-app.get('/api/usuarios', verificarAcceso, soloFundador, async (req, res) => {
+app.get('/api/usuarios', verificarAcceso, soloBosquesino, async (req, res) => {
     try {
         const usuarios = await User.find({}, '-password').sort({ rol: 1, email: 1 });
         res.json(usuarios);
@@ -866,10 +1016,10 @@ app.get('/api/usuarios', verificarAcceso, soloFundador, async (req, res) => {
     }
 });
 
-app.put('/api/usuarios/:id/rol', verificarAcceso, soloFundador, async (req, res) => {
+app.put('/api/usuarios/:id/rol', verificarAcceso, soloBosquesino, async (req, res) => {
     try {
         const { nuevoRol } = req.body;
-        if (!['Fundador', 'Custodio', 'Admin', 'Vigía'].includes(nuevoRol)) {
+        if (!ROLES_VALIDOS.includes(nuevoRol)) {
             return res.status(400).json({ error: 'Rol no válido.' });
         }
         await User.findByIdAndUpdate(req.params.id, { $set: { rol: nuevoRol } });
@@ -879,12 +1029,15 @@ app.put('/api/usuarios/:id/rol', verificarAcceso, soloFundador, async (req, res)
     }
 });
 
-app.post('/api/registrar-asociado', verificarAcceso, soloFundador, async (req, res) => {
+app.post('/api/registrar-asociado', verificarAcceso, soloBosquesino, async (req, res) => {
     try {
         const id = String(req.body.username || req.body.email || '').trim().toLowerCase();
+        if (!id) return res.status(400).json({ error: 'Ingresa un nombre de usuario o correo.' });
+        const password = String(req.body.password || '');
+        if (password.length < 6) return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' });
         if (await User.findOne({ $or: [{ email: id }, { username: id }] })) return res.status(400).json({ error: 'Ese usuario ya existe' });
-        const passwordEncriptada = await bcrypt.hash(String(req.body.password), 10);
-        const rolAsignado = req.body.rol || 'Custodio';
+        const passwordEncriptada = await bcrypt.hash(password, 10);
+        const rolAsignado = ROLES_VALIDOS.includes(req.body.rol) ? req.body.rol : 'Custodio';
         const datos = { username: id, password: passwordEncriptada, rol: rolAsignado };
         if (id.includes('@')) datos.email = id;
         await new User(datos).save();
