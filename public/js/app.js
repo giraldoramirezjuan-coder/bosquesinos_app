@@ -176,6 +176,12 @@ function filtrarMuro(filtro) {
     dibujarMuroCampesino();
 }
 
+function formatearContenidoMuro(texto) {
+    return escapeHtml(texto)
+        .replace(/\[titulo\]([\s\S]*?)\[\/titulo\]/g, '<strong style="display:block; margin:10px 0 4px 0; color:#1b4332; font-size:15px;">$1</strong>')
+        .replace(/\[cita\]([\s\S]*?)\[\/cita\]/g, '<blockquote style="margin:10px 0; padding:8px 12px; background:#f2f8f4; border-left:3px solid #2d6a4f; font-style:italic; color:#244232;">$1</blockquote>');
+}
+
 function dibujarMuroCampesino() {
     const cont = document.getElementById('contenedor-cronicas');
     if (!cont) return;
@@ -249,21 +255,21 @@ function dibujarMuroCampesino() {
             </div>
 
             ${c.titulo ? `<h4 style="margin:0 0 6px 0; color:#0d4a29; font-size:16px;">${escapeHtml(c.titulo)}</h4>` : ''}
-            ${c.contenido && c.contenido !== 'Publicación con foto' ? `<p style="margin:0; font-size:14.5px; color:#222; white-space:pre-line;">${escapeHtml(c.contenido)}</p>` : ''}
+            ${c.contenido && c.contenido !== 'Publicación con foto' ? `<div style="margin:0; font-size:14.5px; color:#222; white-space:pre-line; line-height:1.55;">${formatearContenidoMuro(c.contenido)}</div>` : ''}
             ${galeriaHtml}
             ${bloqueIniciativa}
 
             <!-- ACCIONES DIRECTAS -->
             <div style="display:flex; gap:8px; margin-top:12px; padding-top:10px; border-top:1px solid #eef4f0; position:relative; flex-wrap:wrap;">
-                <button onclick="document.getElementById('emojis-${idEsc}').classList.toggle('oculto')" style="width:auto; flex:1; background:#f8fbf9; border:1px solid #dce8e0; border-radius:8px; padding:7px; font-size:13px;">Reacciones (${totalReacciones})</button>
-                <button onclick="document.getElementById('caja-com-${idEsc}').classList.toggle('oculto')" style="width:auto; flex:1; background:#f8fbf9; border:1px solid #dce8e0; border-radius:8px; padding:7px; font-size:13px;">Comentar (${(c.comentarios || []).length})</button>
-                ${tipo === 'Iniciativa' ? `<button onclick="abrirPatrocinio('${idEsc}')" style="width:auto; flex:1; background:#fff8f0; border:1px solid #c86428; border-radius:8px; padding:7px; font-size:13px; color:#b55016; font-weight:bold;">Patrocinar</button>` : ''}
-                <button onclick="iniciarChatConUsuario('${escapeHtml(c.autor)}', '${escapeHtml(c.contactoDirecto || '')}')" style="width:auto; flex:1; background:#e9f5ed; border:1px solid #74c69d; border-radius:8px; padding:7px; font-size:13px; color:#0d4a29; font-weight:bold;">Contactar</button>
+                <button class="btn-suave" onclick="document.getElementById('emojis-${idEsc}').classList.toggle('oculto')" style="width:auto; flex:1; background:#f8fbf9; border:1px solid #dce8e0; border-radius:8px; padding:7px; font-size:13px;">❤️ 🌱 🙌 ${totalReacciones}</button>
+                <button class="btn-suave" onclick="document.getElementById('caja-com-${idEsc}').classList.toggle('oculto')" style="width:auto; flex:1; background:#f8fbf9; border:1px solid #dce8e0; border-radius:8px; padding:7px; font-size:13px;">💬 Comentar ${(c.comentarios || []).length}</button>
+                ${tipo === 'Iniciativa' ? `<button class="btn-suave" onclick="abrirPatrocinio('${idEsc}')" style="width:auto; flex:1; background:#fff8f0; border:1px solid #c86428; border-radius:8px; padding:7px; font-size:13px; color:#b55016; font-weight:bold;">💚 Patrocinar</button>` : ''}
+                <button class="btn-suave" onclick="iniciarChatConUsuario('${escapeHtml(c.autor)}', '${escapeHtml(c.contactoDirecto || '')}')" style="width:auto; flex:1; background:#e9f5ed; border:1px solid #74c69d; border-radius:8px; padding:7px; font-size:13px; color:#0d4a29; font-weight:bold;">✉️ Contactar</button>
 
-                <div id="emojis-${idEsc}" class="oculto" style="position:absolute; bottom:42px; left:0; background:white; border:1px solid #cce3d4; border-radius:20px; padding:4px 10px; box-shadow:0 4px 12px rgba(0,0,0,0.12); display:flex; gap:10px;">
-                    <span onclick="reaccionarMuro('${idEsc}','orgullo')" style="cursor:pointer; font-size:12px; font-weight:600; color:#1b4332;" title="Orgullo">Orgullo</span>
-                    <span onclick="reaccionarMuro('${idEsc}','semilla')" style="cursor:pointer; font-size:12px; font-weight:600; color:#1b4332;" title="Buena semilla">Semilla</span>
-                    <span onclick="reaccionarMuro('${idEsc}','trueque')" style="cursor:pointer; font-size:12px; font-weight:600; color:#1b4332;" title="Me interesa">Me interesa</span>
+                <div id="emojis-${idEsc}" class="oculto" style="position:absolute; bottom:42px; left:0; background:white; border:1px solid #cce3d4; border-radius:20px; padding:5px 12px; box-shadow:0 4px 12px rgba(0,0,0,0.12); display:flex; gap:12px;">
+                    <span onclick="reaccionarMuro('${idEsc}','orgullo')" style="cursor:pointer; font-size:16px;" title="Orgullo">🙌</span>
+                    <span onclick="reaccionarMuro('${idEsc}','semilla')" style="cursor:pointer; font-size:16px;" title="Buena semilla">🌱</span>
+                    <span onclick="reaccionarMuro('${idEsc}','trueque')" style="cursor:pointer; font-size:16px;" title="Me interesa">🤝</span>
                 </div>
             </div>
 
@@ -419,7 +425,9 @@ async function cargarCatalogo() {
                 } 
             });
 
-            let img = especie.imagenUrl ? `<img src="${especie.imagenUrl}" class="img-arbol">` : `<div class="img-arbol" style="display:flex; justify-content:center; align-items:center; background:#d4e5d7; color:#386641; font-weight:bold; font-size:14px;"> Sin foto</div>`;
+            let img = urlSegura(especie.imagenUrl)
+                ? `<img src="${urlSegura(especie.imagenUrl)}" class="img-arbol">`
+                : `<div class="img-arbol" style="display:flex; flex-direction:column; justify-content:center; align-items:center; background: linear-gradient(145deg, #102a1b 0%, #234d34 60%, #463222 100%); color:#f3efe4; font-weight:700; font-size:14px; letter-spacing:0.6px; text-transform:uppercase;"><span>${escapeHtml(especie.nombreComun)}</span><small style="font-weight:400; font-size:11px; color:#d4c4a8; margin-top:4px; text-transform:none;">Bosque Nativo</small></div>`;
             const btnGest = tieneAccesoCampo() ? `<button class="btn-classic-secondary" style="width: 100%; margin-top: 8px; font-size: 13px;" onclick="abrirGestionInventario('${especie._id}')"> Gestionar Inventario</button>` : '';
 
             lista.innerHTML += `
@@ -1418,8 +1426,12 @@ function filtrarTablaCustodios() {
 
 window.onload = function() { 
     const token = localStorage.getItem('tokenAdmin');
-    const rol = localStorage.getItem('rolUsuario');
-    const email = localStorage.getItem('emailUsuario');
+    let rol = localStorage.getItem('rolUsuario');
+    if (rol === 'Fundador') {
+        rol = 'Bosquesino';
+        localStorage.setItem('rolUsuario', 'Bosquesino');
+    }
+    const email = localStorage.getItem('emailUsuario') || '';
     const vistaGuardada = sessionStorage.getItem('vistaActivaBosquesinos');
 
     if (token) { 
@@ -1432,13 +1444,7 @@ window.onload = function() {
 
         const btnLogin = document.getElementById('btn-nav-login');
         if (btnLogin) btnLogin.classList.add('oculto');
-        document.getElementById('btnModoAdmin').innerText = ' Cerrar Sesión';
-
-        const badge = document.getElementById('badge-usuario-activo');
-        if (badge) {
-            badge.innerText = ' ' + rol + ': ' + email;
-            badge.classList.remove('oculto');
-        }
+        document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión';
 
         // MOSTRAR BOTONES DE CREAR CRÓNICA A CUALQUIERA CON CUENTA
         const btnEditor = document.getElementById('btn-abrir-editor-cronica');
