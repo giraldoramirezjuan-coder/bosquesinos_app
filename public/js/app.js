@@ -234,7 +234,12 @@ document.getElementById('formMuroCampesino')?.addEventListener('submit', async (
         cargarCronicasTerritorio();
     } else {
         const err = await res.json().catch(() => ({}));
-        alert(err.error || 'No se pudo publicar.');
+        if (res.status === 401) {
+            mostrarAvisoBosquesino('Tu sesión expiró. Inicia sesión para publicar sin perder tu texto.', 'info');
+            document.getElementById('modalLoginClasico')?.classList.remove('oculto');
+        } else {
+            alert(err.error || 'No se pudo publicar.');
+        }
     }
 });
 
@@ -417,7 +422,11 @@ async function eliminarPublicacionMuro(id) {
 }
 
 async function reaccionarMuro(id, tipo) {
-    if (!sesionIniciada) return document.getElementById('modalLoginClasico')?.classList.remove('oculto');
+    if (!sesionIniciada) {
+        mostrarAvisoBosquesino('Regístrate o inicia sesión para poder reaccionar.', 'info');
+        document.getElementById('modalLoginClasico')?.classList.remove('oculto');
+        return;
+    }
     try {
         const res = await fetch(`${hostUrl}/api/cronicas/${id}/reaccionar`, {
             method: 'POST',
@@ -425,8 +434,8 @@ async function reaccionarMuro(id, tipo) {
             body: JSON.stringify({ tipo })
         });
         const data = await res.json().catch(() => ({}));
-        if (res.status === 401) {
-            alert('Tu sesión expiró. Inicia sesión nuevamente para reaccionar.');
+        if (res.status === 401 || res.status === 403) {
+            mostrarAvisoBosquesino('Regístrate o inicia sesión para poder reaccionar.', 'info');
             document.getElementById('modalLoginClasico')?.classList.remove('oculto');
             return;
         }
@@ -449,7 +458,11 @@ async function reaccionarMuro(id, tipo) {
 }
 
 async function comentarMuro(id) {
-    if (!sesionIniciada) return document.getElementById('modalLoginClasico')?.classList.remove('oculto');
+    if (!sesionIniciada) {
+        mostrarAvisoBosquesino('Regístrate o inicia sesión para poder comentar.', 'info');
+        document.getElementById('modalLoginClasico')?.classList.remove('oculto');
+        return;
+    }
     const input = document.getElementById(`input-com-${id}`);
     const texto = input ? input.value.trim() : '';
     if (!texto) return alert('Escribe un comentario antes de enviar.');

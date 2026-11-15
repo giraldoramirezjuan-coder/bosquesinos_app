@@ -311,15 +311,25 @@ async function crearPublicacionesIniciales() {
 }
 
 // --- MIDDLEWARES DE ACCESO ---
-function verificarAcceso(req, res, next) {
+async function verificarAcceso(req, res, next) {
     const headerAuth = req.headers['authorization'];
     if (!headerAuth) return res.status(403).json({ error: 'Acceso denegado' });
     try {
         const decodificado = jwt.verify(headerAuth.replace('Bearer ', '').trim(), CLAVE_SECRETA);
         req.usuarioId = decodificado.id;
-        req.usuarioActual = decodificado.username; 
+        req.usuarioActual = decodificado.username || decodificado.email || '';
+        if (!req.usuarioActual && req.usuarioId) {
+            const u = await User.findById(req.usuarioId).select('username email rol').lean();
+            if (u) {
+                req.usuarioActual = u.username || u.email || '';
+                if (!decodificado.rol) decodificado.rol = u.rol;
+            }
+        }
+        if (!req.usuarioActual) {
+            return res.status(401).json({ error: 'Sesión inválida. Inicia sesión nuevamente.' });
+        }
         const rolToken = decodificado.rol === 'Fundador' ? 'Bosquesino' : decodificado.rol;
-        req.rol = (decodificado.username === 'bosquesinos') ? 'Bosquesino' : rolToken;
+        req.rol = (req.usuarioActual === 'bosquesinos') ? 'Bosquesino' : (rolToken || 'Vigía');
         next(); 
     } catch (error) { return res.status(401).json({ error: 'Token inválido o expirado' }); }
 }
@@ -710,7 +720,8 @@ app.post('/api/cronicas', verificarAcceso, async (req, res) => {
         await nuevaPublicacion.save();
         res.status(201).json({ mensaje: 'Publicado con éxito en la Red Comunitaria.' });
     } catch (error) {
-        res.status(400).json({ error: 'Error al publicar en el muro.' });
+        console.error('Error al publicar en el muro:', error);
+        res.status(400).json({ error: 'Error al publicar en el muro: ' + (error.message || 'datos inválidos') });
     }
 });
 
@@ -748,23 +759,36 @@ app.post('/api/cronicas/:id/reaccionar', verificarAcceso, limiteReacciones, asyn
         if (!['orgullo', 'trueque', 'semilla', 'saber'].includes(tipo)) {
             return res.status(400).json({ error: 'Reacción no válida' });
         }
-        const pub = await Cronica.findById(req.params.id);
+        const pub = await Cronica.findById(req.params.id).lean();
         if (!pub) return res.status(404).json({ error: 'Publicación no encontrada' });
 
-        if (!Array.isArray(pub.reaccionesUsuarios)) pub.reaccionesUsuarios = [];
-        let registro = pub.reaccionesUsuarios.find(r => r.usuario === req.usuarioActual);
+        const listaUsuarios = Array.isArray(pub.reaccionesUsuarios) ? pub.reaccionesUsuarios : [];
+        const registro = listaUsuarios.find(r => r.usuario === req.usuarioActual);
         if (registro && registro.cuenta >= 5) {
             return res.status(400).json({ error: 'Ya alcanzaste el límite de 5 reacciones en esta publicación.' });
         }
-        if (!registro) {
-            pub.reaccionesUsuarios.push({ usuario: req.usuarioActual, cuenta: 1 });
+
+        const campoReaccion = `reacciones.${tipo}`;
+        let actualizada;
+        if (registro) {
+            actualizada = await Cronica.findOneAndUpdate(
+                { _id: req.params.id, 'reaccionesUsuarios.usuario': req.usuarioActual },
+                { $inc: { [campoReaccion]: 1, 'reaccionesUsuarios.$.cuenta': 1 } },
+                { new: true }
+            );
         } else {
-            registro.cuenta += 1;
+            actualizada = await Cronica.findByIdAndUpdate(
+                req.params.id,
+                {
+                    $inc: { [campoReaccion]: 1 },
+                    $push: { reaccionesUsuarios: { usuario: req.usuarioActual, cuenta: 1 } }
+                },
+                { new: true }
+            );
         }
-        pub.reacciones[tipo] = (pub.reacciones[tipo] || 0) + 1;
-        await pub.save();
-        res.json({ reacciones: pub.reacciones });
+        res.json({ reacciones: actualizada.reacciones });
     } catch (error) {
+        console.error('Error en reaccionar:', error);
         res.status(400).json({ error: 'Error al registrar reacción' });
     }
 });
