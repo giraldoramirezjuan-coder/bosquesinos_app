@@ -28,6 +28,96 @@ function urlSegura(url) {
     return '';
 }
 
+function mostrarAvisoBosquesino(mensaje, tipo = 'auto') {
+    const texto = String(mensaje ?? '').trim();
+    if (!texto) return;
+
+    let wrap = document.getElementById('bosquesinos-toasts');
+    if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'bosquesinos-toasts';
+        wrap.className = 'bosquesinos-toast-wrap';
+        document.body.appendChild(wrap);
+    }
+
+    const esError = tipo === 'error' || (tipo === 'auto' && /(error|no se pudo|incorrecto|inválid|expiró|denegado|falta|no encontrado|solo el|solo quien)/i.test(texto));
+    const toast = document.createElement('div');
+    toast.className = 'bosquesinos-toast' + (esError ? ' es-error' : '');
+
+    const span = document.createElement('span');
+    span.textContent = (esError ? '⚠️ ' : '🌿 ') + texto;
+
+    const btnCerrar = document.createElement('button');
+    btnCerrar.type = 'button';
+    btnCerrar.className = 'bosquesinos-toast-close';
+    btnCerrar.textContent = '×';
+    btnCerrar.onclick = () => toast.remove();
+
+    toast.appendChild(span);
+    toast.appendChild(btnCerrar);
+    wrap.appendChild(toast);
+
+    setTimeout(() => {
+        if (toast.parentNode) toast.remove();
+    }, 4500);
+}
+
+window.alert = function(mensaje) {
+    mostrarAvisoBosquesino(mensaje, 'auto');
+};
+
+function confirmarBosquesino(mensaje) {
+    return new Promise((resolve) => {
+        const previo = document.getElementById('bosquesinos-confirm-modal');
+        if (previo) previo.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'bosquesinos-confirm-modal';
+        modal.className = 'modal';
+
+        const card = document.createElement('div');
+        card.className = 'bosquesinos-confirm-card';
+
+        const titulo = document.createElement('h3');
+        titulo.textContent = '🌿 Confirmar acción';
+        titulo.style.cssText = 'margin:0 0 10px 0; color:#1b4332; font-size:18px; font-family:Georgia, serif;';
+
+        const p = document.createElement('p');
+        p.textContent = String(mensaje ?? '');
+        p.style.cssText = 'margin:0 0 20px 0; color:#354f52; font-size:14px; line-height:1.5;';
+
+        const acciones = document.createElement('div');
+        acciones.style.cssText = 'display:flex; gap:10px; justify-content:flex-end;';
+
+        const btnCancelar = document.createElement('button');
+        btnCancelar.type = 'button';
+        btnCancelar.textContent = 'Cancelar';
+        btnCancelar.style.cssText = 'width:auto; margin:0; padding:9px 18px; border-radius:10px; border:1px solid #c7dcd0; background:#f4f9f5; color:#1b4332; font-weight:600; cursor:pointer;';
+
+        const btnOk = document.createElement('button');
+        btnOk.type = 'button';
+        btnOk.textContent = 'Confirmar';
+        btnOk.style.cssText = 'width:auto; margin:0; padding:9px 18px; border-radius:10px; border:none; background:#1b4332; color:#fff; font-weight:600; cursor:pointer;';
+
+        const cerrar = (valor) => {
+            modal.remove();
+            resolve(valor);
+        };
+
+        btnCancelar.onclick = () => cerrar(false);
+        btnOk.onclick = () => cerrar(true);
+        modal.onclick = (e) => { if (e.target === modal) cerrar(false); };
+
+        acciones.appendChild(btnCancelar);
+        acciones.appendChild(btnOk);
+        card.appendChild(titulo);
+        card.appendChild(p);
+        card.appendChild(acciones);
+        modal.appendChild(card);
+        document.body.appendChild(modal);
+    });
+}
+
 function obtenerCabecerasSeguras() {
     return {
         'Content-Type': 'application/json',
@@ -313,7 +403,7 @@ async function patrocinarIniciativa(id) {
 }
 
 async function eliminarPublicacionMuro(id) {
-    if (!confirm('¿Eliminar esta publicación?')) return;
+    if (!(await confirmarBosquesino('¿Eliminar esta publicación?'))) return;
     const res = await fetch(`${hostUrl}/api/cronicas/${id}`, {
         method: 'DELETE',
         headers: obtenerCabecerasSeguras()
@@ -569,7 +659,7 @@ function abrirGestionInventario(especieId) {
 }
 
 async function eliminarRegistroDefinitivo(idRegistro) {
-    if (!confirm('¿Seguro que deseas eliminar este registro por completo?')) return;
+    if (!(await confirmarBosquesino('¿Seguro que deseas eliminar este registro por completo?'))) return;
     try {
         const res = await fetch(`${hostUrl}/api/lotes/${idRegistro}`, { method: 'DELETE', headers: obtenerCabecerasSeguras() });
         if (res.ok) { await cargarCatalogo(); abrirGestionInventario(especieInventarioActiva); } else { alert('No se pudo eliminar.'); }
@@ -849,7 +939,7 @@ async function cargarPostulacionesPendientes() {
 }
 
 async function resolverPostulacion(userId, decision) {
-    if (!confirm(`¿Seguro que deseas marcar esta postulación como ${decision}?`)) return;
+    if (!(await confirmarBosquesino(`¿Seguro que deseas marcar esta postulación como ${decision}?`))) return;
     try {
         const res = await fetch(`${hostUrl}/api/resolver-postulacion/${userId}`, { method: 'PUT', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ decision }) });
         const data = await res.json();
@@ -1003,7 +1093,7 @@ document.getElementById('formEditarArbol')?.addEventListener('submit', async (e)
 });
 
 async function registrarFenologia(id, estado) {
-    if (!confirm(`Reportar: ${estado}?`)) return;
+    if (!(await confirmarBosquesino(`¿Reportar estado fenológico: ${estado}?`))) return;
     await fetch(`${hostUrl}/api/arboles-matriz/${id}/monitoreo`, { method: 'POST', headers: obtenerCabecerasSeguras(), body: JSON.stringify({ estadoFenologico: estado, observaciones: 'Campo' }) });
     abrirModalMonitoreo();
 }
@@ -1347,7 +1437,7 @@ async function agregarMantenimientoPadrino(id) {
 }
 
 async function eliminarCertificadoPadrino(id) {
-    if (!confirm('¿Seguro que deseas eliminar este certificado?')) return;
+    if (!(await confirmarBosquesino('¿Seguro que deseas eliminar este certificado?'))) return;
     const res = await fetch(`${hostUrl}/api/apadrinamientos/${id}`, {
         method: 'DELETE',
         headers: obtenerCabecerasSeguras()
@@ -1356,22 +1446,48 @@ async function eliminarCertificadoPadrino(id) {
 }
 
 async function cargarVistaCustodios() {
-    if (!sesionIniciada) return;
+    const tbody = document.getElementById('tbody-arboles-custodios');
+    if (!sesionIniciada) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="padding: 25px; text-align: center; color: #666;">Inicia sesión para consultar la fuente semillera.</td></tr>';
+        return;
+    }
     try {
         const res = await fetch(`${hostUrl}/api/arboles-matriz`, { headers: obtenerCabecerasSeguras() });
-        if (res.ok) {
-            window.arbolesMatrizGlobal = await res.json();
-            
-            // Llenar selector de Custodios/Estudiantes únicos
-            const selEst = document.getElementById('filtro-cust-estudiante');
-            if (selEst) {
-                const custodiosUnicos = [...new Set(window.arbolesMatrizGlobal.map(a => a.custodio).filter(Boolean))].sort();
-                selEst.innerHTML = '<option value=""> Todos los Custodios / Estudiantes (' + custodiosUnicos.length + ')</option>';
-                custodiosUnicos.forEach(c => selEst.innerHTML += `<option value="${c}">${c}</option>`);
-            }
-            filtrarTablaCustodios();
+        if (res.status === 401) {
+            localStorage.removeItem('tokenAdmin');
+            localStorage.removeItem('rolUsuario');
+            localStorage.removeItem('emailUsuario');
+            sesionIniciada = false;
+            esGestor = false;
+            document.getElementById('btn-nav-login')?.classList.remove('oculto');
+            document.getElementById('btn-nav-admin')?.classList.add('oculto');
+            document.getElementById('btn-nav-custodios')?.classList.add('oculto');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="padding: 25px; text-align: center; color: #b55016; font-weight: bold;">Tu sesión expiró (el servidor se reinició o venció el acceso). Inicia sesión nuevamente para ver los árboles.</td></tr>';
+            document.getElementById('modalLoginClasico')?.classList.remove('oculto');
+            return;
         }
-    } catch (e) { console.log(e); }
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="padding: 25px; text-align: center; color: #cf222e;">Error al consultar fuente semillera: ${escapeHtml(err.error || res.status)}</td></tr>`;
+            return;
+        }
+        window.arbolesMatrizGlobal = await res.json();
+
+        // Llenar selector de Custodios/Estudiantes únicos
+        const selEst = document.getElementById('filtro-cust-estudiante');
+        if (selEst) {
+            const custodiosUnicos = [...new Set(window.arbolesMatrizGlobal.map(a => a.custodio).filter(Boolean))].sort();
+            selEst.innerHTML = '<option value="">Todos los Custodios / Estudiantes (' + custodiosUnicos.length + ')</option>';
+            custodiosUnicos.forEach(c => {
+                const cEsc = escapeHtml(c);
+                selEst.innerHTML += `<option value="${cEsc}">${cEsc}</option>`;
+            });
+        }
+        filtrarTablaCustodios();
+    } catch (e) {
+        console.error(e);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="padding: 25px; text-align: center; color: #cf222e;">No se pudo conectar con el servidor para cargar los árboles.</td></tr>';
+    }
 }
 
 function filtrarTablaCustodios() {
@@ -1506,6 +1622,9 @@ function cambiarVista(idVistaDestino) {
         vistaDestino.classList.remove('oculto'); 
         void vistaDestino.offsetWidth; 
         vistaDestino.classList.add('vista-activa'); 
+    }
+    if (idVistaDestino === 'vista-custodios') {
+        cargarVistaCustodios();
     }
     const nav = document.getElementById('menu-principal');
     if (idVistaDestino === 'vista-inicio') { 

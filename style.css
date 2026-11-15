@@ -318,6 +318,73 @@ button.btn-principal:hover { background: #1b4332; }
 }
 .cerrar-modal:hover { color: #e07a5f !important; }
 
+/* --- AVISOS Y CONFIRMACIONES BOSQUESINOS (REEMPLAZA ALERT/CONFIRM DEL NAVEGADOR) --- */
+@keyframes avisoEntrada {
+    0% { opacity: 0; transform: translateY(14px) scale(0.96); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.bosquesinos-toast-wrap {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 380px;
+    width: calc(100vw - 32px);
+    pointer-events: none;
+}
+
+.bosquesinos-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #102a1b 0%, #1c442c 100%);
+    color: #f4efe6;
+    border: 1px solid #9c6635;
+    border-left: 5px solid #6ab084;
+    box-shadow: 0 12px 28px rgba(8, 22, 13, 0.35);
+    font-size: 13.5px;
+    line-height: 1.45;
+    animation: avisoEntrada 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.bosquesinos-toast.es-error {
+    background: linear-gradient(135deg, #3b1715 0%, #5c231f 100%);
+    border-color: #c86428;
+    border-left: 5px solid #e07a5f;
+}
+
+.bosquesinos-toast-close {
+    background: transparent !important;
+    border: none !important;
+    color: #d4c4a8 !important;
+    font-size: 18px !important;
+    line-height: 1 !important;
+    padding: 0 4px !important;
+    margin: 0 !important;
+    width: auto !important;
+    cursor: pointer;
+}
+
+.bosquesinos-confirm-card {
+    background: #fcfaf4 !important;
+    border: 2px solid #9c6635 !important;
+    border-top: 6px solid #1b4332 !important;
+    border-radius: 16px !important;
+    padding: 26px !important;
+    max-width: 420px !important;
+    width: 90% !important;
+    box-shadow: 0 18px 45px rgba(8, 22, 13, 0.45) !important;
+    animation: avisoEntrada 0.22s ease-out forwards;
+}
+
 /* --- CARRITO DE COTIZACIONES --- */
 .carrito-flotante {
     position: fixed; bottom: 30px; right: 30px;
