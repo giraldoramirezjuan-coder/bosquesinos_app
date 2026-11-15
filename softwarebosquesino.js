@@ -101,7 +101,11 @@ const userSchema = new mongoose.Schema({
         tipoBosque: { type: String, default: '' }
     },
     resetPasswordToken: { type: String },
-    resetPasswordExpire: { type: Date }
+    resetPasswordExpire: { type: Date },
+    emailVerificado: { type: Boolean, default: false },
+    emailPendiente: { type: String },
+    emailVerifToken: { type: String },
+    emailVerifExpire: { type: Date }
 });
 const User = mongoose.model('User', userSchema);
 // FASE 0: Fincas Integrales Campesinas
@@ -894,6 +898,28 @@ app.post('/api/registro-publico', limiteRegistro, async (req, res) => {
     }
 });
 
+async function enviarCorreoBosquesino(to, subject, text) {
+    const scriptUrl = (process.env.GOOGLE_SCRIPT_URL || '').trim();
+    if (!scriptUrl) {
+        throw new Error('Falta configurar GOOGLE_SCRIPT_URL en el servidor.');
+    }
+    const rta = await fetch(scriptUrl, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+            secreto: process.env.GOOGLE_SCRIPT_SECRET || "bosquesinos_correo_2026",
+            to,
+            subject,
+            text
+        })
+    });
+    const textoRespuesta = await rta.text();
+    if (textoRespuesta.includes('<!DOCTYPE html>') || textoRespuesta.includes('<html')) {
+        throw new Error('El script de correo requiere permisos públicos.');
+    }
+}
+
 app.post('/api/olvide-password', limiteRecuperacion, async (req, res) => {
     try {
         const emailLimpio = String(req.body.email || '').trim().toLowerCase();
@@ -908,31 +934,10 @@ app.post('/api/olvide-password', limiteRecuperacion, async (req, res) => {
         usuario.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
         await usuario.save();
 
-        const scriptUrl = (process.env.GOOGLE_SCRIPT_URL || '').trim();
-        if (!scriptUrl) {
-            return res.status(500).json({ error: 'Falta configurar GOOGLE_SCRIPT_URL en Render.' });
-        }
+        const textoCorreo = `Hola,\n\nHas solicitado recuperar el acceso a Bosquesinos.\n\nTu nombre de usuario es: ${usuario.username}\nTu código de 6 números es: ${resetToken}\n\nVence en 15 minutos.`;
+        await enviarCorreoBosquesino(usuario.email, 'Código de Recuperación - Bosquesinos', textoCorreo);
 
-        const textoCorreo = `Hola,\n\nHas solicitado recuperar tu clave en Bosquesinos.\n\nTu código de 6 números es: ${resetToken}\n\nVence en 15 minutos.`;
-
-        const rta = await fetch(scriptUrl, {
-            method: 'POST',
-            redirect: 'follow',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-                secreto: process.env.GOOGLE_SCRIPT_SECRET || "bosquesinos_correo_2026",
-                to: usuario.email,
-                subject: 'Código de Recuperación - Bosquesinos',
-                text: textoCorreo
-            })
-        });
-
-        const textoRespuesta = await rta.text();
-        if (textoRespuesta.includes('<!DOCTYPE html>') || textoRespuesta.includes('<html')) {
-            return res.status(500).json({ error: 'El script de correo requiere permisos públicos.' });
-        }
-
-        res.json({ mensaje: 'Código de 6 números enviado a tu correo.' });
+        res.json({ mensaje: 'Código de 6 números y recordatorio de usuario enviados a tu correo.' });
     } catch (error) { 
         res.status(500).json({ error: 'Fallo al enviar: ' + error.message }); 
     }
@@ -971,7 +976,7 @@ app.get('/api/mi-perfil', verificarAcceso, async (req, res) => {
     } catch (error) { res.status(500).json({ error: 'Error al obtener perfil' }); }
 });
 
-app.put('/api/mi-perfil/email', verificarAcceso, async (req, res) => {
+app.put('/api/mi-perfil/email', verificarAcceso, limiteRecuperacion, async (req, res) => {
     try {
         const email = String(req.body.email || '').trim().toLowerCase();
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -984,11 +989,52 @@ app.put('/api/mi-perfil/email', verificarAcceso, async (req, res) => {
         if (duplicado) {
             return res.status(400).json({ error: 'Ese correo ya está registrado en otra cuenta.' });
         }
-        usuario.email = email;
+
+        const codigoVerif = Math.floor(100000 + Math.random() * 900000).toString();
+        usuario.emailPendiente = email;
+        usuario.emailVerifToken = crypto.createHash('sha256').update(codigoVerif).digest('hex');
+        usuario.emailVerifExpire = Date.now() + 15 * 60 * 1000;
         await usuario.save();
-        res.json({ mensaje: 'Correo electrónico guardado con éxito.', email });
+
+        const textoCorreo = `Hola ${usuario.username},\n\nHas solicitado vincular este correo a tu cuenta en Bosquesinos.\n\nTu código de verificación de 6 números es: ${codigoVerif}\n\nVence en 15 minutos.`;
+        await enviarCorreoBosquesino(email, 'Verifica tu correo - Bosquesinos', textoCorreo);
+
+        res.json({ mensaje: 'Te enviamos un código de 6 números a tu correo para confirmarlo.', pendiente: true });
     } catch (error) {
-        res.status(500).json({ error: 'Error al guardar el correo.' });
+        res.status(500).json({ error: 'No se pudo enviar el código: ' + error.message });
+    }
+});
+
+app.post('/api/mi-perfil/email-confirmar', verificarAcceso, limiteRecuperacion, async (req, res) => {
+    try {
+        const codigo = String(req.body.codigo || '').trim();
+        if (!codigo) return res.status(400).json({ error: 'Ingresa el código de 6 números.' });
+
+        const hash = crypto.createHash('sha256').update(codigo).digest('hex');
+        const usuario = await User.findOne({
+            $or: [{ _id: req.usuarioId }, { username: req.usuarioActual }],
+            emailVerifToken: hash,
+            emailVerifExpire: { $gt: Date.now() }
+        });
+        if (!usuario || !usuario.emailPendiente) {
+            return res.status(400).json({ error: 'El código es inválido o ya venció.' });
+        }
+
+        const duplicado = await User.findOne({ email: usuario.emailPendiente, _id: { $ne: usuario._id } });
+        if (duplicado) {
+            return res.status(400).json({ error: 'Ese correo ya fue vinculado a otra cuenta.' });
+        }
+
+        usuario.email = usuario.emailPendiente;
+        usuario.emailVerificado = true;
+        usuario.emailPendiente = undefined;
+        usuario.emailVerifToken = undefined;
+        usuario.emailVerifExpire = undefined;
+        await usuario.save();
+
+        res.json({ mensaje: 'Correo verificado y vinculado a tu cuenta.', email: usuario.email });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al confirmar el correo.' });
     }
 });
 

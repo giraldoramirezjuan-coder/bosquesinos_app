@@ -1658,10 +1658,13 @@ async function abrirModalMiCuenta() {
     if (!sesionIniciada) return document.getElementById('modalLoginClasico')?.classList.remove('oculto');
     const modal = document.getElementById('modalMiCuenta');
     const resumen = document.getElementById('cuenta-resumen-usuario');
+    const estadoEmail = document.getElementById('cuenta-estado-email');
     const inputEmail = document.getElementById('cuenta-email');
+    const formVerif = document.getElementById('formCuentaVerificarEmail');
     const usuario = localStorage.getItem('emailUsuario') || '';
     const rol = localStorage.getItem('rolUsuario') || 'Vigía';
     if (resumen) resumen.textContent = `Usuario: ${usuario} • Rol: ${rol}`;
+    if (formVerif) formVerif.classList.add('oculto');
     if (modal) modal.classList.remove('oculto');
 
     try {
@@ -1670,6 +1673,15 @@ async function abrirModalMiCuenta() {
             const perfil = await res.json();
             if (perfil && inputEmail) inputEmail.value = perfil.email || '';
             if (perfil && resumen) resumen.textContent = `Usuario: ${perfil.username} • Rol: ${perfil.rol}`;
+            if (perfil && estadoEmail) {
+                if (perfil.email && perfil.emailVerificado) {
+                    estadoEmail.textContent = `Correo verificado: ${perfil.email}`;
+                } else if (perfil.email) {
+                    estadoEmail.textContent = `Correo registrado (sin verificar): ${perfil.email}`;
+                } else {
+                    estadoEmail.textContent = 'Aún no tienes un correo verificado en esta cuenta.';
+                }
+            }
         }
     } catch (e) { console.error(e); }
 }
@@ -1685,8 +1697,33 @@ document.getElementById('formCuentaEmail')?.addEventListener('submit', async (e)
         });
         const data = await res.json();
         alert(data.mensaje || data.error);
+        if (res.ok) {
+            document.getElementById('formCuentaVerificarEmail')?.classList.remove('oculto');
+        }
     } catch (err) {
-        alert('Error de conexión al guardar el correo.');
+        alert('Error de conexión al enviar el código de verificación.');
+    }
+});
+
+document.getElementById('formCuentaVerificarEmail')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const codigo = document.getElementById('cuenta-codigo-email')?.value.trim();
+    try {
+        const res = await fetch(`${hostUrl}/api/mi-perfil/email-confirmar`, {
+            method: 'POST',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify({ codigo })
+        });
+        const data = await res.json();
+        alert(data.mensaje || data.error);
+        if (res.ok) {
+            document.getElementById('formCuentaVerificarEmail')?.classList.add('oculto');
+            document.getElementById('formCuentaVerificarEmail')?.reset();
+            const estadoEmail = document.getElementById('cuenta-estado-email');
+            if (estadoEmail && data.email) estadoEmail.textContent = `Correo verificado: ${data.email}`;
+        }
+    } catch (err) {
+        alert('Error de conexión al confirmar el correo.');
     }
 });
 

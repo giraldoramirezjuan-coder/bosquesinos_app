@@ -1034,11 +1034,20 @@
         <h3 style="color: #1b4332; margin: 0 0 6px 0; font-family: Georgia, serif;">👤 Mi Cuenta Bosquesina</h3>
         <p id="cuenta-resumen-usuario" style="font-size: 13px; color: #52796f; margin: 0 0 18px 0;"></p>
 
-        <form id="formCuentaEmail" autocomplete="off" style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed #d8eadd;">
-            <label style="font-size: 13px; font-weight: 600; color: #1b4332; display: block; margin-bottom: 6px;">Correo electrónico (para recuperar contraseña)</label>
+        <form id="formCuentaEmail" autocomplete="off" style="margin-bottom: 12px;">
+            <label style="font-size: 13px; font-weight: 600; color: #1b4332; display: block; margin-bottom: 4px;">Correo electrónico (para recuperar usuario o contraseña)</label>
+            <p id="cuenta-estado-email" style="font-size: 12px; color: #52796f; margin: 0 0 8px 0;"></p>
             <input type="email" id="cuenta-email" placeholder="tu-correo@ejemplo.com" required>
-            <button type="submit" class="btn-principal" style="margin-bottom: 0;">Guardar correo</button>
+            <button type="submit" class="btn-principal" style="margin-bottom: 0;">Enviar código de verificación</button>
         </form>
+
+        <form id="formCuentaVerificarEmail" class="oculto" autocomplete="off" style="margin-bottom: 20px; padding: 12px; background: #f2f8f4; border: 1px solid #95d5b2; border-radius: 10px;">
+            <label style="font-size: 12.5px; font-weight: 600; color: #1b4332; display: block; margin-bottom: 6px;">Ingresa el código de 6 dígitos enviado a tu correo</label>
+            <input type="text" id="cuenta-codigo-email" placeholder="Ej: 123456" maxlength="6" required>
+            <button type="submit" class="btn-principal" style="background: #2d6a4f; margin-bottom: 0;">Confirmar correo</button>
+        </form>
+
+        <div style="border-bottom: 1px dashed #d8eadd; margin-bottom: 16px;"></div>
 
         <form id="formCuentaPassword" autocomplete="off" style="margin-bottom: 18px;">
             <label style="font-size: 13px; font-weight: 600; color: #1b4332; display: block; margin-bottom: 6px;">Cambiar contraseña</label>
