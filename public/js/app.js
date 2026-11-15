@@ -417,24 +417,70 @@ async function eliminarPublicacionMuro(id) {
 }
 
 async function reaccionarMuro(id, tipo) {
-    const res = await fetch(`${hostUrl}/api/cronicas/${id}/reaccionar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tipo })
-    });
-    if (res.ok) cargarCronicasTerritorio();
+    if (!sesionIniciada) return document.getElementById('modalLoginClasico')?.classList.remove('oculto');
+    try {
+        const res = await fetch(`${hostUrl}/api/cronicas/${id}/reaccionar`, {
+            method: 'POST',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify({ tipo })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+            alert('Tu sesión expiró. Inicia sesión nuevamente para reaccionar.');
+            document.getElementById('modalLoginClasico')?.classList.remove('oculto');
+            return;
+        }
+        if (!res.ok) {
+            alert(data.error || 'No se pudo registrar la reacción.');
+            return;
+        }
+        const pub = (window.publicacionesMuroGlobal || []).find(p => p._id === id);
+        if (pub && data.reacciones) {
+            pub.reacciones = data.reacciones;
+            const abierta = !document.getElementById(`caja-com-${id}`)?.classList.contains('oculto');
+            dibujarMuroCampesino();
+            if (abierta) document.getElementById(`caja-com-${id}`)?.classList.remove('oculto');
+        } else {
+            cargarCronicasTerritorio();
+        }
+    } catch (e) {
+        alert('Error de conexión al reaccionar.');
+    }
 }
 
 async function comentarMuro(id) {
-    if (!sesionIniciada) return document.getElementById('modalLoginClasico').classList.remove('oculto');
+    if (!sesionIniciada) return document.getElementById('modalLoginClasico')?.classList.remove('oculto');
     const input = document.getElementById(`input-com-${id}`);
-    if (!input || !input.value.trim()) return;
-    const res = await fetch(`${hostUrl}/api/cronicas/${id}/comentarios`, {
-        method: 'POST',
-        headers: obtenerCabecerasSeguras(),
-        body: JSON.stringify({ texto: input.value.trim() })
-    });
-    if (res.ok) cargarCronicasTerritorio();
+    const texto = input ? input.value.trim() : '';
+    if (!texto) return alert('Escribe un comentario antes de enviar.');
+    try {
+        const res = await fetch(`${hostUrl}/api/cronicas/${id}/comentarios`, {
+            method: 'POST',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify({ texto })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+            alert('Tu sesión expiró. Inicia sesión nuevamente para comentar.');
+            document.getElementById('modalLoginClasico')?.classList.remove('oculto');
+            return;
+        }
+        if (!res.ok) {
+            alert(data.error || 'No se pudo publicar el comentario.');
+            return;
+        }
+        const pub = (window.publicacionesMuroGlobal || []).find(p => p._id === id);
+        if (pub && Array.isArray(data.comentarios)) {
+            pub.comentarios = data.comentarios;
+            dibujarMuroCampesino();
+            document.getElementById(`caja-com-${id}`)?.classList.remove('oculto');
+        } else {
+            await cargarCronicasTerritorio();
+            document.getElementById(`caja-com-${id}`)?.classList.remove('oculto');
+        }
+    } catch (e) {
+        alert('Error de conexión al enviar el comentario.');
+    }
 }
 
 document.getElementById('formLote')?.addEventListener('submit', async (e) => {

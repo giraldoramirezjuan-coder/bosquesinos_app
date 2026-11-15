@@ -222,6 +222,10 @@ const cronicaSchema = new mongoose.Schema({
         semilla: { type: Number, default: 0 },
         saber: { type: Number, default: 0 }
     },
+    reaccionesUsuarios: [{
+        usuario: { type: String, required: true },
+        cuenta: { type: Number, default: 0 }
+    }],
     comentarios: [{
         autor: { type: String, required: true },
         rolAutor: { type: String, default: 'Campesino' },
@@ -738,20 +742,28 @@ app.post('/api/cronicas/:id/patrocinar', verificarAcceso, async (req, res) => {
     }
 });
 
-app.post('/api/cronicas/:id/reaccionar', limiteReacciones, async (req, res) => {
+app.post('/api/cronicas/:id/reaccionar', verificarAcceso, limiteReacciones, async (req, res) => {
     try {
         const { tipo } = req.body;
         if (!['orgullo', 'trueque', 'semilla', 'saber'].includes(tipo)) {
             return res.status(400).json({ error: 'Reacción no válida' });
         }
-        const campo = `reacciones.${tipo}`;
-        const pub = await Cronica.findByIdAndUpdate(
-            req.params.id,
-            { $inc: { [campo]: 1 } },
-            { new: true }
-        );
+        const pub = await Cronica.findById(req.params.id);
         if (!pub) return res.status(404).json({ error: 'Publicación no encontrada' });
-        res.json(pub.reacciones);
+
+        if (!Array.isArray(pub.reaccionesUsuarios)) pub.reaccionesUsuarios = [];
+        let registro = pub.reaccionesUsuarios.find(r => r.usuario === req.usuarioActual);
+        if (registro && registro.cuenta >= 5) {
+            return res.status(400).json({ error: 'Ya alcanzaste el límite de 5 reacciones en esta publicación.' });
+        }
+        if (!registro) {
+            pub.reaccionesUsuarios.push({ usuario: req.usuarioActual, cuenta: 1 });
+        } else {
+            registro.cuenta += 1;
+        }
+        pub.reacciones[tipo] = (pub.reacciones[tipo] || 0) + 1;
+        await pub.save();
+        res.json({ reacciones: pub.reacciones });
     } catch (error) {
         res.status(400).json({ error: 'Error al registrar reacción' });
     }
@@ -760,16 +772,18 @@ app.post('/api/cronicas/:id/reaccionar', limiteReacciones, async (req, res) => {
 // TODAS LAS CUENTAS PUEDEN COMENTAR USOS, RECETAS Y SABERES ANCESTRALES
 app.post('/api/cronicas/:id/comentarios', verificarAcceso, async (req, res) => {
     try {
+        const texto = String(req.body.texto || '').trim();
+        if (!texto) return res.status(400).json({ error: 'Escribe un comentario antes de enviar.' });
         const pub = await Cronica.findById(req.params.id);
         if (!pub) return res.status(404).json({ error: 'Publicación no encontrada' });
         pub.comentarios.push({
             autor: req.usuarioActual,
             rolAutor: req.rol,
             tipoAporte: String(req.body.tipoAporte || 'Comentario / Conversa').trim(),
-            texto: String(req.body.texto).trim()
+            texto
         });
         await pub.save();
-        res.status(201).json({ mensaje: 'Saber y comentario agregado' });
+        res.status(201).json({ mensaje: 'Comentario publicado.', comentarios: pub.comentarios });
     } catch (error) {
         res.status(400).json({ error: 'Error al comentar' });
     }
