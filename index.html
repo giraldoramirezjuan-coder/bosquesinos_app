@@ -158,6 +158,9 @@
         <button id="btn-nav-login" class="btn-nav-bosque btn-nav-login" onclick="document.getElementById('modalLoginClasico').classList.remove('oculto')">
             👤 Iniciar Sesión
         </button>
+        <button id="btn-nav-cuenta" class="btn-nav-bosque oculto" onclick="abrirModalMiCuenta()">
+            👤 Mi Cuenta
+        </button>
         <button id="btn-nav-admin" class="btn-nav-bosque btn-nav-admin oculto" onclick="cambiarVista('panelAdmin')" title="Panel de Control Vivero">⚙️ Panel</button>
     </div>
 </nav>
@@ -548,7 +551,7 @@
        <div id="subpanel-vivero">
             
             <!-- BLOQUE EXCLUSIVO MOTOR DE CAMPO -->
-            <div id="bloque-motor-cerrado">
+            <div id="bloque-motor-cerrado" class="oculto">
                 <p style="font-size: 13px; color: #52796f; text-align: center; margin-top: 0; margin-bottom: 18px;">
                     Registra primero el predio, vincula allí los árboles semilleros y lleva el control de semillas en el vivero.
                 </p>
@@ -1023,6 +1026,31 @@
         </span>
     </div>
 </footer>
+
+<!-- === MODAL MI CUENTA (CORREO Y CONTRASEÑA PARA CUALQUIER ROL) === -->
+<div id="modalMiCuenta" class="modal oculto">
+    <div class="modal-contenido" style="max-width: 440px;">
+        <span class="cerrar-modal" onclick="document.getElementById('modalMiCuenta').classList.add('oculto')">&times;</span>
+        <h3 style="color: #1b4332; margin: 0 0 6px 0; font-family: Georgia, serif;">👤 Mi Cuenta Bosquesina</h3>
+        <p id="cuenta-resumen-usuario" style="font-size: 13px; color: #52796f; margin: 0 0 18px 0;"></p>
+
+        <form id="formCuentaEmail" autocomplete="off" style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed #d8eadd;">
+            <label style="font-size: 13px; font-weight: 600; color: #1b4332; display: block; margin-bottom: 6px;">Correo electrónico (para recuperar contraseña)</label>
+            <input type="email" id="cuenta-email" placeholder="tu-correo@ejemplo.com" required>
+            <button type="submit" class="btn-principal" style="margin-bottom: 0;">Guardar correo</button>
+        </form>
+
+        <form id="formCuentaPassword" autocomplete="off" style="margin-bottom: 18px;">
+            <label style="font-size: 13px; font-weight: 600; color: #1b4332; display: block; margin-bottom: 6px;">Cambiar contraseña</label>
+            <input type="password" id="cuenta-pass-actual" placeholder="Contraseña actual" required>
+            <input type="password" id="cuenta-pass-nueva" placeholder="Nueva contraseña (mínimo 6 caracteres)" minlength="6" required>
+            <input type="password" id="cuenta-pass-confirmar" placeholder="Repetir nueva contraseña" minlength="6" required>
+            <button type="submit" class="btn-principal" style="background: #8c5a2b; margin-bottom: 0;">Actualizar contraseña</button>
+        </form>
+
+        <button type="button" onclick="toggleAdmin()" style="background: #fff0f0; color: #cf222e; border: 1px solid #cf222e; font-weight: bold; margin-bottom: 0;">Cerrar Sesión</button>
+    </div>
+</div>
 
 <!-- === JAVASCRIPT === -->
 <script src="/js/app.js"></script>

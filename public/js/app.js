@@ -949,12 +949,17 @@ async function resolverPostulacion(userId, decision) {
 }
 
 function cambiarTabAdmin(tab) {
+    const rol = localStorage.getItem('rolUsuario') || '';
     const subVivero = document.getElementById('subpanel-vivero');
     const subGob = document.getElementById('subpanel-gobernanza');
     const btnVivero = document.getElementById('btn-tab-vivero');
     const btnGob = document.getElementById('btn-tab-gobernanza');
 
     if (tab === 'gobernanza') {
+        if (rol !== 'Bosquesino') {
+            alert('Acceso restringido al rol Bosquesino.');
+            return;
+        }
         subVivero.classList.add('oculto');
         subGob.classList.remove('oculto');
         btnGob.style.background = '#8a5a00';
@@ -1460,6 +1465,7 @@ async function cargarVistaCustodios() {
             sesionIniciada = false;
             esGestor = false;
             document.getElementById('btn-nav-login')?.classList.remove('oculto');
+            document.getElementById('btn-nav-cuenta')?.classList.add('oculto');
             document.getElementById('btn-nav-admin')?.classList.add('oculto');
             document.getElementById('btn-nav-custodios')?.classList.add('oculto');
             if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="padding: 25px; text-align: center; color: #b55016; font-weight: bold;">Tu sesión expiró (el servidor se reinició o venció el acceso). Inicia sesión nuevamente para ver los árboles.</td></tr>';
@@ -1560,6 +1566,7 @@ window.onload = function() {
 
         const btnLogin = document.getElementById('btn-nav-login');
         if (btnLogin) btnLogin.classList.add('oculto');
+        document.getElementById('btn-nav-cuenta')?.classList.remove('oculto');
         document.getElementById('btnModoAdmin').innerText = 'Cerrar Sesión';
 
         // MOSTRAR BOTONES DE CREAR CRÓNICA A CUALQUIERA CON CUENTA
@@ -1568,26 +1575,34 @@ window.onload = function() {
         if (btnEditor) btnEditor.classList.remove('oculto');
         if (cajaInvitacion) cajaInvitacion.classList.remove('oculto');
 
-        // AQUÍ VA EL CONTROL DE PERMISOS CORRECTO
+        // CONTROL ESTRICTO DE PERMISOS POR ROL
+        const esMotorCampo = (rol === 'Bosquesino' || rol === 'Custodio');
+        const esBosquesino = (rol === 'Bosquesino' || email === 'bosquesinos');
+
         if (esGestor) {
-            document.getElementById('btn-nav-admin').classList.remove('oculto');
-
-            if (rol === 'Admin' && email !== 'bosquesinos') {
-                document.getElementById('bloque-motor-cerrado')?.classList.add('oculto');
-            } else {
-                cargarFincas();
-            }
-
-            if (rol === 'Bosquesino' || email === 'bosquesinos') {
-                const btnGob = document.getElementById('btn-tab-gobernanza');
-                if (btnGob) btnGob.classList.remove('oculto');
-                cargarPostulacionesPendientes();
-                cargarTablaUsuarios();
-            }
+            document.getElementById('btn-nav-admin')?.classList.remove('oculto');
+            document.getElementById('panel-gestor-apadrinamiento')?.classList.remove('oculto');
         } else {
-            document.getElementById('btn-nav-admin').classList.add('oculto');
+            document.getElementById('btn-nav-admin')?.classList.add('oculto');
+            document.getElementById('panel-gestor-apadrinamiento')?.classList.add('oculto');
             document.getElementById('btn-nav-postular')?.classList.remove('oculto');
             document.getElementById('bannerPostulacionAlianza')?.classList.remove('oculto');
+        }
+
+        if (esMotorCampo) {
+            document.getElementById('bloque-motor-cerrado')?.classList.remove('oculto');
+            cargarFincas();
+        } else {
+            document.getElementById('bloque-motor-cerrado')?.classList.add('oculto');
+        }
+
+        if (esBosquesino) {
+            document.getElementById('btn-tab-gobernanza')?.classList.remove('oculto');
+            cargarPostulacionesPendientes();
+            cargarTablaUsuarios();
+        } else {
+            document.getElementById('btn-tab-gobernanza')?.classList.add('oculto');
+            document.getElementById('subpanel-gobernanza')?.classList.add('oculto');
         }
 
         cargarCatalogo();
@@ -1638,3 +1653,61 @@ function cambiarVista(idVistaDestino) {
 function enviarInteresWhatsApp() {
     window.open('https://wa.me/573226575786?text=Hola Bosquesinos, estoy interesado en colaborar con la asociación. Me gustaría hablar sobre...', '_blank');
 }
+
+async function abrirModalMiCuenta() {
+    if (!sesionIniciada) return document.getElementById('modalLoginClasico')?.classList.remove('oculto');
+    const modal = document.getElementById('modalMiCuenta');
+    const resumen = document.getElementById('cuenta-resumen-usuario');
+    const inputEmail = document.getElementById('cuenta-email');
+    const usuario = localStorage.getItem('emailUsuario') || '';
+    const rol = localStorage.getItem('rolUsuario') || 'Vigía';
+    if (resumen) resumen.textContent = `Usuario: ${usuario} • Rol: ${rol}`;
+    if (modal) modal.classList.remove('oculto');
+
+    try {
+        const res = await fetch(`${hostUrl}/api/mi-perfil`, { headers: obtenerCabecerasSeguras() });
+        if (res.ok) {
+            const perfil = await res.json();
+            if (perfil && inputEmail) inputEmail.value = perfil.email || '';
+            if (perfil && resumen) resumen.textContent = `Usuario: ${perfil.username} • Rol: ${perfil.rol}`;
+        }
+    } catch (e) { console.error(e); }
+}
+
+document.getElementById('formCuentaEmail')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('cuenta-email')?.value.trim();
+    try {
+        const res = await fetch(`${hostUrl}/api/mi-perfil/email`, {
+            method: 'PUT',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        alert(data.mensaje || data.error);
+    } catch (err) {
+        alert('Error de conexión al guardar el correo.');
+    }
+});
+
+document.getElementById('formCuentaPassword')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const passwordActual = document.getElementById('cuenta-pass-actual')?.value || '';
+    const nuevaPassword = document.getElementById('cuenta-pass-nueva')?.value || '';
+    const confirmar = document.getElementById('cuenta-pass-confirmar')?.value || '';
+    if (nuevaPassword !== confirmar) {
+        return alert('Las contraseñas nuevas no coinciden.');
+    }
+    try {
+        const res = await fetch(`${hostUrl}/api/mi-perfil/password`, {
+            method: 'PUT',
+            headers: obtenerCabecerasSeguras(),
+            body: JSON.stringify({ passwordActual, nuevaPassword })
+        });
+        const data = await res.json();
+        alert(data.mensaje || data.error);
+        if (res.ok) document.getElementById('formCuentaPassword').reset();
+    } catch (err) {
+        alert('Error de conexión al actualizar la contraseña.');
+    }
+});

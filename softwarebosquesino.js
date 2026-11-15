@@ -308,6 +308,7 @@ function verificarAcceso(req, res, next) {
     if (!headerAuth) return res.status(403).json({ error: 'Acceso denegado' });
     try {
         const decodificado = jwt.verify(headerAuth.replace('Bearer ', '').trim(), CLAVE_SECRETA);
+        req.usuarioId = decodificado.id;
         req.usuarioActual = decodificado.username; 
         const rolToken = decodificado.rol === 'Fundador' ? 'Bosquesino' : decodificado.rol;
         req.rol = (decodificado.username === 'bosquesinos') ? 'Bosquesino' : rolToken;
@@ -968,6 +969,49 @@ app.get('/api/mi-perfil', verificarAcceso, async (req, res) => {
         const usuario = await User.findOne({ $or: [{ email: req.usuarioActual }, { username: req.usuarioActual }] }, '-password');
         res.json(usuario);
     } catch (error) { res.status(500).json({ error: 'Error al obtener perfil' }); }
+});
+
+app.put('/api/mi-perfil/email', verificarAcceso, async (req, res) => {
+    try {
+        const email = String(req.body.email || '').trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({ error: 'Ingresa un correo electrónico válido.' });
+        }
+        const usuario = await User.findOne({ $or: [{ _id: req.usuarioId }, { username: req.usuarioActual }] });
+        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado.' });
+
+        const duplicado = await User.findOne({ email, _id: { $ne: usuario._id } });
+        if (duplicado) {
+            return res.status(400).json({ error: 'Ese correo ya está registrado en otra cuenta.' });
+        }
+        usuario.email = email;
+        await usuario.save();
+        res.json({ mensaje: 'Correo electrónico guardado con éxito.', email });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al guardar el correo.' });
+    }
+});
+
+app.put('/api/mi-perfil/password', verificarAcceso, async (req, res) => {
+    try {
+        const passwordActual = String(req.body.passwordActual || '');
+        const nuevaPassword = String(req.body.nuevaPassword || '');
+        if (nuevaPassword.length < 6) {
+            return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 6 caracteres.' });
+        }
+        const usuario = await User.findOne({ $or: [{ _id: req.usuarioId }, { username: req.usuarioActual }] });
+        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado.' });
+
+        const coincide = await bcrypt.compare(passwordActual, usuario.password);
+        if (!coincide) {
+            return res.status(401).json({ error: 'La contraseña actual es incorrecta.' });
+        }
+        usuario.password = await bcrypt.hash(nuevaPassword, 10);
+        await usuario.save();
+        res.json({ mensaje: 'Contraseña actualizada con éxito.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la contraseña.' });
+    }
 });
 
 app.post('/api/postular-custodio', verificarAcceso, async (req, res) => {
